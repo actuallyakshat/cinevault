@@ -10,21 +10,25 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
-const navLinks = [{ href: "/dashboard", label: "Dashboard" }];
+import ThemeToggler from "./ThemeToggler";
+const navLinks = [
+  { href: "/search", label: "Search" },
+  { href: "/dashboard", label: "Dashboard" },
+];
 
 export default function Navbar() {
-  const { signOut } = useAuth();
+  const { signOut, isSignedIn } = useAuth();
   const pathname = usePathname();
   const { openSignIn } = useClerk();
   return (
     <nav
-      className={`${pathname == "/" ? "" : ""} fixed flex h-16 w-full items-center justify-center`}
+      className={`${pathname == "/" ? "" : "bg-background"} fixed flex h-16 w-full items-center justify-center`}
     >
-      <div className="container flex items-center justify-between">
+      <div className="container flex h-full items-center justify-between">
         <h1 className="text-xl font-extrabold">
-          <Link href={"/"}>CineVault</Link>
+          <Link href={isSignedIn ? "/dashboard" : "/"}>CineVault</Link>
         </h1>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <SignedIn>
             {navLinks.map(({ href, label }) => (
               <NavLink key={href} href={href} title={label} />
@@ -39,6 +43,7 @@ export default function Navbar() {
             </Button>
           </SignedOut>
         </div>
+        <ThemeToggler />
       </div>
     </nav>
   );
