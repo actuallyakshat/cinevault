@@ -2,8 +2,8 @@
 import React, { useEffect } from "react";
 import ExploreMediaCard from "./ExploreMediaCard";
 import { getLatestMedia } from "../_actions/actions";
-import { Pagination } from "@/components/ui/pagination";
 import PaginationComponent from "./Pagination";
+import LoadingSpinner from "@/app/_components/LoadingSpinner";
 export default function LatestMedia({ mediaType }: { mediaType: string }) {
   const [latestMedia, setLatestMedia] = React.useState<any[]>([]);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -22,6 +22,13 @@ export default function LatestMedia({ mediaType }: { mediaType: string }) {
     handleGetTopRatedMedia();
   }, [mediaType, pageNumber]);
 
+  if (loading)
+    return (
+      <div className="mt-16">
+        <LoadingSpinner />
+      </div>
+    );
+
   return (
     <div className="flex flex-col items-center">
       <div className="mx-auto mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -32,13 +39,6 @@ export default function LatestMedia({ mediaType }: { mediaType: string }) {
               key={media.id}
               media={media}
             />
-          ))}
-        {loading &&
-          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-            <div
-              key={i}
-              className="h-[300px] w-[240px] animate-pulse rounded-lg bg-gray-200 text-gray-900"
-            ></div>
           ))}
       </div>
       <div className="mt-8 flex justify-center">
