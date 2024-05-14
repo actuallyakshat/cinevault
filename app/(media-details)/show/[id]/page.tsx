@@ -31,8 +31,18 @@ export default function Show({ params }: { params: { id: string } }) {
     fetchData();
   }, [id]);
 
-  console.log(id);
   if (loading) return <LoadingScreen />;
+  if (!loading && !details)
+    return (
+      <div>
+        <h1 className="pt-16 text-center text-3xl font-bold text-foreground/80">
+          Show Not Found
+        </h1>
+        <p className="text-center font-medium text-foreground/50">
+          The show you are looking for does not exist.
+        </p>
+      </div>
+    );
   return (
     <div className="-mt-16 min-h-screen pb-8 text-white">
       <div
@@ -41,7 +51,7 @@ export default function Show({ params }: { params: { id: string } }) {
           backgroundImage: movieBackdrop ? `url(${movieBackdrop})` : "none",
         }}
       />
-      <div className="fixed inset-0 z-[-1] scale-110 bg-black/40 backdrop-blur-lg"></div>
+      <div className="fixed inset-0 z-[-1] scale-110 bg-gradient-to-t from-black/100 via-black/40 to-black/10 backdrop-blur-lg"></div>
       <div className="container grid w-full grid-cols-1 pt-28 lg:grid-cols-4 lg:gap-6">
         <div className="col-span-1 mb-8 flex w-full items-center justify-center">
           <Image
@@ -49,7 +59,7 @@ export default function Show({ params }: { params: { id: string } }) {
             alt={details?.name}
             width={500}
             height={500}
-            className="mx-auto aspect-auto min-h-[400px] w-[300px] rounded-lg object-cover"
+            className="mx-auto aspect-auto min-h-[400px] w-[300px] rounded-lg object-cover shadow-2xl shadow-black/70"
           />
         </div>
 

@@ -4,12 +4,13 @@ import { getMediaDetails } from "../../_actions/actions";
 import Image from "next/image";
 import {
   formatMovieDate,
+  formatShowDate,
   getGenreById,
   getRuntimeFromMinutes,
 } from "@/lib/functions";
 import LoadingScreen from "@/app/_components/LoadingScreen";
 import MediaCrudButtons from "../../_components/MediaCrudButtons";
-export default function Movie({ params }: { params: { id: string } }) {
+export default function Show({ params }: { params: { id: string } }) {
   const imagePrefix = "http://image.tmdb.org/t/p/w500";
   const [loading, setLoading] = React.useState(true);
   const [details, setDetails] = React.useState<any>(null);
@@ -32,31 +33,45 @@ export default function Movie({ params }: { params: { id: string } }) {
 
   console.log(id);
   if (loading) return <LoadingScreen />;
+  if (!loading && !details)
+    return (
+      <div>
+        <h1 className="pt-16 text-center text-3xl font-bold text-foreground/80">
+          Movie Not Found
+        </h1>
+        <p className="text-center font-medium text-foreground/50">
+          The movie you are looking for does not exist.
+        </p>
+      </div>
+    );
   return (
-    <div className="-mt-16 min-h-screen text-white">
+    <div className="-mt-16 min-h-screen pb-8 text-white">
       <div
         className="fixed inset-0 z-[-2] scale-110 overflow-y-auto bg-cover bg-center bg-no-repeat blur-lg"
         style={{
           backgroundImage: movieBackdrop ? `url(${movieBackdrop})` : "none",
         }}
       />
-      <div className="fixed inset-0 z-[-1] scale-110 bg-black/40 backdrop-blur-lg"></div>
-      <div className="container grid grid-cols-4 items-start gap-6 pt-28">
-        <Image
-          src={imagePrefix + details?.poster_path}
-          alt={details?.title}
-          width={500}
-          height={500}
-          className="col-span-1 aspect-auto rounded-lg object-cover"
-        />
+      <div className="fixed inset-0 z-[-1] scale-110 bg-gradient-to-t from-black/100 via-black/40 to-black/10 backdrop-blur-lg"></div>
+      <div className="container grid w-full grid-cols-1 pt-28 lg:grid-cols-4 lg:gap-6">
+        <div className="col-span-1 mb-8 flex w-full items-center justify-center">
+          <Image
+            src={imagePrefix + details?.poster_path}
+            alt={details?.title}
+            width={500}
+            height={500}
+            className="mx-auto aspect-auto min-h-[400px] w-[300px] rounded-lg object-cover shadow-2xl shadow-black/70"
+          />
+        </div>
+
         <div className="col-span-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
             <div className="max-w-3xl text-5xl font-black">
               {details?.title}
             </div>
-            <div className="font-medium text-white/80">
+            <p className="font-medium text-white/80">
               {formatMovieDate(details?.release_date)}
-            </div>
+            </p>
           </div>
           <div className="my-2 font-semibold text-white/80">
             {details?.tagline}
@@ -83,7 +98,7 @@ export default function Movie({ params }: { params: { id: string } }) {
             )}
           </div>
           <p className="max-w-2xl text-lg">{details?.overview}</p>
-          <div className="mt-8">
+          <div className="mt-8 w-full">
             <MediaCrudButtons title={details?.title} />
           </div>
         </div>

@@ -14,6 +14,7 @@ import ThemeToggler from "./ThemeToggler";
 const navLinks = [
   { href: "/search", label: "Search" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/explore", label: "Explore" },
 ];
 
 export default function Navbar() {
@@ -24,8 +25,8 @@ export default function Navbar() {
     <nav
       className={`${pathname == "/" ? "" : "bg-background"} fixed z-[1000] flex h-16 w-full items-center justify-center`}
     >
-      <div className="container flex h-full items-center justify-between">
-        <h1 className="text-xl font-extrabold">
+      <div className="flex h-full items-center justify-between lg:container">
+        <h1 className="hidden text-xl font-extrabold lg:block">
           <Link href={isSignedIn ? "/dashboard" : "/"}>CineVault</Link>
         </h1>
         <div className="flex items-center space-x-2">
