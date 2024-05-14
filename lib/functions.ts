@@ -110,16 +110,19 @@ const genreList = [
     name: "Western",
   },
 ];
-// const getGenreById = (genreId: number) => {
-//   return genre.find((g) => g.id === genreId).name;
-// };
-// const getIdByGenre = (genreName: string): string | undefined => {
-//   return genre.find((g) => g.name === genreName).id;
-// };
 
 export const getGenreById = (genreId: number) => {
   const genre = genreList.find((g) => g.id === genreId);
   if (genre) {
     return genre.name;
   }
+};
+
+export const getRuntimeFromMinutes = (minutes: number) => {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const minutesLeft = minutes % 60;
+  return `${hours} hr ${minutesLeft} min`;
 };

@@ -50,7 +50,11 @@ export default function Search() {
         (searchResults?.length > 0 ? (
           <div className="container mt-10">
             {searchResults.map((result: any) => (
-              <SearchResultCard key={result.id} result={result} />
+              <SearchResultCard
+                key={result.id}
+                result={result}
+                mediaType={mediaType}
+              />
             ))}
           </div>
         ) : (

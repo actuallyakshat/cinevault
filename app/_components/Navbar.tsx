@@ -22,7 +22,7 @@ export default function Navbar() {
   const { openSignIn } = useClerk();
   return (
     <nav
-      className={`${pathname == "/" ? "" : "bg-background"} fixed flex h-16 w-full items-center justify-center`}
+      className={`${pathname == "/" ? "" : "bg-background"} fixed z-[1000] flex h-16 w-full items-center justify-center`}
     >
       <div className="container flex h-full items-center justify-between">
         <h1 className="text-xl font-extrabold">

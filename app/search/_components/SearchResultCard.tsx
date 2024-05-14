@@ -1,16 +1,26 @@
 import { formatMovieDate, formatShowDate, getGenreById } from "@/lib/functions";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
-export default function SearchResultCard({ result }: { result: any }) {
+export default function SearchResultCard({
+  result,
+  mediaType,
+}: {
+  result: any;
+  mediaType: string;
+}) {
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
+  const router = useRouter();
 
   return (
     <>
       {result.poster_path && (
         <div
           onClick={() => {
-            console.log(result);
+            router.push(
+              `/${mediaType == "Movies" ? "movie" : "show"}/${result.id}`,
+            );
           }}
           className="mx-auto my-3 grid w-full max-w-[960px] cursor-pointer grid-cols-4 gap-5"
           key={result.id}
