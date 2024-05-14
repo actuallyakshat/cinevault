@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import ThemeToggler from "./ThemeToggler";
+import MobileSidebar from "./MobileSidebar";
 const navLinks = [
   { href: "/search", label: "Search" },
   { href: "/dashboard", label: "Dashboard" },
@@ -23,19 +24,24 @@ export default function Navbar() {
   const { openSignIn } = useClerk();
   return (
     <nav
-      className={`${pathname == "/" ? "" : "bg-background"} fixed z-[1000] flex h-16 w-full items-center justify-center`}
+      className={`${pathname == "/" ? "" : "bg-background"} fixed z-[30] flex h-16 w-full items-center justify-center`}
     >
-      <div className="flex h-full items-center justify-between lg:container">
+      <div className="flex h-full w-full items-center justify-between px-8 lg:container lg:px-0">
         <h1 className="hidden text-xl font-extrabold lg:block">
           <Link href={isSignedIn ? "/dashboard" : "/"}>CineVault</Link>
         </h1>
-        <div className="flex items-center space-x-2">
+        <MobileSidebar menuItems={navLinks} />
+        <div className="hidden items-center space-x-2 lg:flex">
           <SignedIn>
             {navLinks.map(({ href, label }) => (
               <NavLink key={href} href={href} title={label} />
             ))}
+          </SignedIn>
+        </div>
+        <div className="flex items-center justify-end gap-3">
+          <SignedIn>
             <Button variant="ghost" onClick={() => signOut()}>
-              Sign out{" "}
+              Sign out
             </Button>
           </SignedIn>
           <SignedOut>
@@ -43,20 +49,29 @@ export default function Navbar() {
               Sign in
             </Button>
           </SignedOut>
+          <ThemeToggler />
         </div>
-        <ThemeToggler />
       </div>
     </nav>
   );
 }
 
-function NavLink({ href, title }: { href: string; title: string }) {
+export function NavLink({
+  href,
+  title,
+  onClose,
+}: {
+  href: string;
+  title: string;
+  onClose?: Function;
+}) {
   const pathname = usePathname();
   return (
     <Link href={href}>
       <Button
-        variant="ghost"
-        className={pathname == href ? "bg-primary/10 hover:bg-primary/10" : ""}
+        onClick={onClose && (() => onClose())}
+        variant="navigation"
+        className={`${pathname == href ? "bg-primary/10 hover:bg-primary/10" : ""} w-full lg:w-fit `}
       >
         {title}
       </Button>

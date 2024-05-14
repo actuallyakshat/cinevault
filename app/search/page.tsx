@@ -31,7 +31,7 @@ export default function Search() {
   }, [searchQuery, mediaType]);
 
   return (
-    <div className="mt-8 w-full">
+    <div className="mt-8 w-full px-6 pb-8">
       <div className="mx-auto flex w-full max-w-xl items-center justify-center gap-1">
         <SearchMedia setSearchQuery={setSearchQuery} />
         <SelectMediaTypeButton setMediaType={setMediaType} />
@@ -48,7 +48,7 @@ export default function Search() {
       {searchQuery &&
         !loading &&
         (searchResults?.length > 0 ? (
-          <div className="container mt-10">
+          <div className="mt-10 space-y-8 lg:space-y-0">
             {searchResults.map((result: any) => (
               <SearchResultCard
                 key={result.id}

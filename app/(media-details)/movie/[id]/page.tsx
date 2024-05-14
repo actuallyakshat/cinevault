@@ -45,7 +45,7 @@ export default function Show({ params }: { params: { id: string } }) {
       </div>
     );
   return (
-    <div className="-mt-16 min-h-screen pb-8 text-white">
+    <div className="-mt-16 min-h-screen pb-16 text-white">
       <div
         className="fixed inset-0 z-[-2] scale-110 overflow-y-auto bg-cover bg-center bg-no-repeat blur-lg"
         style={{

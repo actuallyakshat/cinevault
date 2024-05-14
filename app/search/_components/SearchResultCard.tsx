@@ -12,7 +12,7 @@ export default function SearchResultCard({
 }) {
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
   const router = useRouter();
-
+  if (!result.poster_path || !result.overview) return null;
   return (
     <>
       {result.poster_path && (
@@ -30,10 +30,10 @@ export default function SearchResultCard({
             alt={result.title}
             width={500}
             height={500}
-            className="col-span-1 w-full max-w-[300px] rounded-lg object-cover"
+            className="col-span-1 hidden w-full max-w-[300px] rounded-lg object-cover lg:block"
           />
-          <div className="col-span-3">
-            <div className="flex items-center justify-between">
+          <div className="col-span-4 lg:col-span-3">
+            <div className="flex items-center justify-between gap-4">
               <div className="text-3xl font-bold">
                 {result.title || result.name}
               </div>
