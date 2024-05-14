@@ -9,9 +9,11 @@ import PopularMedia from "./_components/PopularMedia";
 export default function Explore() {
   const [mediaType, setMediaType] = React.useState("Movies");
   const [exploreCategory, setExploreCategory] = React.useState("latest");
+  const [loading, setLoading] = React.useState(true);
   return (
     <div>
       <div className="container py-12">
+        <h1 className="mb-4 text-3xl font-extrabold">Explore {mediaType}</h1>
         <div className="flex items-center gap-3">
           <SelectMediaTypeButton setMediaType={setMediaType} />
           <SelectExploreCategory setExploreCategory={setExploreCategory} />

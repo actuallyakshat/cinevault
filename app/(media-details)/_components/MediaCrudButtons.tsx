@@ -16,7 +16,7 @@ export default function MediaCrudButtons({ title }: { title: string }) {
         </Button>
       </div>
       <Button className={`${buttonStyle} overflow-hidden`}>
-        Already Watched <span className="truncate">{title}?</span>
+        Already Watched<span className="truncate">{title}?</span>
       </Button>
     </div>
   );
