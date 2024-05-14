@@ -22,7 +22,7 @@ export default function SearchResultCard({
               `/${mediaType == "Movies" ? "movie" : "show"}/${result.id}`,
             );
           }}
-          className="mx-auto my-3 grid w-full max-w-[960px] cursor-pointer grid-cols-4 gap-5"
+          className="mx-auto grid w-full max-w-[960px] cursor-pointer grid-cols-4 gap-5"
           key={result.id}
         >
           <Image

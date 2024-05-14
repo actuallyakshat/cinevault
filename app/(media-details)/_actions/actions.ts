@@ -25,3 +25,26 @@ export async function getMediaDetails({
     return null;
   }
 }
+
+export async function getTrailer({
+  mediaId,
+  mediaType,
+}: {
+  mediaId: string;
+  mediaType: string;
+}) {
+  try {
+    const res = await axios.get(
+      `https://api.themoviedb.org/3/${mediaType}/${mediaId}/videos?language=en-US`,
+      {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}

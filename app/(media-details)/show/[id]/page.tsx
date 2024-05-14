@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { getMediaDetails } from "../../_actions/actions";
+import { getMediaDetails, getTrailer } from "../../_actions/actions";
 import Image from "next/image";
 import {
   formatMovieDate,
@@ -10,20 +10,31 @@ import {
 } from "@/lib/functions";
 import LoadingScreen from "@/app/_components/LoadingScreen";
 import MediaCrudButtons from "../../_components/MediaCrudButtons";
+import { Button } from "@/components/ui/button";
+import { MonitorPlay } from "lucide-react";
+import TrailerFrame from "../../_components/TrailerFrame";
 export default function Show({ params }: { params: { id: string } }) {
   const imagePrefix = "http://image.tmdb.org/t/p/w500";
   const [loading, setLoading] = React.useState(true);
   const [details, setDetails] = React.useState<any>(null);
+  const [trailer, setTrailer] = React.useState<any>(null);
+  const [trailerFrame, setTrailerFrame] = React.useState<any>(null);
   const { id } = params;
   const movieBackdrop = `${imagePrefix}${details?.backdrop_path}`;
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const response = await getMediaDetails({
-        mediaType: "tv",
-        mediaId: id,
-      });
+      const [response, trailerResponse] = await Promise.all([
+        getMediaDetails({ mediaType: "tv", mediaId: id }),
+        getTrailer({ mediaId: id, mediaType: "tv" }),
+      ]);
       setDetails(response);
+      const filteredTrailer = trailerResponse.results.find(
+        (result: any) => result.type === "Trailer",
+      );
+      if (filteredTrailer) {
+        setTrailer(filteredTrailer.key);
+      }
       setLoading(false);
     }
     fetchData();
@@ -51,7 +62,7 @@ export default function Show({ params }: { params: { id: string } }) {
       />
       <div className="fixed inset-0 z-[-1] scale-110 bg-gradient-to-t from-black/100 via-black/40 to-black/10 backdrop-blur-lg"></div>
       <div className="container grid w-full grid-cols-1 pt-28 lg:grid-cols-4 lg:gap-6">
-        <div className="col-span-1 mb-8 flex w-full items-center justify-center">
+        <div className="col-span-1 mb-8 flex w-full flex-col items-center justify-center">
           <Image
             src={imagePrefix + details?.poster_path}
             alt={details?.name}
@@ -59,6 +70,27 @@ export default function Show({ params }: { params: { id: string } }) {
             height={500}
             className="mx-auto aspect-auto min-h-[400px] w-[300px] rounded-lg object-cover shadow-2xl shadow-black/70"
           />
+          {trailer && (
+            <Button
+              className="mt-4 flex w-full items-center justify-center gap-3 bg-yellow-500 text-black hover:bg-yellow-600"
+              onClick={() => {
+                setTrailerFrame(true);
+              }}
+            >
+              {/* <Link
+                href={youtubePrefix + trailer}
+                target="_blank"
+                className="flex w-full items-center justify-center gap-3"
+              ></Link> */}
+              Watch Trailer <MonitorPlay className="size-5" />
+            </Button>
+          )}
+          {trailerFrame && (
+            <TrailerFrame
+              video_key={trailer}
+              onClose={() => setTrailerFrame(false)}
+            />
+          )}
         </div>
 
         <div className="col-span-3">

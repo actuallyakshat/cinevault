@@ -47,7 +47,7 @@ export default function Search() {
       {searchQuery &&
         !loading &&
         (searchResults?.length > 0 ? (
-          <div className="mt-10 space-y-8 lg:space-y-0">
+          <div className="mt-10 space-y-8 lg:space-y-3">
             {searchResults.map((result: any) => (
               <SearchResultCard
                 key={result.id}
