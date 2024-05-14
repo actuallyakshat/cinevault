@@ -1,17 +1,16 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
 import React from "react";
 import { useTheme } from "next-themes";
 import { useUser } from "@clerk/nextjs";
-const githubLink = "https://github.com/actuallyakshat/cinevault";
 
 export default function Hero() {
   const { user } = useUser();
+  console.log(user);
   const { theme } = useTheme();
   return (
-    <section
+    <div
       className={`herobg ${theme == "dark" ? "dark" : ""} -mt-16 flex h-screen flex-col items-center justify-center gap-4`}
     >
       <h1 className="text-5xl font-black">Your Digital Cinematic Memory</h1>
@@ -30,6 +29,6 @@ export default function Hero() {
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }

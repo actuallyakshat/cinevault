@@ -11,12 +11,13 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 
 export function NavigationLoader({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
+  const [color, setColor] = React.useState<string>("");
+  React.useEffect(() => {
+    setColor(theme === "dark" ? "#fff" : "#000");
+  }, [theme]);
   return (
     <>
-      <NextTopLoader
-        showSpinner={false}
-        color={theme === "dark" ? "#fff" : "#000"}
-      />
+      <NextTopLoader showSpinner={false} color={color} />
       {children}
     </>
   );
