@@ -23,8 +23,7 @@ export default function RootLayout({
         <body className={inter.className} suppressHydrationWarning={true}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="light"
             disableTransitionOnChange
           >
             <NavigationLoader>

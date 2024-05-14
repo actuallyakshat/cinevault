@@ -11,12 +11,14 @@ import {
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { NavLink } from "./Navbar";
+import { useUser } from "@clerk/nextjs";
 
 export default function MobileSidebar({
   menuItems,
 }: {
   menuItems: { href: string; label: string }[];
 }) {
+  const { user } = useUser();
   const [open, setOpen] = React.useState(false);
   return (
     <div className="block lg:hidden">
@@ -26,7 +28,14 @@ export default function MobileSidebar({
         </SheetTrigger>
         <SheetContent side={"left"}>
           <SheetHeader>
-            <SheetTitle className="text-3xl font-black">CineVault</SheetTitle>
+            <SheetTitle className="text-3xl font-black">
+              <Link
+                onClick={() => setOpen(false)}
+                href={user ? "/dashboard" : "/"}
+              >
+                CineVault
+              </Link>
+            </SheetTitle>
             <SheetDescription asChild>
               <div className="flex flex-col pt-8">
                 {menuItems.map(({ href, label }) => (
