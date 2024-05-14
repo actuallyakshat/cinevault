@@ -1,12 +1,8 @@
 "use client";
 import React from "react";
 import SelectMediaTypeButton from "./_components/SelectMediaTypeButton";
-import SearchMedia from "./_components/SearchMedia";
-import { useTheme } from "next-themes";
 
 export default function Dashboard() {
-  const { theme } = useTheme();
-  console.log(theme);
   const [mediaType, setMediaType] = React.useState<string>("Movies");
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">

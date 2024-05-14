@@ -21,7 +21,6 @@ export default function Search() {
         mediaType == "Movies" ? "movie" : "tv",
       );
       setSearchResults(results);
-      console.log(results);
       setLoading(false);
     }, 1000);
     debouncedSearch();

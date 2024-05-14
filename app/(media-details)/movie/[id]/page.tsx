@@ -24,14 +24,11 @@ export default function Show({ params }: { params: { id: string } }) {
         mediaId: id,
       });
       setDetails(response);
-      console.log(response);
-      console.log(imagePrefix + response?.poster_path);
       setLoading(false);
     }
     fetchData();
   }, [id]);
 
-  console.log(id);
   if (loading) return <LoadingScreen />;
   if (!loading && !details)
     return (
