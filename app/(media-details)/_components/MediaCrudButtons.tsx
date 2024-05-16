@@ -5,6 +5,7 @@ import ReviewMediaModal from "./ReviewMediaModal";
 import { addToFavorites, addToWatchlist } from "../_actions/actions";
 import { getGenreById } from "@/lib/functions";
 import { AuthContext } from "@/providers/auth-provider";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function MediaCrudButtons({
   title,
@@ -23,6 +24,7 @@ export default function MediaCrudButtons({
     React.useState<boolean>(false);
   const [watchlistLoading, setWatchlistLoading] =
     React.useState<boolean>(false);
+  const { toast } = useToast();
 
   React.useEffect(() => {
     if (userDetails) {
@@ -49,6 +51,17 @@ export default function MediaCrudButtons({
         genres: allGenres as string[],
       };
       const response = await addToWatchlist(payload, userId);
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: `${title} has been added to your watchlist`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: `${response.message}`,
+        });
+      }
       console.log(response);
     } catch (error) {
       console.log(error);
@@ -74,6 +87,17 @@ export default function MediaCrudButtons({
         genres: allGenres as string[],
       };
       const response = await addToFavorites(payload, userId);
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: `${title} has been added to your favorites`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: `${response.message}`,
+        });
+      }
       console.log(response);
     } catch (error) {
       console.log(error);
