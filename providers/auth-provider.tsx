@@ -1,3 +1,4 @@
+"use client";
 import { getUserDetails } from "@/app/dashboard/_actions/actions";
 import { useUser } from "@clerk/nextjs";
 import React, { createContext, useState, useEffect } from "react";
