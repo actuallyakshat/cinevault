@@ -27,9 +27,12 @@ export default function WatchedMedia({
     console.log(mediaList);
   }, [data]);
   return (
-    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
+    <div>
       {data.map((media) => (
-        <div key={media.id}>
+        <div
+          key={media.id}
+          className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2"
+        >
           <Link
             href={"/" + comparisionSlug + "/" + media.media.tmdbId}
             className="col-span-1 flex gap-6 rounded-lg bg-secondary/70 p-4 shadow-lg transition-all duration-300 hover:scale-[1.01]"
@@ -49,7 +52,7 @@ export default function WatchedMedia({
                 </h4>
               </div>
               <div className="my-1">
-                {media.media.genres.map((genre) => (
+                {media.media.genres.map((genre: string) => (
                   <span
                     key={genre}
                     className="mr-1 rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground"
