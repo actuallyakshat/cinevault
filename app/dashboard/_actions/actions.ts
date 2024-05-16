@@ -1,5 +1,6 @@
 "use server";
 import prisma from "@/db";
+import { ClerkMiddlewareAuthObject } from "@clerk/nextjs/server";
 import axios from "axios";
 
 const TOKEN = process.env.TMDB_API_TOKEN as string;
@@ -30,35 +31,32 @@ async function searchMedia(query: string, mediaType: string): Promise<void> {
   }
 }
 
-const createUser = async () => {
+const getUserDetails = async ({
+  name,
+  email,
+}: {
+  name: string;
+  email: string;
+}) => {
   try {
-    const user = await prisma.user.create({
-      data: {
-        name: "Akshat Doe",
-        email: "akshatdoe@example.com",
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
       },
     });
-    console.log("User created!!!");
-    console.log(user);
+    if (!user) {
+      const newUser = await prisma.user.create({
+        data: {
+          email,
+          name,
+        },
+      });
+      return newUser;
+    }
+    return user;
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Error fetching data:", error);
   }
 };
 
-const getAllUsers = async () => {
-  try {
-    const users = await prisma.user.findMany({
-      include: {
-        watched: true,
-        favorites: true,
-        watchlist: true,
-      },
-    });
-    console.log("Users:", users);
-    return users;
-  } catch (error) {
-    console.error("Error getting users:", error);
-  }
-};
-
-export { searchMedia, createUser, getAllUsers };
+export { searchMedia, getUserDetails };

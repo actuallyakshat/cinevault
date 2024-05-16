@@ -1,16 +1,16 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import SelectMediaTypeButton from "./_components/SelectMediaTypeButton";
-import { createUser, getAllUsers } from "./_actions/actions";
-import { Button } from "@/components/ui/button";
+import { AuthContext } from "@/providers/auth-provider";
+import LoadingScreen from "../_components/LoadingScreen";
 
 export default function Dashboard() {
   const [mediaType, setMediaType] = React.useState<string>("Movies");
-  useEffect(() => {
-    getAllUsers().then((users) => {
-      console.log("Users:", users);
-    });
-  }, []);
+  const { userDetails, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">

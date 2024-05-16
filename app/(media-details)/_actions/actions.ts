@@ -88,11 +88,10 @@ export const writeReview = async (
   userId: string,
 ) => {
   try {
-    console.log("Media: ", media);
     const mediaId = await createMedia(media);
     if (!mediaId) {
       console.error("Failed to create media or media ID is undefined");
-      return;
+      return { sucess: false, message: "Failed to save media to our database" };
     }
 
     const existingReview = await prisma.watched.findFirst({
@@ -104,7 +103,7 @@ export const writeReview = async (
 
     if (existingReview) {
       console.log("Review already exists!");
-      return;
+      return { success: false, message: "Review already exists" };
     }
 
     const newReview = await prisma.watched.create({
@@ -115,8 +114,6 @@ export const writeReview = async (
         review: review,
       },
     });
-
-    console.log("Review created!");
 
     await prisma.user.update({
       where: {
@@ -131,9 +128,10 @@ export const writeReview = async (
       },
     });
 
-    return newReview;
+    return { data: newReview, success: true, message: "Review created" };
   } catch (error) {
     console.error("Error writing review:", error);
+    return { success: false, message: "Failed to save review to our database" };
   }
 };
 
@@ -142,7 +140,10 @@ export const addToWatchlist = async (media: Media, userId: string) => {
     const mediaId = await createMedia(media);
     if (!mediaId) {
       console.error("Failed to create media or media ID is undefined");
-      return;
+      return {
+        success: false,
+        message: "Failed to save media to our database",
+      };
     }
 
     const user = await prisma.user.findFirst({
@@ -156,14 +157,17 @@ export const addToWatchlist = async (media: Media, userId: string) => {
 
     if (!user) {
       console.error("User not found");
-      return;
+      return { success: false, message: "User not found" };
     }
 
     const existingWatchlist = user.watchlist.find((item) => item.id == mediaId);
 
     if (existingWatchlist) {
       console.log("Movie already exists in watchlist");
-      return;
+      return {
+        success: false,
+        message: "This media already exists in watchlist",
+      };
     }
 
     await prisma.user.update({
@@ -182,6 +186,7 @@ export const addToWatchlist = async (media: Media, userId: string) => {
     return { success: true, message: "Movie added to watchlist" };
   } catch (error) {
     console.error("Error adding to watchlist:", error);
+    return { success: false, message: "Failed to add to watchlist" };
   }
 };
 
@@ -190,7 +195,10 @@ export const addToFavorites = async (media: Media, userId: string) => {
     const mediaId = await createMedia(media);
     if (!mediaId) {
       console.error("Failed to create media or media ID is undefined");
-      return;
+      return {
+        success: false,
+        message: "Failed to save media to our database",
+      };
     }
 
     const user = await prisma.user.findFirst({
@@ -204,14 +212,17 @@ export const addToFavorites = async (media: Media, userId: string) => {
 
     if (!user) {
       console.error("User not found");
-      return;
+      return { success: false, message: "User not found" };
     }
 
     const existingFavorites = user.favorites.find((item) => item.id == mediaId);
 
     if (existingFavorites) {
       console.log("Movie already exists in favorites");
-      return;
+      return {
+        success: false,
+        message: "This media already exists in favorites",
+      };
     }
 
     await prisma.user.update({
@@ -230,5 +241,6 @@ export const addToFavorites = async (media: Media, userId: string) => {
     return { success: true, message: "Movie added to favorites" };
   } catch (error) {
     console.error("Error adding to favorites:", error);
+    return { success: false, message: "Failed to add to favorites" };
   }
 };

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +14,9 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { getGenreById } from "@/lib/functions";
 import { writeReview } from "../_actions/actions";
+import { AuthContext } from "@/providers/auth-provider";
+import { Loader } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 export default function ReviewMediaModal({
   title,
   details,
@@ -23,13 +26,25 @@ export default function ReviewMediaModal({
   details: any;
   mediaType: string;
 }) {
+  const { toast } = useToast();
   const [rating, setRating] = React.useState<number[]>([5]);
   const [review, setReview] = React.useState<string>("");
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [open, setOpen] = React.useState<boolean>(false);
   const buttonStyle =
     "w-full bg-white text-black hover:bg-white/80 flex items-center justify-center gap-2";
+  const { userDetails } = useContext(AuthContext);
+  const [userId, setUserId] = React.useState<string>("");
+
+  React.useEffect(() => {
+    if (userDetails) {
+      setUserId(userDetails.id);
+    }
+  }, [userDetails]);
 
   async function submitReviewHandler(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);
     try {
       const allGenres = details.genres.map((genre: any) =>
         getGenreById(genre.id),
@@ -47,16 +62,28 @@ export default function ReviewMediaModal({
         genres: allGenres as string[],
       };
       console.log(payload);
-      const userId = "45f50a5c-863a-4876-8537-ecc33d35f337";
       const response = await writeReview(payload, review, rating[0], userId);
       console.log(response);
+      if (response.success) {
+        setOpen(false);
+        toast({
+          title: "Review Added",
+          description: `Review for ${title} has been added saved.`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.message,
+        });
+      }
     } catch (e) {
       console.log(e);
     }
+    setLoading(false);
   }
   return (
     <div>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button className={`${buttonStyle} overflow-hidden`}>
             Already Watched<span className="truncate">{title}?</span>
@@ -88,7 +115,13 @@ export default function ReviewMediaModal({
                     </Label>
                   </div>
                   <div className="mt-4 flex w-full justify-end">
-                    <Button className="w-full">Add to Watched List</Button>
+                    <Button className="w-full" disabled={loading}>
+                      {loading ? (
+                        <Loader className="animate-spin" />
+                      ) : (
+                        "Add to Watched List"
+                      )}
+                    </Button>
                   </div>
                 </form>
               </div>

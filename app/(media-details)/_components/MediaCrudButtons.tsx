@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Heart, Popcorn } from "lucide-react";
-import React from "react";
+import { Heart, Loader, Popcorn } from "lucide-react";
+import React, { useContext } from "react";
 import ReviewMediaModal from "./ReviewMediaModal";
 import { addToFavorites, addToWatchlist } from "../_actions/actions";
 import { getGenreById } from "@/lib/functions";
+import { AuthContext } from "@/providers/auth-provider";
 
 export default function MediaCrudButtons({
   title,
@@ -16,9 +17,21 @@ export default function MediaCrudButtons({
 }) {
   const buttonStyle =
     "w-full bg-white text-black hover:bg-white/80 flex items-center justify-center gap-2";
-  const userId = "45f50a5c-863a-4876-8537-ecc33d35f337";
+  const { userDetails } = useContext(AuthContext);
+  const [userId, setUserId] = React.useState<string>("");
+  const [favoritesLoading, setFavoritesLoading] =
+    React.useState<boolean>(false);
+  const [watchlistLoading, setWatchlistLoading] =
+    React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (userDetails) {
+      setUserId(userDetails.id);
+    }
+  }, [userDetails]);
 
   const handleAddToWatchlist = async () => {
+    setWatchlistLoading(true);
     try {
       console.log("loading");
       const allGenres = details.genres.map((genre: any) =>
@@ -40,11 +53,12 @@ export default function MediaCrudButtons({
     } catch (error) {
       console.log(error);
     }
+    setWatchlistLoading(false);
   };
 
   const handleAddToFavorites = async () => {
+    setFavoritesLoading(true);
     try {
-      console.log("loading");
       const allGenres = details.genres.map((genre: any) =>
         getGenreById(genre.id),
       );
@@ -64,16 +78,37 @@ export default function MediaCrudButtons({
     } catch (error) {
       console.log(error);
     }
+    setFavoritesLoading(false);
   };
 
   return (
     <div className="mx-auto max-w-xl space-y-3 lg:mx-0">
       <div className="flex items-center gap-3">
-        <Button className={buttonStyle} onClick={handleAddToWatchlist}>
-          Add To Watchlist <Popcorn className="size-4" />
+        <Button
+          className={buttonStyle}
+          onClick={handleAddToWatchlist}
+          disabled={watchlistLoading || favoritesLoading}
+        >
+          {watchlistLoading ? (
+            <Loader className="animate-spin" />
+          ) : (
+            <span className="flex items-center gap-2">
+              Add To Watchlist <Popcorn className="size-4" />
+            </span>
+          )}
         </Button>
-        <Button className={buttonStyle} onClick={handleAddToFavorites}>
-          Add To Favorites <Heart className="size-4" />
+        <Button
+          className={buttonStyle}
+          onClick={handleAddToFavorites}
+          disabled={favoritesLoading || watchlistLoading}
+        >
+          {favoritesLoading ? (
+            <Loader className="animate-spin" />
+          ) : (
+            <span className="flex items-center gap-2">
+              Add To Favorites <Heart className="size-4" />
+            </span>
+          )}
         </Button>
       </div>
       <ReviewMediaModal title={title} details={details} mediaType={mediaType} />

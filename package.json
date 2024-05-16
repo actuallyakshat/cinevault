@@ -7,8 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
   },
   "dependencies": {
