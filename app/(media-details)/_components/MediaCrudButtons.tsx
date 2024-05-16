@@ -43,7 +43,7 @@ export default function MediaCrudButtons({
         id: "",
         tmdbId: details.id.toString() as string,
         title: title as string,
-        mediaType: "MOVIE",
+        mediaType: mediaType,
         posterUrl: details.poster_path as string,
         releaseYear:
           (details?.release_date?.split("-")[0] as string) ||

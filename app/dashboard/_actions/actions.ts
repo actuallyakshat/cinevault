@@ -43,6 +43,11 @@ const getUserDetails = async ({
       where: {
         email,
       },
+      include: {
+        watchlist: true,
+        favorites: true,
+        watched: true,
+      },
     });
     if (!user) {
       const newUser = await prisma.user.create({
