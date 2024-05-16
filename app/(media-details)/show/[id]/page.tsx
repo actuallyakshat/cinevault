@@ -29,6 +29,7 @@ export default function Show({ params }: { params: { id: string } }) {
         getTrailer({ mediaId: id, mediaType: "tv" }),
       ]);
       setDetails(response);
+      console.log(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",
       );
@@ -72,16 +73,11 @@ export default function Show({ params }: { params: { id: string } }) {
           />
           {trailer && (
             <Button
-              className="mt-4 flex w-full items-center justify-center gap-3 bg-yellow-500 text-black hover:bg-yellow-600"
+              className="mt-4 flex w-full max-w-sm items-center justify-center gap-3 bg-yellow-500 text-black hover:bg-yellow-600"
               onClick={() => {
                 setTrailerFrame(true);
               }}
             >
-              {/* <Link
-                href={youtubePrefix + trailer}
-                target="_blank"
-                className="flex w-full items-center justify-center gap-3"
-              ></Link> */}
               Watch Trailer <MonitorPlay className="size-5" />
             </Button>
           )}
@@ -126,7 +122,11 @@ export default function Show({ params }: { params: { id: string } }) {
           </div>
           <p className="max-w-2xl text-lg">{details?.overview}</p>
           <div className="mt-8 w-full">
-            <MediaCrudButtons title={details?.name} />
+            <MediaCrudButtons
+              details={details}
+              title={details?.name}
+              mediaType="show"
+            />
           </div>
         </div>
       </div>

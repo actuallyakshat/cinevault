@@ -12,13 +12,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { release } from "os";
 import { getGenreById } from "@/lib/functions";
 import { writeReview } from "../_actions/actions";
-enum MediaType {
-  MOVIE,
-  TV,
-}
 export default function ReviewMediaModal({
   title,
   details,
@@ -44,7 +39,7 @@ export default function ReviewMediaModal({
         id: "",
         tmdbId: details.id.toString() as string,
         title: title as string,
-        mediaType: "MOVIE",
+        mediaType: mediaType as string,
         posterUrl: details.poster_path as string,
         releaseYear:
           (details?.release_date?.split("-")[0] as string) ||

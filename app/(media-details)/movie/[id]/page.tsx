@@ -73,7 +73,7 @@ export default function Show({ params }: { params: { id: string } }) {
           />
           {trailer && (
             <Button
-              className="mt-4 flex w-full items-center justify-center gap-3 bg-yellow-500 text-black hover:bg-yellow-600"
+              className="mt-4 flex w-full max-w-sm items-center justify-center gap-3 bg-yellow-500 text-black hover:bg-yellow-600"
               onClick={() => {
                 setTrailerFrame(true);
               }}
