@@ -39,6 +39,7 @@ const getUserDetails = async ({
   email: string;
 }) => {
   try {
+    console.log("Fetching user details");
     const user = await prisma.user.findUnique({
       where: {
         email,
@@ -46,10 +47,16 @@ const getUserDetails = async ({
       include: {
         watchlist: true,
         favorites: true,
-        watched: true,
+        watched: {
+          include: {
+            media: true,
+          },
+        },
       },
     });
+    console.log("user", user);
     if (!user) {
+      console.log("Creating new user");
       const newUser = await prisma.user.create({
         data: {
           email,

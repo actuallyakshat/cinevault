@@ -6,6 +6,7 @@ import { addToFavorites, addToWatchlist } from "../_actions/actions";
 import { getGenreById } from "@/lib/functions";
 import { AuthContext } from "@/providers/auth-provider";
 import { useToast } from "@/components/ui/use-toast";
+import { getUserDetails } from "@/app/dashboard/_actions/actions";
 
 export default function MediaCrudButtons({
   title,
@@ -18,7 +19,7 @@ export default function MediaCrudButtons({
 }) {
   const buttonStyle =
     "w-full bg-white text-black hover:bg-white/80 flex items-center justify-center gap-2";
-  const { userDetails } = useContext(AuthContext);
+  const { userDetails, setUserDetails } = useContext(AuthContext);
   const [userId, setUserId] = React.useState<string>("");
   const [favoritesLoading, setFavoritesLoading] =
     React.useState<boolean>(false);
@@ -31,6 +32,14 @@ export default function MediaCrudButtons({
       setUserId(userDetails.id);
     }
   }, [userDetails]);
+
+  const refreshUserDetails = async () => {
+    const freshUserDetails = await getUserDetails({
+      email: userDetails.email,
+      name: userDetails.name,
+    });
+    setUserDetails(freshUserDetails);
+  };
 
   const handleAddToWatchlist = async () => {
     setWatchlistLoading(true);
@@ -56,6 +65,7 @@ export default function MediaCrudButtons({
           title: "Success",
           description: `${title} has been added to your watchlist`,
         });
+        refreshUserDetails();
       } else {
         toast({
           title: "Error",
@@ -79,7 +89,7 @@ export default function MediaCrudButtons({
         id: "",
         tmdbId: details.id.toString() as string,
         title: title as string,
-        mediaType: "MOVIE",
+        mediaType: mediaType,
         posterUrl: details.poster_path as string,
         releaseYear:
           (details?.release_date?.split("-")[0] as string) ||
@@ -92,6 +102,7 @@ export default function MediaCrudButtons({
           title: "Success",
           description: `${title} has been added to your favorites`,
         });
+        refreshUserDetails();
       } else {
         toast({
           title: "Error",
@@ -135,7 +146,12 @@ export default function MediaCrudButtons({
           )}
         </Button>
       </div>
-      <ReviewMediaModal title={title} details={details} mediaType={mediaType} />
+      <ReviewMediaModal
+        title={title}
+        details={details}
+        mediaType={mediaType}
+        refreshUserDetails={refreshUserDetails}
+      />
     </div>
   );
 }

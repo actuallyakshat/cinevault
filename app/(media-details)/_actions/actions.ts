@@ -1,5 +1,6 @@
 "use server";
 
+import { getUserDetails } from "@/app/dashboard/_actions/actions";
 import prisma from "@/db";
 import { Media } from "@prisma/client";
 import axios from "axios";

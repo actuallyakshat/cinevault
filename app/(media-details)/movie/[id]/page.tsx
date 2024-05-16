@@ -15,7 +15,7 @@ import { MonitorPlay } from "lucide-react";
 import TrailerFrame from "../../_components/TrailerFrame";
 
 export default function Show({ params }: { params: { id: string } }) {
-  const imagePrefix = "http://image.tmdb.org/t/p/w500";
+  const imagePrefix = "https://image.tmdb.org/t/p/w500";
   const [loading, setLoading] = React.useState(true);
   const [details, setDetails] = React.useState<any>(null);
   const [trailer, setTrailer] = React.useState<any>(null);

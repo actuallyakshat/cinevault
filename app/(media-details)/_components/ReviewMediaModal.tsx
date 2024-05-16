@@ -21,10 +21,12 @@ export default function ReviewMediaModal({
   title,
   details,
   mediaType,
+  refreshUserDetails,
 }: {
   title: string;
   details: any;
   mediaType: string;
+  refreshUserDetails: Function;
 }) {
   const { toast } = useToast();
   const [rating, setRating] = React.useState<number[]>([5]);
@@ -70,6 +72,7 @@ export default function ReviewMediaModal({
           title: "Review Added",
           description: `Review for ${title} has been added saved.`,
         });
+        refreshUserDetails();
       } else {
         toast({
           title: "Error",

@@ -7,6 +7,7 @@ import SelectList from "./_components/SelectList";
 import WatchlistMedia from "./_components/WatchlistMedia";
 import FavoriteMedia from "./_components/FavoriteMedia";
 import WatchedMedia from "./_components/WatchedMedia";
+import Loading from "../(media-details)/loading";
 
 export default function Dashboard() {
   const [mediaType, setMediaType] = React.useState<string>("Movies");
@@ -39,9 +40,17 @@ export default function Dashboard() {
         <SelectList setSelectedList={setSelectedList} />
         <SelectMediaTypeButton setMediaType={setMediaType} />
       </div>
-      {selectedList == "Watchlist" && <WatchlistMedia />}
-      {selectedList == "Favorites" && <FavoriteMedia />}
-      {selectedList == "Watched" && <WatchedMedia />}
+      <div className="mt-6">
+        {selectedList == "Watchlist" && (
+          <WatchlistMedia mediaList={mediaList} mediaType={mediaType} />
+        )}
+        {selectedList == "Favorites" && (
+          <FavoriteMedia mediaList={mediaList} mediaType={mediaType} />
+        )}
+        {selectedList == "Watched" && (
+          <WatchedMedia mediaList={mediaList} mediaType={mediaType} />
+        )}
+      </div>
     </div>
   );
 }
