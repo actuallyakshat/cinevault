@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define the User model
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  watched   Watched[]
+  favorites Media[]   @relation(name: "Favorites")
+  watchlist Media[]   @relation(name: "Watchlist")
+}
+
+// Define the Movie model
+model Media {
+  id           String    @id @default(uuid())
+  tmdbId       String
+  title        String
+  posterUrl    String
+  releaseYear  String
+  genres       String[]
+  mediaType    String
+  favouritedBy User[]    @relation(name: "Favorites")
+  watchlistBy  User[]    @relation(name: "Watchlist")
+  watchedBy    Watched[] @relation(name: "Watched")
+}
+
+// Define the Watched model
+model Watched {
+  id      String @id @default(uuid())
+  rating  Int
+  review  String
+  media   Media  @relation(fields: [mediaId], references: [id], name: "Watched")
+  mediaId String
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+}

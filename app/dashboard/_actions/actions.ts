@@ -1,4 +1,5 @@
 "use server";
+import prisma from "@/db";
 import axios from "axios";
 
 const TOKEN = process.env.TMDB_API_TOKEN as string;
@@ -29,4 +30,29 @@ async function searchMedia(query: string, mediaType: string): Promise<void> {
   }
 }
 
-export { searchMedia };
+const createUser = async () => {
+  try {
+    const user = await prisma.user.create({
+      data: {
+        name: "Akshat Doe",
+        email: "akshatdoe@example.com",
+      },
+    });
+    console.log("User created!!!");
+    console.log(user);
+  } catch (error) {
+    console.error("Error creating user:", error);
+  }
+};
+
+const getAllUsers = async () => {
+  try {
+    const users = await prisma.user.findMany();
+    console.log("Users:", users);
+    return users;
+  } catch (error) {
+    console.error("Error getting users:", error);
+  }
+};
+
+export { searchMedia, createUser, getAllUsers };

@@ -3,8 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "./_components/Navbar";
-import NextTopLoader from "nextjs-toploader";
 import { NavigationLoader, ThemeProvider } from "@/providers/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -26,6 +26,7 @@ export default function RootLayout({
             defaultTheme="light"
             disableTransitionOnChange
           >
+            <Toaster />
             <NavigationLoader>
               <Navbar />
               <div className="pt-16">{children}</div>

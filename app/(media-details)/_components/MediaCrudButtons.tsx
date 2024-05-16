@@ -1,8 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Popcorn } from "lucide-react";
 import React from "react";
+import ReviewMediaModal from "./ReviewMediaModal";
 
-export default function MediaCrudButtons({ title }: { title: string }) {
+export default function MediaCrudButtons({
+  title,
+  details,
+  mediaType,
+}: {
+  title: string;
+  details: any;
+  mediaType: string;
+}) {
   const buttonStyle =
     "w-full bg-white text-black hover:bg-white/80 flex items-center justify-center gap-2";
   return (
@@ -15,9 +24,7 @@ export default function MediaCrudButtons({ title }: { title: string }) {
           Add To Favorites <Heart className="size-4" />
         </Button>
       </div>
-      <Button className={`${buttonStyle} overflow-hidden`}>
-        Already Watched<span className="truncate">{title}?</span>
-      </Button>
+      <ReviewMediaModal title={title} details={details} mediaType={mediaType} />
     </div>
   );
 }

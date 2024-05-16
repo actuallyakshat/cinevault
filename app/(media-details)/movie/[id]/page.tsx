@@ -12,10 +12,9 @@ import LoadingScreen from "@/app/_components/LoadingScreen";
 import MediaCrudButtons from "../../_components/MediaCrudButtons";
 import { Button } from "@/components/ui/button";
 import { MonitorPlay } from "lucide-react";
-import Link from "next/link";
 import TrailerFrame from "../../_components/TrailerFrame";
+
 export default function Show({ params }: { params: { id: string } }) {
-  const youtubePrefix = "https://www.youtube.com/watch?v=";
   const imagePrefix = "http://image.tmdb.org/t/p/w500";
   const [loading, setLoading] = React.useState(true);
   const [details, setDetails] = React.useState<any>(null);
@@ -23,14 +22,16 @@ export default function Show({ params }: { params: { id: string } }) {
   const [trailerFrame, setTrailerFrame] = React.useState<any>(null);
   const { id } = params;
   const movieBackdrop = `${imagePrefix}${details?.backdrop_path}`;
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       const [response, trailerResponse] = await Promise.all([
-        getMediaDetails({ mediaType: "movie", mediaId: id }),
+        getMediaDetails({ mediaType: "MOVIE", mediaId: id }),
         getTrailer({ mediaId: id, mediaType: "movie" }),
       ]);
       setDetails(response);
+      console.log(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",
       );
@@ -79,11 +80,6 @@ export default function Show({ params }: { params: { id: string } }) {
                 setTrailerFrame(true);
               }}
             >
-              {/* <Link
-                href={youtubePrefix + trailer}
-                target="_blank"
-                className="flex w-full items-center justify-center gap-3"
-              ></Link> */}
               Watch Trailer <MonitorPlay className="size-5" />
             </Button>
           )}
@@ -130,7 +126,11 @@ export default function Show({ params }: { params: { id: string } }) {
           </div>
           <p className="max-w-2xl text-lg">{details?.overview}</p>
           <div className="mt-8 w-full">
-            <MediaCrudButtons title={details?.title} />
+            <MediaCrudButtons
+              title={details?.title}
+              details={details}
+              mediaType="movie"
+            />
           </div>
         </div>
       </div>
