@@ -25,7 +25,7 @@ export default function WatchlistMedia({
   }, [data]);
 
   return (
-    <div className="col-span-2 grid gap-3 md:grid-cols-3 lg:grid-cols-5">
+    <div className="col-span-2 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
       {data.map((media) => (
         <Link
           href={"/" + comparisionSlug + "/" + media.tmdbId}
@@ -37,7 +37,7 @@ export default function WatchlistMedia({
             alt={media.title}
             width={500}
             height={500}
-            className="w-full cursor-pointer rounded-lg transition-all duration-300 group-hover:scale-105"
+            className="h-full w-full cursor-pointer rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
           />
         </Link>
       ))}

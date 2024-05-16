@@ -18,7 +18,10 @@ export default function SelectList({
     <div>
       <Select
         defaultValue="Watchlist"
-        onValueChange={(value) => setSelectedList(value)}
+        onValueChange={(value) => {
+          localStorage.setItem("selectedList", value);
+          setSelectedList(value);
+        }}
       >
         <SelectTrigger className="w-[180px] font-semibold">
           <SelectValue placeholder="Select List" />

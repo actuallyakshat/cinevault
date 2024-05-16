@@ -27,6 +27,12 @@ export default function Dashboard() {
     }
   }, [userDetails, selectedList]);
 
+  useEffect(() => {
+    if (localStorage.getItem("selectedList")) {
+      setSelectedList(localStorage.getItem("selectedList") as string);
+    }
+  }, []);
+
   if (loading) {
     return <LoadingScreen />;
   }
