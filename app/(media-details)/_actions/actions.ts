@@ -125,7 +125,7 @@ export const writeReview = async (
       data: {
         watched: {
           connect: {
-            id: mediaId,
+            id: newReview.id,
           },
         },
       },
@@ -134,5 +134,101 @@ export const writeReview = async (
     return newReview;
   } catch (error) {
     console.error("Error writing review:", error);
+  }
+};
+
+export const addToWatchlist = async (media: Media, userId: string) => {
+  try {
+    const mediaId = await createMedia(media);
+    if (!mediaId) {
+      console.error("Failed to create media or media ID is undefined");
+      return;
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        watchlist: true,
+      },
+    });
+
+    if (!user) {
+      console.error("User not found");
+      return;
+    }
+
+    const existingWatchlist = user.watchlist.find((item) => item.id == mediaId);
+
+    if (existingWatchlist) {
+      console.log("Movie already exists in watchlist");
+      return;
+    }
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        watchlist: {
+          connect: {
+            id: mediaId,
+          },
+        },
+      },
+    });
+
+    return { success: true, message: "Movie added to watchlist" };
+  } catch (error) {
+    console.error("Error adding to watchlist:", error);
+  }
+};
+
+export const addToFavorites = async (media: Media, userId: string) => {
+  try {
+    const mediaId = await createMedia(media);
+    if (!mediaId) {
+      console.error("Failed to create media or media ID is undefined");
+      return;
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        favorites: true,
+      },
+    });
+
+    if (!user) {
+      console.error("User not found");
+      return;
+    }
+
+    const existingFavorites = user.favorites.find((item) => item.id == mediaId);
+
+    if (existingFavorites) {
+      console.log("Movie already exists in favorites");
+      return;
+    }
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        favorites: {
+          connect: {
+            id: mediaId,
+          },
+        },
+      },
+    });
+
+    return { success: true, message: "Movie added to favorites" };
+  } catch (error) {
+    console.error("Error adding to favorites:", error);
   }
 };

@@ -47,7 +47,13 @@ const createUser = async () => {
 
 const getAllUsers = async () => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: {
+        watched: true,
+        favorites: true,
+        watchlist: true,
+      },
+    });
     console.log("Users:", users);
     return users;
   } catch (error) {

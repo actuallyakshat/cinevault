@@ -22,16 +22,14 @@ export default function Show({ params }: { params: { id: string } }) {
   const [trailerFrame, setTrailerFrame] = React.useState<any>(null);
   const { id } = params;
   const movieBackdrop = `${imagePrefix}${details?.backdrop_path}`;
-
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       const [response, trailerResponse] = await Promise.all([
-        getMediaDetails({ mediaType: "MOVIE", mediaId: id }),
+        getMediaDetails({ mediaType: "movie", mediaId: id }),
         getTrailer({ mediaId: id, mediaType: "movie" }),
       ]);
       setDetails(response);
-      console.log(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",
       );
