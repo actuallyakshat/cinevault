@@ -26,7 +26,6 @@ export default function Search() {
     debouncedSearch();
     return () => {
       debouncedSearch.cancel();
-      setLoading(false);
     };
   }, [searchQuery, mediaType]);
 

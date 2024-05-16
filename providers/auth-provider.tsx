@@ -13,10 +13,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkAuth = async () => {
       try {
         setLoading(true);
-        console.log("user", user);
         if (!user) {
           return;
         }
+        console.log(user);
         const response = await getUserDetails({
           name: user.fullName!,
           email: user.primaryEmailAddress?.emailAddress!,

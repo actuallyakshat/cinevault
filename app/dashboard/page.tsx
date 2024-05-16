@@ -6,7 +6,7 @@ import LoadingScreen from "../_components/LoadingScreen";
 
 export default function Dashboard() {
   const [mediaType, setMediaType] = React.useState<string>("Movies");
-  const { userDetails, loading } = useContext(AuthContext);
+  const { loading } = useContext(AuthContext);
 
   if (loading) {
     return <LoadingScreen />;
