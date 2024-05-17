@@ -63,9 +63,7 @@ export default function ReviewMediaModal({
           (details?.first_air_date?.split("-")[0] as string),
         genres: allGenres as string[],
       };
-      console.log(payload);
       const response = await writeReview(payload, review, rating[0], userId);
-      console.log(response);
       if (response.success) {
         setOpen(false);
         toast({

@@ -20,10 +20,6 @@ export default function FavoriteMedia({
     setData(filteredData);
   }, [mediaList, mediaType, comparisionSlug]);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
   return (
     <div className="col-span-2 grid gap-3 md:grid-cols-3 lg:grid-cols-5">
       {data.map((media) => (
@@ -37,7 +33,7 @@ export default function FavoriteMedia({
             alt={media.title}
             width={500}
             height={500}
-            className="w-full cursor-pointer rounded-lg transition-all duration-300 group-hover:scale-105"
+            className="w-full cursor-pointer rounded-lg transition-all duration-300 md:group-hover:scale-105"
           />
         </Link>
       ))}

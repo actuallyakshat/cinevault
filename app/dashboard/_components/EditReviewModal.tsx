@@ -20,10 +20,14 @@ import {
 import { AuthContext } from "@/providers/auth-provider";
 import { getUserDetails } from "../_actions/actions";
 
-export default function EditReviewModal({ details }: { details: any }) {
-  console.log("details", details);
+export default function EditReviewModal({
+  details,
+  styles,
+}: {
+  details: any;
+  styles: string;
+}) {
   const [openModal, setOpenModal] = React.useState(false);
-  console.log("details", details);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [rating, setRating] = React.useState<number[]>([details.rating]);
   const { toast } = useToast();
@@ -119,7 +123,9 @@ export default function EditReviewModal({ details }: { details: any }) {
   return (
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogTrigger asChild>
-        <Button className="absolute bottom-0 right-0 xl:left-1/2 xl:w-full xl:-translate-x-1/2">
+        <Button
+          className={`absolute bottom-0 right-0 xl:left-1/2 xl:w-full xl:-translate-x-1/2 ${styles ? styles : ""} `}
+        >
           Edit Review
         </Button>
       </DialogTrigger>

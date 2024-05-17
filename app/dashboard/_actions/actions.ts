@@ -24,7 +24,7 @@ async function searchMedia(query: string, mediaType: string): Promise<void> {
       const movies = response.data.results;
       return movies;
     } else {
-      console.log("No data found");
+      console.log("No data found for search");
     }
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -39,7 +39,6 @@ const getUserDetails = async ({
   email: string;
 }) => {
   try {
-    console.log("Fetching user details");
     const user = await prisma.user.findUnique({
       where: {
         email,
@@ -55,7 +54,6 @@ const getUserDetails = async ({
       },
     });
     if (!user) {
-      console.log("Creating new user");
       const newUser = await prisma.user.create({
         data: {
           email,

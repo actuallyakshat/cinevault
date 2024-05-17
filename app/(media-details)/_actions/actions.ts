@@ -59,7 +59,6 @@ export const createMedia = async (media: Media) => {
         tmdbId: media.tmdbId,
       },
     });
-    console.log("mila media? : ", existingMedia);
     if (existingMedia) {
       console.log("Media already exists!");
       return existingMedia.id;
@@ -74,8 +73,6 @@ export const createMedia = async (media: Media) => {
         mediaType: media.mediaType,
       },
     });
-    console.log(newMedia);
-    console.log("Media created!");
     return newMedia.id;
   } catch (error) {
     console.error("Error creating media:", error);
@@ -247,7 +244,6 @@ export const addToFavorites = async (media: Media, userId: string) => {
 };
 
 export async function removeFromWatchlist(mediaId: string, userId: string) {
-  console.log(mediaId);
   try {
     const user = await prisma.user.findFirst({
       where: {
@@ -266,7 +262,6 @@ export async function removeFromWatchlist(mediaId: string, userId: string) {
     const existingWatchlist = user.watchlist.find(
       (item) => item.tmdbId == mediaId,
     );
-    console.log(existingWatchlist);
 
     if (!existingWatchlist) {
       console.log("Media does not exist in watchlist");

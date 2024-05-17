@@ -17,7 +17,6 @@ export default function Dashboard() {
   );
   const { userDetails, loading } = useContext(AuthContext);
   const [mediaList, setMediaList] = React.useState([]);
-  console.log(userDetails);
   useEffect(() => {
     if (userDetails) {
       if (selectedList == "Watchlist") {

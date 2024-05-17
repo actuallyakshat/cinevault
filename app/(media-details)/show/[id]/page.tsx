@@ -29,7 +29,6 @@ export default function Show({ params }: { params: { id: string } }) {
         getTrailer({ mediaId: id, mediaType: "tv" }),
       ]);
       setDetails(response);
-      console.log(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",
       );

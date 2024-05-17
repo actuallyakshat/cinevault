@@ -52,7 +52,6 @@ export default function MediaCrudButtons({
     setWatchlistLoading(true);
     if (request == "add") {
       try {
-        console.log("loading");
         const allGenres = details.genres.map((genre: any) =>
           getGenreById(genre.id),
         );
@@ -80,7 +79,6 @@ export default function MediaCrudButtons({
             description: `${response.message}`,
           });
         }
-        console.log(response);
       } catch (error) {
         console.log(error);
       }
@@ -149,7 +147,6 @@ export default function MediaCrudButtons({
             description: `${response.message}`,
           });
         }
-        console.log(response);
       } catch (error) {
         console.log(error);
       }
@@ -192,8 +189,6 @@ export default function MediaCrudButtons({
   const isInWatchedList = userDetails?.watched?.find(
     (item: any) => item.media.tmdbId == details.id,
   );
-
-  console.log("isInWatchedList", isInWatchedList);
 
   if (!userDetails)
     return (
@@ -241,7 +236,10 @@ export default function MediaCrudButtons({
       <div className="relative w-full">
         {isInWatchedList ? (
           <div className="pb-10">
-            <EditReviewModal details={isInWatchedList} />
+            <EditReviewModal
+              styles="bg-white text-black hover:bg-white/80"
+              details={isInWatchedList}
+            />
           </div>
         ) : (
           <ReviewMediaModal
