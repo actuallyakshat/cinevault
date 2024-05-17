@@ -10,8 +10,13 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 }
 
 export function NavigationLoader({ children }: { children: React.ReactNode }) {
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [color, setColor] = React.useState<string>("");
+
+  React.useEffect(() => {
+    setTheme("light");
+  }, [setTheme]);
+
   React.useEffect(() => {
     setColor(theme === "dark" ? "#fff" : "#000");
   }, [theme]);

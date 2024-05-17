@@ -1,4 +1,5 @@
 "use client";
+import LoadingScreen from "@/app/_components/LoadingScreen";
 import { getUserDetails } from "@/app/dashboard/_actions/actions";
 import { useUser } from "@clerk/nextjs";
 import React, { createContext, useState, useEffect } from "react";
@@ -9,7 +10,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useUser();
   const [loading, setLoading] = useState<boolean>(true);
   const [userDetails, setUserDetails] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -23,26 +23,25 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         if (!response) {
-          setError("No user details found");
           return;
         }
 
         setUserDetails(response);
       } catch (error) {
-        setError("Error fetching user details");
         console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchUserDetails();
   }, [user]);
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <AuthContext.Provider
-      value={{ userDetails, setUserDetails, loading, error }}
-    >
+    <AuthContext.Provider value={{ userDetails, setUserDetails, loading }}>
       {children}
     </AuthContext.Provider>
   );
