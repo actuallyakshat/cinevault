@@ -19,10 +19,27 @@ export default function WatchedMedia({
   }, [mediaList, mediaType, comparisionSlug]);
 
   return (
-    <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2">
-      {data.map((media) => (
-        <WatchedMediaCard key={media.id} media={media} mediaType={mediaType} />
-      ))}
+    <div>
+      {data.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2">
+          {data.map((media) => (
+            <WatchedMediaCard
+              key={media.id}
+              media={media}
+              mediaType={mediaType}
+            />
+          ))}
+        </div>
+      )}
+      <div>
+        {data.length == 0 && (
+          <div className="mt-8 w-full">
+            <h1 className="text-center text-xl font-bold text-foreground/70">
+              No {mediaType} found
+            </h1>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

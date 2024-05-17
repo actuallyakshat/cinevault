@@ -7,7 +7,9 @@ export default function Loading() {
       <div>
         <Loader className="size-8 animate-spin" />
       </div>
-      <p className="text-lg font-medium">Hang tight, we&apos;re loading...</p>
+      <p className="text-lg font-bold text-foreground/70">
+        Hang tight, we&apos;re loading...
+      </p>
     </div>
   );
 }

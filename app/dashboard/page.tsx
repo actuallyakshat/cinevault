@@ -29,10 +29,6 @@ export default function Dashboard() {
     }
   }, [userDetails, selectedList]);
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">
       <div className="flex w-full flex-col lg:flex-row lg:items-center lg:justify-between">

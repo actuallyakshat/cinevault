@@ -31,7 +31,7 @@ export default function EditReviewModal({
   const [loading, setLoading] = React.useState<boolean>(false);
   const [rating, setRating] = React.useState<number[]>([details.rating]);
   const { toast } = useToast();
-  const [review, setReview] = React.useState<string>("");
+  const [review, setReview] = React.useState<string>(details.review || "");
   const { userDetails, setUserDetails } = useContext(AuthContext);
 
   async function handleUpdateReview(e: React.FormEvent) {
