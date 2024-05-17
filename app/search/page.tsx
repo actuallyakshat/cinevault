@@ -7,7 +7,9 @@ import { searchMedia } from "../dashboard/_actions/actions";
 import SearchResultCard from "./_components/SearchResultCard";
 
 export default function Search() {
-  const [mediaType, setMediaType] = React.useState("Movies");
+  const [mediaType, setMediaType] = React.useState(
+    localStorage.getItem("mediaType") || "Movies",
+  );
   const [searchResults, setSearchResults] = React.useState<any>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -37,7 +39,10 @@ export default function Search() {
     <div className="mt-8 w-full px-6 pb-8">
       <div className="mx-auto flex w-full max-w-xl items-center justify-center gap-1">
         <SearchMedia setSearchQuery={setSearchQuery} />
-        <SelectMediaTypeButton setMediaType={setMediaType} />
+        <SelectMediaTypeButton
+          mediaType={mediaType}
+          setMediaType={setMediaType}
+        />
       </div>
       {searchQuery && loading && (
         <div className="my-6 flex flex-col items-center gap-4">

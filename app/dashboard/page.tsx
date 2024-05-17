@@ -7,11 +7,14 @@ import SelectList from "./_components/SelectList";
 import WatchlistMedia from "./_components/WatchlistMedia";
 import FavoriteMedia from "./_components/FavoriteMedia";
 import WatchedMedia from "./_components/WatchedMedia";
-import Loading from "../(media-details)/loading";
 
 export default function Dashboard() {
-  const [mediaType, setMediaType] = React.useState<string>("Movies");
-  const [selectedList, setSelectedList] = React.useState<string>("Watchlist");
+  const [mediaType, setMediaType] = React.useState<string>(
+    localStorage.getItem("mediaType" || "Movies") as string,
+  );
+  const [selectedList, setSelectedList] = React.useState<string>(
+    localStorage.getItem("selectedList") as string,
+  );
   const { userDetails, loading } = useContext(AuthContext);
   const [mediaList, setMediaList] = React.useState([]);
   console.log(userDetails);
@@ -27,12 +30,6 @@ export default function Dashboard() {
     }
   }, [userDetails, selectedList]);
 
-  useEffect(() => {
-    if (localStorage.getItem("selectedList")) {
-      setSelectedList(localStorage.getItem("selectedList") as string);
-    }
-  }, []);
-
   if (loading) {
     return <LoadingScreen />;
   }
@@ -43,8 +40,14 @@ export default function Dashboard() {
         <h1 className="text-3xl font-extrabold">Dashboard</h1>
       </div>
       <div className="mt-4 flex items-center gap-3">
-        <SelectList setSelectedList={setSelectedList} />
-        <SelectMediaTypeButton setMediaType={setMediaType} />
+        <SelectList
+          selectedList={selectedList}
+          setSelectedList={setSelectedList}
+        />
+        <SelectMediaTypeButton
+          mediaType={mediaType}
+          setMediaType={setMediaType}
+        />
       </div>
       <div className="mt-6">
         {selectedList == "Watchlist" && (

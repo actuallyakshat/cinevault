@@ -10,14 +10,16 @@ import {
 import React from "react";
 
 export default function SelectList({
+  selectedList,
   setSelectedList,
 }: {
   setSelectedList: Function;
+  selectedList: string;
 }) {
   return (
     <div>
       <Select
-        defaultValue="Watchlist"
+        defaultValue={selectedList}
         onValueChange={(value) => {
           localStorage.setItem("selectedList", value);
           setSelectedList(value);

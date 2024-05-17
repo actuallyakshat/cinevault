@@ -89,7 +89,7 @@ export default function ReviewMediaModal({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button className={`${buttonStyle} overflow-hidden`}>
-            Already Watched<span className="truncate">{title}?</span>
+            Already Watched<span className="-ml-1 truncate">{title}?</span>
           </Button>
         </DialogTrigger>
         <DialogContent>

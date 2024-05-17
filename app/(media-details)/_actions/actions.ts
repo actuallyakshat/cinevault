@@ -245,3 +245,183 @@ export const addToFavorites = async (media: Media, userId: string) => {
     return { success: false, message: "Failed to add to favorites" };
   }
 };
+
+export async function removeFromWatchlist(mediaId: string, userId: string) {
+  console.log(mediaId);
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        watchlist: true,
+      },
+    });
+
+    if (!user) {
+      console.error("User not found");
+      return { success: false, message: "User not found" };
+    }
+
+    const existingWatchlist = user.watchlist.find(
+      (item) => item.tmdbId == mediaId,
+    );
+    console.log(existingWatchlist);
+
+    if (!existingWatchlist) {
+      console.log("Media does not exist in watchlist");
+      return {
+        success: false,
+        message: "This media does not exist in watchlist",
+      };
+    }
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        watchlist: {
+          disconnect: {
+            id: existingWatchlist.id,
+          },
+        },
+      },
+    });
+    return { success: true, message: "Movie removed from watchlist" };
+  } catch (error) {
+    console.error("Error removing from watchlist:", error);
+    return { success: false, message: "Failed to remove from watchlist" };
+  }
+}
+
+export async function removeFromFavorites(mediaId: string, userId: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        favorites: true,
+      },
+    });
+
+    if (!user) {
+      console.error("User not found");
+      return { success: false, message: "User not found" };
+    }
+
+    const existingFavorites = user.favorites.find(
+      (item) => item.tmdbId == mediaId,
+    );
+
+    if (!existingFavorites) {
+      console.log("Media does not exist in favorites");
+      return {
+        success: false,
+        message: "This media does not exist in favorites",
+      };
+    }
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        favorites: {
+          disconnect: {
+            id: existingFavorites.id,
+          },
+        },
+      },
+    });
+    return { success: true, message: "Movie removed from favorites" };
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
+    return { success: false, message: "Failed to remove from favorites" };
+  }
+}
+
+export async function removeFromWatched(mediaId: string, userId: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        watched: true,
+      },
+    });
+
+    if (!user) {
+      console.error("User not found");
+      return { success: false, message: "User not found" };
+    }
+
+    const existingWatched = user.watched.find((item) => item.id == mediaId);
+
+    if (!existingWatched) {
+      console.log("Media does not exist in watched");
+      return {
+        success: false,
+        message: "This media does not exist in watched",
+      };
+    }
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        watched: {
+          disconnect: {
+            id: existingWatched.id,
+          },
+        },
+      },
+    });
+    return { success: true, message: "Movie removed from watched" };
+  } catch (error) {
+    console.error("Error removing from watched:", error);
+    return { success: false, message: "Failed to remove from watched" };
+  }
+}
+
+export async function removeFromWatchedList(mediaId: string, userId: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+      include: {
+        watched: {
+          include: {
+            media: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      console.error("User not found");
+      return { success: false, message: "User not found" };
+    }
+
+    const existingWatched = user.watched.find(
+      (item) => item.media.tmdbId == mediaId,
+    );
+
+    if (!existingWatched) {
+      return {
+        success: false,
+        message: "You don't have a review for this media",
+      };
+    }
+
+    await prisma.watched.delete({
+      where: { id: existingWatched.id },
+    });
+
+    return { success: true, message: "Review removed from watched list" };
+  } catch (error) {
+    console.error("Error removing from watched:", error);
+    return { success: false, message: "Failed to remove from watched" };
+  }
+}

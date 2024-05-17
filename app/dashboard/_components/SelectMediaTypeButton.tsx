@@ -10,15 +10,20 @@ import {
 import React from "react";
 
 export default function SelectMediaTypeButton({
+  mediaType,
   setMediaType,
 }: {
   setMediaType: Function;
+  mediaType: string;
 }) {
   return (
     <div>
       <Select
-        defaultValue="Movies"
-        onValueChange={(value) => setMediaType(value)}
+        defaultValue={mediaType}
+        onValueChange={(value) => {
+          localStorage.setItem("mediaType", value);
+          setMediaType(value);
+        }}
       >
         <SelectTrigger className="w-[180px] font-semibold">
           <SelectValue placeholder="Media Type" />

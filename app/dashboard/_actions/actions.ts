@@ -54,7 +54,6 @@ const getUserDetails = async ({
         },
       },
     });
-    console.log("user", user);
     if (!user) {
       console.log("Creating new user");
       const newUser = await prisma.user.create({

@@ -7,16 +7,26 @@ import LatestMedia from "./_components/LatestMedia";
 import PopularMedia from "./_components/PopularMedia";
 
 export default function Explore() {
-  const [mediaType, setMediaType] = React.useState("Movies");
-  const [exploreCategory, setExploreCategory] = React.useState("latest");
+  const [mediaType, setMediaType] = React.useState(
+    localStorage.getItem("mediaType") || "Movies",
+  );
+  const [exploreCategory, setExploreCategory] = React.useState(
+    localStorage.getItem("exploreCategory") || "latest",
+  );
   const [loading, setLoading] = React.useState(true);
   return (
     <div>
       <div className="container py-12">
         <h1 className="mb-4 text-3xl font-extrabold">Explore {mediaType}</h1>
         <div className="flex items-center gap-3">
-          <SelectMediaTypeButton setMediaType={setMediaType} />
-          <SelectExploreCategory setExploreCategory={setExploreCategory} />
+          <SelectMediaTypeButton
+            mediaType={mediaType}
+            setMediaType={setMediaType}
+          />
+          <SelectExploreCategory
+            exploreCategory={exploreCategory}
+            setExploreCategory={setExploreCategory}
+          />
         </div>
         {exploreCategory == "top-rated" && (
           <TopRatedMedia mediaType={mediaType} />

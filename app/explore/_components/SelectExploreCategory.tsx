@@ -8,14 +8,19 @@ import {
 } from "@/components/ui/select";
 export default function SelectExploreCategory({
   setExploreCategory,
+  exploreCategory,
 }: {
   setExploreCategory: Function;
+  exploreCategory: string;
 }) {
   return (
     <div>
       <Select
-        defaultValue="latest"
-        onValueChange={(value) => setExploreCategory(value)}
+        defaultValue={exploreCategory}
+        onValueChange={(value) => {
+          localStorage.setItem("exploreCategory", value);
+          setExploreCategory(value);
+        }}
       >
         <SelectTrigger className="w-[180px] font-semibold">
           <SelectValue placeholder="Select Category" />
