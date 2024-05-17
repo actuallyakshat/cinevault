@@ -19,7 +19,7 @@ export default function ExploreMediaCard({
     >
       <Image
         src={imagePrefix + media.poster_path}
-        alt={media.title}
+        alt={media.title || media.name}
         width={200}
         height={300}
         className="h-full w-full rounded-lg object-cover transition-all duration-300 md:group-hover:scale-105"

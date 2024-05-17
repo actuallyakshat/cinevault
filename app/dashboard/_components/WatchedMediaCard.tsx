@@ -55,7 +55,7 @@ export default function WatchedMediaCard({
               ? `${media.review.substring(0, 360)}...`
               : media.review}
           </p>
-          <EditReviewModal details={media} />
+          <EditReviewModal styles="" details={media} />
         </div>
       </div>
     </div>

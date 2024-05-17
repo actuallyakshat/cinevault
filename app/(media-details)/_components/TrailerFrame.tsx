@@ -6,7 +6,6 @@ interface Props {
 }
 
 const TrailerFrame: React.FC<Props> = ({ video_key, onClose }: Props) => {
-  console.log(video_key);
   return (
     <div
       onClick={() => onClose()}

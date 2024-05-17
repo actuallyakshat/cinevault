@@ -202,10 +202,10 @@ export default function MediaCrudButtons({
     );
 
   return (
-    <div className="mx-auto max-w-xl space-y-3 lg:mx-0">
-      <div className="flex items-center gap-3">
+    <div className="mx-auto max-w-2xl space-y-3 lg:mx-0">
+      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-2">
         <Button
-          className={buttonStyle}
+          className={`${buttonStyle} col-span-1`}
           onClick={() => handleWatchlist(isInWatchlist ? "remove" : "add")}
           disabled={watchlistLoading}
         >
@@ -219,7 +219,7 @@ export default function MediaCrudButtons({
           )}
         </Button>
         <Button
-          className={buttonStyle}
+          className={`${buttonStyle} col-span-1`}
           onClick={() => handleFavoriteList(isInFavorites ? "remove" : "add")}
           disabled={favoritesLoading}
         >

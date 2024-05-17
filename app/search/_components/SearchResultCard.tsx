@@ -27,7 +27,7 @@ export default function SearchResultCard({
         >
           <Image
             src={imagePrefix + result.poster_path}
-            alt={result.title}
+            alt={result.title || result.name}
             width={500}
             height={500}
             className="col-span-1 hidden w-full max-w-[300px] rounded-lg object-cover lg:block"
