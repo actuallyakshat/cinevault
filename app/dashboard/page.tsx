@@ -10,10 +10,10 @@ import WatchedMedia from "./_components/WatchedMedia";
 
 export default function Dashboard() {
   const [mediaType, setMediaType] = React.useState<string>(
-    localStorage.getItem("mediaType" || "Movies") as string,
+    localStorage.getItem("mediaType") || "Movies",
   );
   const [selectedList, setSelectedList] = React.useState<string>(
-    localStorage.getItem("selectedList") as string,
+    localStorage.getItem("selectedList") || "Watchlist",
   );
   const { userDetails, loading } = useContext(AuthContext);
   const [mediaList, setMediaList] = React.useState([]);
