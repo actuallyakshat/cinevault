@@ -36,7 +36,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, [user]);
 
-  if (loading || !userDetails || !loaded) {
+  if (loading || !loaded) {
     return <LoadingScreen />;
   }
 
