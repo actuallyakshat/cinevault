@@ -13,7 +13,10 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Loader } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { removeFromWatchedList } from "@/app/(media-details)/_actions/actions";
+import {
+  removeFromWatchedList,
+  updateReview,
+} from "@/app/(media-details)/_actions/actions";
 import { AuthContext } from "@/providers/auth-provider";
 import { getUserDetails } from "../_actions/actions";
 
@@ -27,8 +30,37 @@ export default function EditReviewModal({ details }: { details: any }) {
   const [review, setReview] = React.useState<string>("");
   const { userDetails, setUserDetails } = useContext(AuthContext);
 
-  async function submitReviewHandler(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleUpdateReview(e: React.FormEvent) {
+    try {
+      e.preventDefault();
+      setLoading(true);
+      const res = await updateReview(
+        details.media.tmdbId,
+        details.userId,
+        rating[0],
+        review,
+      );
+      if (res.success) {
+        toast({
+          title: "Review updated",
+          description: res.message,
+        });
+        await refreshUser();
+        setLoading(false);
+        setOpenModal(false);
+      } else {
+        toast({
+          title: "Error",
+          description: res.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating review:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update review",
+      });
+    }
   }
 
   async function refreshUser() {
@@ -97,7 +129,7 @@ export default function EditReviewModal({ details }: { details: any }) {
           <DialogDescription asChild>
             <div>
               <p>Write something about your experience.</p>
-              <form onSubmit={submitReviewHandler}>
+              <form onSubmit={handleUpdateReview}>
                 <Textarea
                   placeholder="Your review"
                   className="my-4 h-32 text-foreground"
@@ -121,6 +153,7 @@ export default function EditReviewModal({ details }: { details: any }) {
                   <Button
                     className="w-full"
                     variant={"destructive"}
+                    type="button"
                     disabled={loading}
                     onClick={handleDeleteReview}
                   >
@@ -130,7 +163,7 @@ export default function EditReviewModal({ details }: { details: any }) {
                       "Delete Review"
                     )}
                   </Button>
-                  <Button className="w-full" disabled={loading}>
+                  <Button className="w-full" type="submit" disabled={loading}>
                     {loading ? (
                       <Loader className="animate-spin" />
                     ) : (

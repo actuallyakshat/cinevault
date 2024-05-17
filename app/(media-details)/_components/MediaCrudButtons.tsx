@@ -212,7 +212,7 @@ export default function MediaCrudButtons({
         <Button
           className={buttonStyle}
           onClick={() => handleWatchlist(isInWatchlist ? "remove" : "add")}
-          disabled={watchlistLoading || favoritesLoading}
+          disabled={watchlistLoading}
         >
           {watchlistLoading ? (
             <Loader className="animate-spin" />
@@ -226,7 +226,7 @@ export default function MediaCrudButtons({
         <Button
           className={buttonStyle}
           onClick={() => handleFavoriteList(isInFavorites ? "remove" : "add")}
-          disabled={favoritesLoading || watchlistLoading}
+          disabled={favoritesLoading}
         >
           {favoritesLoading ? (
             <Loader className="animate-spin" />

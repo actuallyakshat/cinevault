@@ -425,3 +425,52 @@ export async function removeFromWatchedList(mediaId: string, userId: string) {
     return { success: false, message: "Failed to remove from watched" };
   }
 }
+
+export async function updateReview(
+  mediaId: string,
+  userId: string,
+  rating: number,
+  review: string,
+) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+      include: {
+        watched: {
+          include: {
+            media: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      console.error("User not found");
+      return { success: false, message: "User not found" };
+    }
+
+    const existingWatched = user.watched.find(
+      (item) => item.media.tmdbId == mediaId,
+    );
+
+    if (!existingWatched) {
+      return {
+        success: false,
+        message: "You don't have a review for this media",
+      };
+    }
+
+    await prisma.watched.update({
+      where: { id: existingWatched.id },
+      data: {
+        rating: rating,
+        review: review,
+      },
+    });
+
+    return { success: true, message: "Review updated" };
+  } catch (error) {
+    console.error("Error updating review:", error);
+    return { success: false, message: "Failed to update review" };
+  }
+}
