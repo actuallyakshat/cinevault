@@ -1,13 +1,14 @@
 "use client";
 import LoadingScreen from "@/app/_components/LoadingScreen";
 import { getUserDetails } from "@/app/dashboard/_actions/actions";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useClerk, useUser } from "@clerk/nextjs";
 import React, { createContext, useState, useEffect } from "react";
 
 const AuthContext = createContext<any>(null);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useUser();
+  const { loaded } = useClerk();
   const [loading, setLoading] = useState<boolean>(true);
   const [userDetails, setUserDetails] = useState<any>(null);
 
@@ -29,14 +30,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUserDetails(response);
       } catch (error) {
         console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
       }
     };
     fetchUserDetails();
+    setLoading(false);
   }, [user]);
 
-  if (loading) {
+  if (loading || !userDetails || !loaded) {
     return <LoadingScreen />;
   }
 
