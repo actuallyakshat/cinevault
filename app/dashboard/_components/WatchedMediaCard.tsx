@@ -16,7 +16,7 @@ export default function WatchedMediaCard({
   return (
     <div
       key={media.id}
-      className="col-span-1 flex flex-col gap-6 rounded-lg border bg-secondary/70 p-4 shadow-lg md:flex-row"
+      className="col-span-1 flex flex-col gap-6 rounded-lg border bg-secondary/70 p-4 shadow-lg lg:flex-row"
     >
       <div className="min-h-[300px]">
         <Image
@@ -25,14 +25,14 @@ export default function WatchedMediaCard({
           width={500}
           height={500}
           loading="lazy"
-          className="mx-auto h-full w-[200px] rounded-lg object-cover transition-all duration-300 md:w-[300px]"
+          className="mx-auto h-full w-[200px] rounded-lg object-cover transition-all duration-300 lg:w-[300px]"
         />
       </div>
 
       <div className="relative h-full w-full pb-16">
         <Link
           href={"/" + comparisionSlug + "/" + media.media.tmdbId}
-          className="flex w-full items-center justify-between"
+          className="flex w-full items-center justify-between gap-4"
         >
           <h1 className="text-3xl font-bold">{media?.media?.title}</h1>
           <h4 className="flex items-center gap-2 text-2xl font-bold text-foreground/80">

@@ -14,6 +14,10 @@ export default function FavoriteMedia({
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
   const comparisionSlug = mediaType == "Movies" ? "movie" : "show";
   useEffect(() => {
+    if (mediaList.length == 0) {
+      setData([]);
+      return;
+    }
     const filteredData = mediaList.filter(
       (media) => media.mediaType == comparisionSlug,
     );
@@ -23,7 +27,7 @@ export default function FavoriteMedia({
   return (
     <>
       {data.length > 0 && (
-        <div className="col-span-2 grid gap-3 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
           {data.map((media) => (
             <Link
               href={"/" + comparisionSlug + "/" + media.tmdbId}

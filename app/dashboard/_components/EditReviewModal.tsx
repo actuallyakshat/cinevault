@@ -124,7 +124,7 @@ export default function EditReviewModal({
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogTrigger asChild>
         <Button
-          className={`absolute bottom-0 right-0 xl:left-1/2 xl:w-full xl:-translate-x-1/2 ${styles ? styles : ""} `}
+          className={`absolute bottom-0 right-0 w-full xl:left-1/2 xl:w-full xl:-translate-x-1/2 ${styles ? styles : ""} `}
         >
           Edit Review
         </Button>

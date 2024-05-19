@@ -52,9 +52,9 @@ export default function MediaCrudButtons({
     setWatchlistLoading(true);
     if (request == "add") {
       try {
-        const allGenres = details.genres.map((genre: any) =>
-          getGenreById(genre.id),
-        );
+        const allGenres = details.genres
+          .map((genre: any) => getGenreById(genre.id))
+          .filter(Boolean);
         const payload = {
           id: "",
           tmdbId: details.id.toString() as string,
@@ -66,6 +66,7 @@ export default function MediaCrudButtons({
             (details?.first_air_date?.split("-")[0] as string),
           genres: allGenres as string[],
         };
+        console.log(payload);
         const response = await addToWatchlist(payload, userId);
         if (response.success) {
           toast({

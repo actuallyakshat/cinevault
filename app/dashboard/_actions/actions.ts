@@ -60,7 +60,7 @@ const getUserDetails = async ({
           name,
         },
       });
-      return newUser;
+      return { ...newUser, watchlist: [], favorites: [], watched: [] };
     }
     return user;
   } catch (error) {

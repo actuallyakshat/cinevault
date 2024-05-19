@@ -12,6 +12,10 @@ export default function WatchedMedia({
   const comparisionSlug = mediaType == "Movies" ? "movie" : "show";
 
   useEffect(() => {
+    if (mediaList.length == 0) {
+      setData([]);
+      return;
+    }
     const filteredData = mediaList.filter(
       (item) => item?.media?.mediaType == comparisionSlug,
     );
@@ -21,7 +25,7 @@ export default function WatchedMedia({
   return (
     <div>
       {data.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
           {data.map((media) => (
             <WatchedMediaCard
               key={media.id}
