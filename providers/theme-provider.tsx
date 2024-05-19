@@ -14,7 +14,7 @@ export function NavigationLoader({ children }: { children: React.ReactNode }) {
   const [color, setColor] = React.useState<string>("");
 
   React.useEffect(() => {
-    setTheme("light");
+    setTheme(localStorage.getItem("theme") || "light");
   }, [setTheme]);
 
   React.useEffect(() => {
