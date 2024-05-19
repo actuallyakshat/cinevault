@@ -26,6 +26,7 @@ export default function SearchResultCard({
           key={result.id}
         >
           <Image
+            loading="lazy"
             src={imagePrefix + result.poster_path}
             alt={result.title || result.name}
             width={500}

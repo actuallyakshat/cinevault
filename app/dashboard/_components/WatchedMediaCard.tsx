@@ -20,11 +20,11 @@ export default function WatchedMediaCard({
     >
       <div className="min-h-[300px]">
         <Image
+          loading="lazy"
           src={`https://image.tmdb.org/t/p/w500${media?.media?.posterUrl}`}
           alt={media?.media?.title}
           width={500}
           height={500}
-          loading="lazy"
           className="mx-auto h-full w-[200px] rounded-lg object-cover transition-all duration-300 lg:w-[300px]"
         />
       </div>

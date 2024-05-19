@@ -18,6 +18,7 @@ export default function ExploreMediaCard({
       className="group mx-auto w-full cursor-pointer"
     >
       <Image
+        loading="lazy"
         src={imagePrefix + media.poster_path}
         alt={media.title || media.name}
         width={200}

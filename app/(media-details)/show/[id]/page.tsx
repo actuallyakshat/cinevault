@@ -64,6 +64,7 @@ export default function Show({ params }: { params: { id: string } }) {
       <div className="container grid w-full grid-cols-1 pt-28 lg:grid-cols-4 lg:gap-6">
         <div className="col-span-1 mb-8 flex w-full flex-col items-center justify-center">
           <Image
+            loading="lazy"
             src={imagePrefix + details?.poster_path}
             alt={details?.name}
             width={500}

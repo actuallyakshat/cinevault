@@ -35,6 +35,7 @@ export default function FavoriteMedia({
               className="group col-span-1"
             >
               <Image
+                loading="lazy"
                 src={`${imagePrefix}${media.posterUrl}`}
                 alt={media.title}
                 width={500}
