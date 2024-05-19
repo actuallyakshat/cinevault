@@ -48,14 +48,14 @@ export default function Search() {
         <div className="my-6 flex flex-col items-center gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex w-full max-w-[960px] gap-8">
-              <div className="hidden h-[350px] w-[270px] animate-pulse rounded-lg bg-gray-400 lg:block"></div>
+              <div className="hidden h-[350px] w-[270px] animate-pulse rounded-lg bg-muted lg:block"></div>
               <div className="flex w-full flex-col gap-4">
                 <div className="flex h-10 w-full items-center gap-6">
-                  <div className="h-full flex-[4] animate-pulse rounded-lg bg-gray-400"></div>
-                  <div className="h-full flex-[1] animate-pulse rounded-lg bg-gray-400"></div>
+                  <div className="h-full flex-[4] animate-pulse rounded-lg bg-muted"></div>
+                  <div className="h-full flex-[1] animate-pulse rounded-lg bg-muted"></div>
                 </div>
-                <div className="h-4 w-[20%] animate-pulse rounded-lg bg-gray-400"></div>
-                <div className="h-36 w-[60%] animate-pulse rounded-lg bg-gray-400"></div>
+                <div className="h-4 w-[20%] animate-pulse rounded-lg bg-muted"></div>
+                <div className="h-36 w-[60%] animate-pulse rounded-lg bg-muted"></div>
               </div>
             </div>
           ))}

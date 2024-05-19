@@ -195,10 +195,10 @@ export default function MediaCrudButtons({
     return (
       <div className="mx-auto max-w-xl animate-pulse space-y-3 lg:mx-0">
         <div className="flex max-w-xl items-center gap-3">
-          <div className="h-11 w-full rounded-lg bg-gray-300"></div>
-          <div className="h-11 w-full rounded-lg bg-gray-300"></div>
+          <div className="h-11 w-full rounded-lg bg-muted"></div>
+          <div className="h-11 w-full rounded-lg bg-muted"></div>
         </div>
-        <div className="h-11 w-full  rounded-lg bg-gray-300"></div>
+        <div className="h-11 w-full  rounded-lg bg-muted"></div>
       </div>
     );
 

@@ -30,7 +30,23 @@ export default function Dashboard() {
   }, [userDetails, selectedList]);
 
   if (!userDetails) {
-    return null;
+    return (
+      <div className="mx-auto max-w-screen-2xl animate-pulse px-6 py-16 lg:px-8">
+        <div className="h-10 max-w-[350px] rounded-lg bg-muted"></div>
+        <div className="mt-4 flex gap-4">
+          <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+          <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              className="col-span-1 h-[400px] w-full rounded-lg bg-muted"
+            ></div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
