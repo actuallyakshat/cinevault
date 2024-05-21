@@ -36,13 +36,16 @@ export default function Dashboard() {
       } else if (selectedList === "Watched") {
         selectedListData = userDetails.watched;
       }
-
+      if (selectedList === "Watched") {
+        setMediaList(selectedListData);
+        return;
+      }
       const mediaTypeToExtract =
         mediaType.toLowerCase() == "movies" ? "movie" : "show";
       const filteredList = selectedListData.filter(
         (media: any) => media.mediaType.toLowerCase() === mediaTypeToExtract,
       );
-      setMediaList(selectedListData);
+      setMediaList(filteredList);
     }
   }, [userDetails, selectedList, mediaType]);
 
