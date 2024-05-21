@@ -4,7 +4,6 @@ import { getMediaDetails, getTrailer } from "../../_actions/actions";
 import Image from "next/image";
 import {
   formatMovieDate,
-  formatShowDate,
   getGenreById,
   getRuntimeFromMinutes,
 } from "@/lib/functions";
@@ -14,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { MonitorPlay } from "lucide-react";
 import TrailerFrame from "../../_components/TrailerFrame";
 
-export default function Show({ params }: { params: { id: string } }) {
+export default function Movie({ params }: { params: { id: string } }) {
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
   const [loading, setLoading] = React.useState(true);
   const [details, setDetails] = React.useState<any>(null);

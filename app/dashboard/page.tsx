@@ -1,22 +1,30 @@
 "use client";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SelectMediaTypeButton from "./_components/SelectMediaTypeButton";
 import { AuthContext } from "@/providers/auth-provider";
-import LoadingScreen from "../_components/LoadingScreen";
 import SelectList from "./_components/SelectList";
 import WatchlistMedia from "./_components/WatchlistMedia";
 import FavoriteMedia from "./_components/FavoriteMedia";
 import WatchedMedia from "./_components/WatchedMedia";
+import SortSelection from "./_components/SortSelection";
+import GenreFilter from "./GenreFilter";
 
 export default function Dashboard() {
+  const [availableGenres, setAvailableGenres] = React.useState<any>([]);
+
+  const [sortCriterion, setSortCriterion] = useState(""); // 'name', 'releaseYear', or ''
+  const [sortOrder, setSortOrder] = useState("none");
+
   const [mediaType, setMediaType] = React.useState<string>(
     localStorage.getItem("mediaType") || "Movies",
   );
   const [selectedList, setSelectedList] = React.useState<string>(
     localStorage.getItem("selectedList") || "Watchlist",
   );
-  const { userDetails, loading } = useContext(AuthContext);
+  const { userDetails } = useContext(AuthContext);
   const [mediaList, setMediaList] = React.useState([]);
+
+  //Media assignment to specific lists
   useEffect(() => {
     if (userDetails) {
       if (selectedList == "Watchlist") {
@@ -28,6 +36,39 @@ export default function Dashboard() {
       }
     }
   }, [userDetails, selectedList]);
+
+  //Sorting logic
+  const sortMediaList = () => {
+    let sortedList = [...mediaList];
+
+    if (sortCriterion === "name") {
+      sortedList.sort((a: any, b: any) => a.title.localeCompare(b.title));
+      if (sortOrder === "desc") sortedList.reverse();
+    } else if (sortCriterion === "releaseYear") {
+      sortedList.sort((a: any, b: any) => a.releaseYear - b.releaseYear);
+      if (sortOrder === "desc") sortedList.reverse();
+    }
+
+    if (sortOrder === "none") {
+      sortedList = [...mediaList]; // Reset to initial order if sortOrder is 'none'
+    }
+
+    setMediaList(sortedList);
+  };
+
+  useEffect(() => {
+    sortMediaList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortCriterion, sortOrder]);
+
+  useEffect(() => {
+    if (mediaList) {
+      const allGenres = mediaList.flatMap((media: any) => media.genres);
+      const uniqueGenresArray = Array.from(new Set(allGenres));
+      setAvailableGenres(uniqueGenresArray);
+      console.log(mediaList);
+    }
+  }, [mediaList]);
 
   if (!userDetails) {
     return (
@@ -54,15 +95,28 @@ export default function Dashboard() {
       <div className="flex w-full flex-col lg:flex-row lg:items-center lg:justify-between">
         <h1 className="text-3xl font-extrabold">Dashboard</h1>
       </div>
-      <div className="mt-4 flex items-center gap-3">
-        <SelectList
-          selectedList={selectedList}
-          setSelectedList={setSelectedList}
-        />
-        <SelectMediaTypeButton
-          mediaType={mediaType}
-          setMediaType={setMediaType}
-        />
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <SelectList
+            selectedList={selectedList}
+            setSelectedList={setSelectedList}
+          />
+          <SelectMediaTypeButton
+            mediaType={mediaType}
+            setMediaType={setMediaType}
+          />
+        </div>
+        {selectedList !== "Watched" && (
+          <div className="flex items-center gap-3">
+            <SortSelection
+              sortCriterion={sortCriterion}
+              setSortCriterion={setSortCriterion}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+            />
+            <GenreFilter />
+          </div>
+        )}
       </div>
       <div className="mt-6">
         {selectedList == "Watchlist" && (
