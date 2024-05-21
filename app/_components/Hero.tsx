@@ -33,7 +33,7 @@ export default function Hero() {
           </div>
         )}
       </div>
-      <footer className="fixed bottom-0 hidden h-12 w-full items-center justify-around bg-primary text-primary-foreground md:flex">
+      <footer className="fixed bottom-0 hidden h-12 w-full items-center justify-around border-t text-foreground md:flex">
         <Link href={user ? "/dashboard" : "/"} className="text-lg font-medium">
           CineVault
         </Link>
