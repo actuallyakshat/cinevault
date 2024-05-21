@@ -12,7 +12,7 @@ import GenreFilter from "./GenreFilter";
 export default function Dashboard() {
   const [availableGenres, setAvailableGenres] = React.useState<any>([]);
 
-  const [sortCriterion, setSortCriterion] = useState(""); // 'name', 'releaseYear', or ''
+  const [sortCriterion, setSortCriterion] = useState("");
   const [sortOrder, setSortOrder] = useState("none");
 
   const [mediaType, setMediaType] = React.useState<string>(
@@ -22,20 +22,29 @@ export default function Dashboard() {
     localStorage.getItem("selectedList") || "Watchlist",
   );
   const { userDetails } = useContext(AuthContext);
-  const [mediaList, setMediaList] = React.useState([]);
+  const [mediaList, setMediaList] = React.useState<any>([]);
 
-  //Media assignment to specific lists
+  // Media assignment to specific lists and filtering by media type
   useEffect(() => {
-    if (userDetails) {
-      if (selectedList == "Watchlist") {
-        setMediaList(userDetails.watchlist);
-      } else if (selectedList == "Favorites") {
-        setMediaList(userDetails.favorites);
-      } else if (selectedList == "Watched") {
-        setMediaList(userDetails.watched);
+    if (userDetails && selectedList && mediaType) {
+      let selectedListData: any[] = [];
+
+      if (selectedList === "Watchlist") {
+        selectedListData = userDetails.watchlist;
+      } else if (selectedList === "Favorites") {
+        selectedListData = userDetails.favorites;
+      } else if (selectedList === "Watched") {
+        selectedListData = userDetails.watched;
       }
+
+      const mediaTypeToExtract =
+        mediaType.toLowerCase() == "movies" ? "movie" : "show";
+      const filteredList = selectedListData.filter(
+        (media: any) => media.mediaType.toLowerCase() === mediaTypeToExtract,
+      );
+      setMediaList(selectedListData);
     }
-  }, [userDetails, selectedList]);
+  }, [userDetails, selectedList, mediaType]);
 
   //Sorting logic
   const sortMediaList = () => {
@@ -50,7 +59,7 @@ export default function Dashboard() {
     }
 
     if (sortOrder === "none") {
-      sortedList = [...mediaList]; // Reset to initial order if sortOrder is 'none'
+      sortedList = [...mediaList];
     }
 
     setMediaList(sortedList);
@@ -62,13 +71,19 @@ export default function Dashboard() {
   }, [sortCriterion, sortOrder]);
 
   useEffect(() => {
-    if (mediaList) {
-      const allGenres = mediaList.flatMap((media: any) => media.genres);
-      const uniqueGenresArray = Array.from(new Set(allGenres));
-      setAvailableGenres(uniqueGenresArray);
-      console.log(mediaList);
+    if (userDetails && selectedList) {
+      const lowercaseSelectedList = selectedList.toLowerCase();
+      const selectedListData = userDetails[lowercaseSelectedList];
+
+      if (selectedListData) {
+        const allGenres = selectedListData.flatMap(
+          (media: any) => media.genres,
+        );
+        const uniqueGenresArray = Array.from(new Set(allGenres));
+        setAvailableGenres(uniqueGenresArray);
+      }
     }
-  }, [mediaList]);
+  }, [userDetails, selectedList]);
 
   if (!userDetails) {
     return (
@@ -114,7 +129,7 @@ export default function Dashboard() {
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
             />
-            <GenreFilter />
+            <GenreFilter uniqueGenres={availableGenres} />
           </div>
         )}
       </div>
