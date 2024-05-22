@@ -11,22 +11,22 @@ import GenreFilter from "./GenreFilter";
 import { Input } from "@/components/ui/input";
 
 export default function Dashboard() {
-  const [availableGenres, setAvailableGenres] = React.useState<any>([]);
+  const [availableGenres, setAvailableGenres] = useState<any[]>([]);
   const [sortCriterion, setSortCriterion] = useState("");
   const [sortOrder, setSortOrder] = useState("none");
-  const [mediaType, setMediaType] = React.useState<string>(
+  const [mediaType, setMediaType] = useState<string>(
     localStorage.getItem("mediaType") || "Movies",
   );
-  const [selectedList, setSelectedList] = React.useState<string>(
+  const [selectedList, setSelectedList] = useState<string>(
     localStorage.getItem("selectedList") || "Watchlist",
   );
-  const [selectedGenres, setSelectedGenres] = React.useState<string[]>([]);
-  const [filteredMediaList, setFilteredMediaList] = React.useState<any[]>([]);
-  const [sortedList, setSortedList] = React.useState<any[]>([]);
-  const [finalMediaList, setFinalMediaList] = React.useState<any[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [mediaList, setMediaList] = useState<any[]>([]);
+  const [filteredMediaList, setFilteredMediaList] = useState<any[]>([]);
+  const [sortedList, setSortedList] = useState<any[]>([]);
+  const [finalMediaList, setFinalMediaList] = useState<any[]>([]);
   const { userDetails } = useContext(AuthContext);
-  const [mediaList, setMediaList] = React.useState<any>([]);
-  const [searchQuery, setSearchQuery] = React.useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Media assignment to specific lists and filtering by media type
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function Dashboard() {
         selectedListData = userDetails.watched;
       }
       const mediaTypeToExtract =
-        mediaType.toLowerCase() == "movies" ? "movie" : "show";
+        mediaType.toLowerCase() === "movies" ? "movie" : "show";
       if (selectedList === "Watched") {
         const filteredList = selectedListData.filter(
           (media: any) =>
@@ -68,12 +68,13 @@ export default function Dashboard() {
             selectedGenres.includes(genre),
           ),
         );
-        setFilteredMediaList(tempFilteredList);
-        return;
+      } else {
+        tempFilteredList = mediaList.filter((media: any) =>
+          media?.genres?.some((genre: string) =>
+            selectedGenres.includes(genre),
+          ),
+        );
       }
-      tempFilteredList = mediaList.filter((media: any) =>
-        media?.genres?.some((genre: string) => selectedGenres?.includes(genre)),
-      );
     }
     setFilteredMediaList(tempFilteredList);
   }, [mediaList, selectedGenres, selectedList]);
@@ -90,28 +91,22 @@ export default function Dashboard() {
         tempSortedList.sort((a: any, b: any) =>
           a?.media?.title.localeCompare(b?.media?.title),
         );
-        if (sortOrder === "desc") tempSortedList.reverse();
       } else if (sortCriterion === "releaseYear") {
         tempSortedList.sort(
           (a: any, b: any) => a?.media?.releaseYear - b?.media?.releaseYear,
         );
-        if (sortOrder === "desc") tempSortedList.reverse();
       } else if (sortCriterion === "rating") {
         tempSortedList.sort((a: any, b: any) => a.rating - b.rating);
-        if (sortOrder === "desc") tempSortedList.reverse();
       }
-      setSortedList(tempSortedList);
-      return;
     } else {
       if (sortCriterion === "name") {
         tempSortedList.sort((a: any, b: any) => a.title.localeCompare(b.title));
-        if (sortOrder === "desc") tempSortedList.reverse();
       } else if (sortCriterion === "releaseYear") {
         tempSortedList.sort((a: any, b: any) => a.releaseYear - b.releaseYear);
-        if (sortOrder === "desc") tempSortedList.reverse();
       }
-      setSortedList(tempSortedList);
     }
+    if (sortOrder === "desc") tempSortedList.reverse();
+    setSortedList(tempSortedList);
   };
 
   useEffect(() => {
@@ -119,10 +114,22 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredMediaList, sortCriterion, sortOrder]);
 
-  // Set final media list combining sorting and filtering
+  // Combine search logic with sorted list
   useEffect(() => {
-    setFinalMediaList(sortedList);
-  }, [sortedList]);
+    let tempFinalList = [...sortedList];
+    if (searchQuery.length > 0) {
+      if (selectedList === "Watched") {
+        tempFinalList = sortedList.filter((media: any) =>
+          media?.media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+      } else {
+        tempFinalList = sortedList.filter((media: any) =>
+          media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+      }
+    }
+    setFinalMediaList(tempFinalList);
+  }, [searchQuery, sortedList, selectedList]);
 
   useEffect(() => {
     if (selectedGenres.length > 0) {
@@ -134,15 +141,12 @@ export default function Dashboard() {
   // Extract available genres
   useEffect(() => {
     if (mediaList.length > 0) {
+      let allGenres;
       if (selectedList === "Watched") {
-        const allGenres = mediaList.flatMap(
-          (media: any) => media?.media?.genres,
-        );
-        const uniqueGenresArray = Array.from(new Set(allGenres));
-        setAvailableGenres(uniqueGenresArray);
-        return;
+        allGenres = mediaList.flatMap((media: any) => media?.media?.genres);
+      } else {
+        allGenres = mediaList.flatMap((media: any) => media?.genres);
       }
-      const allGenres = mediaList.flatMap((media: any) => media?.genres);
       const uniqueGenresArray = Array.from(new Set(allGenres));
       setAvailableGenres(uniqueGenresArray);
     }
@@ -156,44 +160,17 @@ export default function Dashboard() {
     );
   };
 
-  //Search Logic
-  useEffect(() => {
-    if (searchQuery === "") {
-      // Reset to the original media list when the search query is cleared
-      setFilteredMediaList(mediaList);
-      sortMediaList(); // Re-sort the list based on the current sorting criteria
-      return;
-    }
-    if (searchQuery.length > 0) {
-      if (selectedList === "Watched") {
-        const filteredList = mediaList.filter((media: any) =>
-          media?.media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-        setFinalMediaList(filteredList);
-        return;
-      } else {
-        const filteredList = mediaList.filter((media: any) =>
-          media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-        setFinalMediaList(filteredList);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mediaList, searchQuery]);
-
-  useEffect(() => {
-    setSearchQuery("");
-  }, [selectedList]);
-
   if (!userDetails) {
     return (
       <div className="mx-auto max-w-screen-2xl animate-pulse px-6 py-16 lg:px-8">
-        <div className="h-10 max-w-[350px] rounded-lg bg-muted"></div>
+        <div className="h-10 w-[200px] rounded-lg bg-muted sm:max-w-[350px]"></div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
-            <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
-            <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+              <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+            </div>
+            <div className="h-10 w-full rounded-lg bg-muted sm:w-[180px]"></div>
           </div>
           <div className="flex items-center gap-4">
             <div className="h-10 w-[80px] rounded-lg bg-muted"></div>
@@ -252,13 +229,13 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="mt-6">
-        {selectedList == "Watchlist" && (
+        {selectedList === "Watchlist" && (
           <WatchlistMedia mediaList={finalMediaList} mediaType={mediaType} />
         )}
-        {selectedList == "Favorites" && (
+        {selectedList === "Favorites" && (
           <FavoriteMedia mediaList={finalMediaList} mediaType={mediaType} />
         )}
-        {selectedList == "Watched" && (
+        {selectedList === "Watched" && (
           <WatchedMedia mediaList={finalMediaList} mediaType={mediaType} />
         )}
       </div>
