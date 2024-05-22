@@ -8,19 +8,23 @@ import FavoriteMedia from "./_components/FavoriteMedia";
 import WatchedMedia from "./_components/WatchedMedia";
 import SortSelection from "./_components/SortSelection";
 import GenreFilter from "./GenreFilter";
+import { cleanUpUnreferencedMedia } from "../(media-details)/_actions/actions";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
   const [availableGenres, setAvailableGenres] = React.useState<any>([]);
-
   const [sortCriterion, setSortCriterion] = useState("");
   const [sortOrder, setSortOrder] = useState("none");
-
   const [mediaType, setMediaType] = React.useState<string>(
     localStorage.getItem("mediaType") || "Movies",
   );
   const [selectedList, setSelectedList] = React.useState<string>(
     localStorage.getItem("selectedList") || "Watchlist",
   );
+  const [selectedGenres, setSelectedGenres] = React.useState<string[]>([]);
+  const [filteredMediaList, setFilteredMediaList] = React.useState<any[]>([]);
+  const [sortedList, setSortedList] = React.useState<any[]>([]);
+  const [finalMediaList, setFinalMediaList] = React.useState<any[]>([]);
   const { userDetails } = useContext(AuthContext);
   const [mediaList, setMediaList] = React.useState<any>([]);
 
@@ -36,12 +40,17 @@ export default function Dashboard() {
       } else if (selectedList === "Watched") {
         selectedListData = userDetails.watched;
       }
-      if (selectedList === "Watched") {
-        setMediaList(selectedListData);
-        return;
-      }
       const mediaTypeToExtract =
         mediaType.toLowerCase() == "movies" ? "movie" : "show";
+      if (selectedList === "Watched") {
+        const filteredList = selectedListData.filter(
+          (media: any) =>
+            media.media.mediaType.toLowerCase() === mediaTypeToExtract,
+        );
+        setMediaList(filteredList);
+        return;
+      }
+
       const filteredList = selectedListData.filter(
         (media: any) => media.mediaType.toLowerCase() === mediaTypeToExtract,
       );
@@ -49,52 +58,110 @@ export default function Dashboard() {
     }
   }, [userDetails, selectedList, mediaType]);
 
-  //Sorting logic
+  // Filter media list based on selected genres
+  useEffect(() => {
+    let tempFilteredList = [...mediaList];
+    if (selectedGenres.length > 0) {
+      if (selectedList === "Watched") {
+        tempFilteredList = mediaList.filter((media: any) =>
+          media?.media?.genres?.some((genre: string) =>
+            selectedGenres.includes(genre),
+          ),
+        );
+        setFilteredMediaList(tempFilteredList);
+        return;
+      }
+      tempFilteredList = mediaList.filter((media: any) =>
+        media?.genres?.some((genre: string) => selectedGenres?.includes(genre)),
+      );
+    }
+    setFilteredMediaList(tempFilteredList);
+  }, [mediaList, selectedGenres, selectedList]);
+
+  // Sort filtered media list
   const sortMediaList = () => {
-    let sortedList = [...mediaList];
-
-    if (sortCriterion === "name") {
-      sortedList.sort((a: any, b: any) => a.title.localeCompare(b.title));
-      if (sortOrder === "desc") sortedList.reverse();
-    } else if (sortCriterion === "releaseYear") {
-      sortedList.sort((a: any, b: any) => a.releaseYear - b.releaseYear);
-      if (sortOrder === "desc") sortedList.reverse();
-    }
-
+    let tempSortedList = [...filteredMediaList];
     if (sortOrder === "none") {
-      sortedList = [...mediaList];
+      setSortedList(tempSortedList);
+      return;
     }
-
-    setMediaList(sortedList);
+    if (selectedList === "Watched") {
+      if (sortCriterion === "name") {
+        tempSortedList.sort((a: any, b: any) =>
+          a?.media?.title.localeCompare(b?.media?.title),
+        );
+        if (sortOrder === "desc") tempSortedList.reverse();
+      } else if (sortCriterion === "releaseYear") {
+        tempSortedList.sort(
+          (a: any, b: any) => a?.media?.releaseYear - b?.media?.releaseYear,
+        );
+        if (sortOrder === "desc") tempSortedList.reverse();
+      } else if (sortCriterion === "rating") {
+        tempSortedList.sort((a: any, b: any) => a.rating - b.rating);
+        if (sortOrder === "desc") tempSortedList.reverse();
+      }
+      setSortedList(tempSortedList);
+      return;
+    } else {
+      if (sortCriterion === "name") {
+        tempSortedList.sort((a: any, b: any) => a.title.localeCompare(b.title));
+        if (sortOrder === "desc") tempSortedList.reverse();
+      } else if (sortCriterion === "releaseYear") {
+        tempSortedList.sort((a: any, b: any) => a.releaseYear - b.releaseYear);
+        if (sortOrder === "desc") tempSortedList.reverse();
+      }
+      setSortedList(tempSortedList);
+    }
   };
 
   useEffect(() => {
     sortMediaList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortCriterion, sortOrder]);
+  }, [filteredMediaList, sortCriterion, sortOrder]);
 
+  // Set final media list combining sorting and filtering
   useEffect(() => {
-    if (userDetails && selectedList) {
-      const lowercaseSelectedList = selectedList.toLowerCase();
-      const selectedListData = userDetails[lowercaseSelectedList];
+    setFinalMediaList(sortedList);
+  }, [sortedList]);
 
-      if (selectedListData) {
-        const allGenres = selectedListData.flatMap(
-          (media: any) => media.genres,
+  // Extract available genres
+  useEffect(() => {
+    if (mediaList.length > 0) {
+      if (selectedList === "Watched") {
+        const allGenres = mediaList.flatMap(
+          (media: any) => media?.media?.genres,
         );
         const uniqueGenresArray = Array.from(new Set(allGenres));
         setAvailableGenres(uniqueGenresArray);
+        return;
       }
+      const allGenres = mediaList.flatMap((media: any) => media?.genres);
+      const uniqueGenresArray = Array.from(new Set(allGenres));
+      setAvailableGenres(uniqueGenresArray);
     }
-  }, [userDetails, selectedList]);
+  }, [mediaList, selectedList]);
+
+  const handleGenreChange = (genre: string) => {
+    setSelectedGenres((prevSelectedGenres) =>
+      prevSelectedGenres.includes(genre)
+        ? prevSelectedGenres.filter((g) => g !== genre)
+        : [...prevSelectedGenres, genre],
+    );
+  };
 
   if (!userDetails) {
     return (
       <div className="mx-auto max-w-screen-2xl animate-pulse px-6 py-16 lg:px-8">
         <div className="h-10 max-w-[350px] rounded-lg bg-muted"></div>
-        <div className="mt-4 flex gap-4">
-          <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
-          <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+            <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-[80px] rounded-lg bg-muted"></div>
+            <div className="h-10 w-[130px] rounded-lg bg-muted"></div>
+          </div>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -124,27 +191,31 @@ export default function Dashboard() {
             setMediaType={setMediaType}
           />
         </div>
-        {selectedList !== "Watched" && (
-          <div className="flex items-center gap-3">
-            <SortSelection
-              sortCriterion={sortCriterion}
-              setSortCriterion={setSortCriterion}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-            <GenreFilter uniqueGenres={availableGenres} />
-          </div>
-        )}
+
+        <div className="flex items-center gap-3">
+          <SortSelection
+            sortCriterion={sortCriterion}
+            setSortCriterion={setSortCriterion}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            selectedList={selectedList}
+          />
+          <GenreFilter
+            uniqueGenres={availableGenres}
+            selectedGenres={selectedGenres}
+            handleGenreChange={handleGenreChange}
+          />
+        </div>
       </div>
       <div className="mt-6">
         {selectedList == "Watchlist" && (
-          <WatchlistMedia mediaList={mediaList} mediaType={mediaType} />
+          <WatchlistMedia mediaList={finalMediaList} mediaType={mediaType} />
         )}
         {selectedList == "Favorites" && (
-          <FavoriteMedia mediaList={mediaList} mediaType={mediaType} />
+          <FavoriteMedia mediaList={finalMediaList} mediaType={mediaType} />
         )}
         {selectedList == "Watched" && (
-          <WatchedMedia mediaList={mediaList} mediaType={mediaType} />
+          <WatchedMedia mediaList={finalMediaList} mediaType={mediaType} />
         )}
       </div>
     </div>

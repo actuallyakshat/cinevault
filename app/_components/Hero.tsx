@@ -7,7 +7,7 @@ import { useAuth, useClerk, useUser } from "@clerk/nextjs";
 import { Github, Heart } from "lucide-react";
 const LinkedIn = "https://www.linkedin.com/in/akshat-dubey29/";
 const GitHub = "https://github.com/actuallyakshat/cinevault";
-export default function Hero() {
+function Hero() {
   const { user } = useUser();
   const { openSignIn } = useClerk();
   const { theme } = useTheme();
@@ -53,3 +53,5 @@ export default function Hero() {
     </div>
   );
 }
+
+export default Hero;

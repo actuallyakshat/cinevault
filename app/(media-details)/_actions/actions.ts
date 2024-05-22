@@ -1,6 +1,5 @@
 "use server";
 
-import { getUserDetails } from "@/app/dashboard/_actions/actions";
 import prisma from "@/db";
 import { Media } from "@prisma/client";
 import axios from "axios";
@@ -270,6 +269,7 @@ export async function removeFromWatchlist(mediaId: string, userId: string) {
         message: "This media does not exist in watchlist",
       };
     }
+
     await prisma.user.update({
       where: {
         id: userId,
@@ -282,6 +282,26 @@ export async function removeFromWatchlist(mediaId: string, userId: string) {
         },
       },
     });
+    const mediaReferences = await prisma.media.findFirst({
+      where: { tmdbId: mediaId },
+      include: {
+        favouritedBy: true,
+        watchlistBy: true,
+        watchedBy: true,
+      },
+    });
+
+    if (!mediaReferences) {
+      return { success: false, message: "Media not found" };
+    }
+    console.log("all good");
+    if (
+      mediaReferences.favouritedBy.length === 0 &&
+      mediaReferences.watchlistBy.length === 0 &&
+      mediaReferences.watchedBy.length === 0
+    ) {
+      await prisma.media.delete({ where: { id: mediaReferences.id } });
+    }
     return { success: true, message: "Movie removed from watchlist" };
   } catch (error) {
     console.error("Error removing from watchlist:", error);
@@ -329,6 +349,25 @@ export async function removeFromFavorites(mediaId: string, userId: string) {
         },
       },
     });
+    const mediaReferences = await prisma.media.findFirst({
+      where: { tmdbId: mediaId },
+      include: {
+        favouritedBy: true,
+        watchlistBy: true,
+        watchedBy: true,
+      },
+    });
+
+    if (!mediaReferences) {
+      return { success: false, message: "Media not found" };
+    }
+    if (
+      mediaReferences.favouritedBy.length === 0 &&
+      mediaReferences.watchlistBy.length === 0 &&
+      mediaReferences.watchedBy.length === 0
+    ) {
+      await prisma.media.delete({ where: { id: mediaReferences.id } });
+    }
     return { success: true, message: "Movie removed from favorites" };
   } catch (error) {
     console.error("Error removing from favorites:", error);
@@ -374,6 +413,25 @@ export async function removeFromWatched(mediaId: string, userId: string) {
         },
       },
     });
+    const mediaReferences = await prisma.media.findFirst({
+      where: { tmdbId: mediaId },
+      include: {
+        favouritedBy: true,
+        watchlistBy: true,
+        watchedBy: true,
+      },
+    });
+
+    if (!mediaReferences) {
+      return { success: false, message: "Media not found" };
+    }
+    if (
+      mediaReferences.favouritedBy.length === 0 &&
+      mediaReferences.watchlistBy.length === 0 &&
+      mediaReferences.watchedBy.length === 0
+    ) {
+      await prisma.media.delete({ where: { id: mediaReferences.id } });
+    }
     return { success: true, message: "Movie removed from watched" };
   } catch (error) {
     console.error("Error removing from watched:", error);
@@ -413,6 +471,26 @@ export async function removeFromWatchedList(mediaId: string, userId: string) {
     await prisma.watched.delete({
       where: { id: existingWatched.id },
     });
+
+    const mediaReferences = await prisma.media.findFirst({
+      where: { tmdbId: mediaId },
+      include: {
+        favouritedBy: true,
+        watchlistBy: true,
+        watchedBy: true,
+      },
+    });
+
+    if (!mediaReferences) {
+      return { success: false, message: "Media not found" };
+    }
+    if (
+      mediaReferences.favouritedBy.length === 0 &&
+      mediaReferences.watchlistBy.length === 0 &&
+      mediaReferences.watchedBy.length === 0
+    ) {
+      await prisma.media.delete({ where: { id: mediaReferences.id } });
+    }
 
     return { success: true, message: "Review removed from watched list" };
   } catch (error) {
@@ -467,5 +545,38 @@ export async function updateReview(
   } catch (error) {
     console.error("Error updating review:", error);
     return { success: false, message: "Failed to update review" };
+  }
+}
+
+export async function cleanUpUnreferencedMedia() {
+  try {
+    // Fetch all media entries
+    const allMedia = await prisma.media.findMany({
+      include: {
+        favouritedBy: true,
+        watchlistBy: true,
+        watchedBy: true,
+      },
+    });
+
+    // Iterate through all media entries and delete unreferenced ones
+    for (const media of allMedia) {
+      const { id, favouritedBy, watchlistBy, watchedBy } = media;
+
+      // Check if the media is referenced by any user
+      if (
+        favouritedBy.length === 0 &&
+        watchlistBy.length === 0 &&
+        watchedBy.length === 0
+      ) {
+        // If no references are found, delete the media
+        await prisma.media.delete({ where: { id: id } });
+        console.log(`Deleted unreferenced media with id: ${id}`);
+      }
+    }
+  } catch (error) {
+    console.error("Error cleaning up unreferenced media:", error);
+  } finally {
+    await prisma.$disconnect();
   }
 }

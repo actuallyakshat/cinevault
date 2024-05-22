@@ -66,7 +66,6 @@ export default function MediaCrudButtons({
             (details?.first_air_date?.split("-")[0] as string),
           genres: allGenres as string[],
         };
-        console.log(payload);
         const response = await addToWatchlist(payload, userId);
         if (response.success) {
           toast({
