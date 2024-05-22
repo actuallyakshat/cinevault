@@ -101,3 +101,12 @@
     hsl(0deg 0% 7%) 100%
   );
 }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #09090b white;
+}
+
+.dark {
+  scrollbar-color: white #09090b;
+}

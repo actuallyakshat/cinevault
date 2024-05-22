@@ -19,7 +19,7 @@ export default function GenreFilter({
   handleGenreChange: (genre: string) => void;
 }) {
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger>
         <Button
           variant="ghost"

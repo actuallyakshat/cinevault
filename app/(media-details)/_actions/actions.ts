@@ -547,36 +547,3 @@ export async function updateReview(
     return { success: false, message: "Failed to update review" };
   }
 }
-
-export async function cleanUpUnreferencedMedia() {
-  try {
-    // Fetch all media entries
-    const allMedia = await prisma.media.findMany({
-      include: {
-        favouritedBy: true,
-        watchlistBy: true,
-        watchedBy: true,
-      },
-    });
-
-    // Iterate through all media entries and delete unreferenced ones
-    for (const media of allMedia) {
-      const { id, favouritedBy, watchlistBy, watchedBy } = media;
-
-      // Check if the media is referenced by any user
-      if (
-        favouritedBy.length === 0 &&
-        watchlistBy.length === 0 &&
-        watchedBy.length === 0
-      ) {
-        // If no references are found, delete the media
-        await prisma.media.delete({ where: { id: id } });
-        console.log(`Deleted unreferenced media with id: ${id}`);
-      }
-    }
-  } catch (error) {
-    console.error("Error cleaning up unreferenced media:", error);
-  } finally {
-    await prisma.$disconnect();
-  }
-}

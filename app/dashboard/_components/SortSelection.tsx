@@ -45,6 +45,11 @@ const SortSelection = ({
   };
 
   useEffect(() => {
+    if (selectedList != "Watched" && sortCriterion == "rating") {
+      setSortOrder("none");
+      setSortCriterion("");
+      return;
+    }
     if (sortCriterion) {
       if (sortCriterion === "name") {
         setButtontitle(`Sort by Name ${getArrow("name")}`);
@@ -57,10 +62,10 @@ const SortSelection = ({
       setButtontitle("Sort");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortCriterion, sortOrder]);
+  }, [sortCriterion, sortOrder, selectedList]);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         className={`${sortOrder !== "none" ? "underline" : ""}`}
       >

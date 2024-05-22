@@ -8,8 +8,7 @@ import FavoriteMedia from "./_components/FavoriteMedia";
 import WatchedMedia from "./_components/WatchedMedia";
 import SortSelection from "./_components/SortSelection";
 import GenreFilter from "./GenreFilter";
-import { cleanUpUnreferencedMedia } from "../(media-details)/_actions/actions";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Dashboard() {
   const [availableGenres, setAvailableGenres] = React.useState<any>([]);
@@ -27,6 +26,7 @@ export default function Dashboard() {
   const [finalMediaList, setFinalMediaList] = React.useState<any[]>([]);
   const { userDetails } = useContext(AuthContext);
   const [mediaList, setMediaList] = React.useState<any>([]);
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
 
   // Media assignment to specific lists and filtering by media type
   useEffect(() => {
@@ -124,6 +124,13 @@ export default function Dashboard() {
     setFinalMediaList(sortedList);
   }, [sortedList]);
 
+  useEffect(() => {
+    if (selectedGenres.length > 0) {
+      setSelectedGenres([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedList]);
+
   // Extract available genres
   useEffect(() => {
     if (mediaList.length > 0) {
@@ -149,12 +156,42 @@ export default function Dashboard() {
     );
   };
 
+  //Search Logic
+  useEffect(() => {
+    if (searchQuery === "") {
+      // Reset to the original media list when the search query is cleared
+      setFilteredMediaList(mediaList);
+      sortMediaList(); // Re-sort the list based on the current sorting criteria
+      return;
+    }
+    if (searchQuery.length > 0) {
+      if (selectedList === "Watched") {
+        const filteredList = mediaList.filter((media: any) =>
+          media?.media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+        setFinalMediaList(filteredList);
+        return;
+      } else {
+        const filteredList = mediaList.filter((media: any) =>
+          media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+        setFinalMediaList(filteredList);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mediaList, searchQuery]);
+
+  useEffect(() => {
+    setSearchQuery("");
+  }, [selectedList]);
+
   if (!userDetails) {
     return (
       <div className="mx-auto max-w-screen-2xl animate-pulse px-6 py-16 lg:px-8">
         <div className="h-10 max-w-[350px] rounded-lg bg-muted"></div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
+            <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
             <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
             <div className="h-10 w-[180px] rounded-lg bg-muted"></div>
           </div>
@@ -180,19 +217,26 @@ export default function Dashboard() {
       <div className="flex w-full flex-col lg:flex-row lg:items-center lg:justify-between">
         <h1 className="text-3xl font-extrabold">Dashboard</h1>
       </div>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <SelectList
-            selectedList={selectedList}
-            setSelectedList={setSelectedList}
-          />
-          <SelectMediaTypeButton
-            mediaType={mediaType}
-            setMediaType={setMediaType}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 md:flex-nowrap">
+        <div className="flex w-full flex-wrap items-center justify-center gap-3 sm:flex-nowrap sm:justify-start">
+          <div className="flex w-full items-center gap-3 sm:w-fit">
+            <SelectList
+              selectedList={selectedList}
+              setSelectedList={setSelectedList}
+            />
+            <SelectMediaTypeButton
+              mediaType={mediaType}
+              setMediaType={setMediaType}
+            />
+          </div>
+
+          <Input
+            placeholder="Search"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full sm:w-[180px]"
           />
         </div>
-
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 sm:w-fit">
           <SortSelection
             sortCriterion={sortCriterion}
             setSortCriterion={setSortCriterion}
