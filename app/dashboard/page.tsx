@@ -1,165 +1,196 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import SelectMediaTypeButton from "./_components/SelectMediaTypeButton";
-import { AuthContext } from "@/providers/auth-provider";
-import SelectList from "./_components/SelectList";
-import WatchlistMedia from "./_components/WatchlistMedia";
-import FavoriteMedia from "./_components/FavoriteMedia";
-import WatchedMedia from "./_components/WatchedMedia";
-import SortSelection from "./_components/SortSelection";
-import GenreFilter from "./GenreFilter";
 import { Input } from "@/components/ui/input";
+import { AuthContext } from "@/providers/auth-provider";
+import { Media, Watched } from "@prisma/client";
+import { useContext, useEffect, useMemo, useState } from "react";
+import FavoriteMedia from "./_components/FavoriteMedia";
+import SelectList from "./_components/SelectList";
+import SelectMediaTypeButton from "./_components/SelectMediaTypeButton";
+import SortSelection from "./_components/SortSelection";
+import WatchedMedia from "./_components/WatchedMedia";
+import WatchlistMedia from "./_components/WatchlistMedia";
+import GenreFilter from "./GenreFilter";
+
+interface WatchedMedia extends Watched {
+  media: Media;
+}
+
+type ListType = "Watchlist" | "Favorites" | "Watched";
+type MediaType = "Movies" | "Shows";
 
 export default function Dashboard() {
-  const [availableGenres, setAvailableGenres] = useState<any[]>([]);
-  const [sortCriterion, setSortCriterion] = useState("");
-  const [sortOrder, setSortOrder] = useState("none");
-  const [mediaType, setMediaType] = useState<string>(
-    localStorage.getItem("mediaType") || "Movies",
+  const { userDetails, loading } = useContext(AuthContext);
+
+  const [mediaType, setMediaType] = useState<MediaType>(
+    (localStorage.getItem("mediaType") as MediaType) || "Movies",
   );
-  const [selectedList, setSelectedList] = useState<string>(
-    localStorage.getItem("selectedList") || "Watchlist",
+  const [selectedList, setSelectedList] = useState<ListType>(
+    (localStorage.getItem("selectedList") as ListType) || "Watchlist",
   );
+
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [mediaList, setMediaList] = useState<any[]>([]);
-  const [filteredMediaList, setFilteredMediaList] = useState<any[]>([]);
-  const [sortedList, setSortedList] = useState<any[]>([]);
-  const [finalMediaList, setFinalMediaList] = useState<any[]>([]);
-  const { userDetails } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortCriterion, setSortCriterion] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
 
-  // Media assignment to specific lists and filtering by media type
-  useEffect(() => {
-    if (userDetails && selectedList && mediaType) {
-      let selectedListData: any[] = [];
+  const processedMediaList = useMemo(() => {
+    if (!userDetails || loading) return [];
 
-      if (selectedList === "Watchlist") {
-        selectedListData = userDetails.watchlist;
-      } else if (selectedList === "Favorites") {
-        selectedListData = userDetails.favorites;
-      } else if (selectedList === "Watched") {
-        selectedListData = userDetails.watched;
+    const getSelectedListData = (): Media[] | WatchedMedia[] => {
+      switch (selectedList) {
+        case "Watchlist":
+          return userDetails.watchlist || [];
+        case "Favorites":
+          return userDetails.favorites || [];
+        case "Watched":
+          return userDetails.watched || [];
+        default:
+          return [];
       }
-      const mediaTypeToExtract =
-        mediaType.toLowerCase() === "movies" ? "movie" : "show";
-      if (selectedList === "Watched") {
-        const filteredList = selectedListData.filter(
-          (media: any) =>
-            media.media.mediaType.toLowerCase() === mediaTypeToExtract,
-        );
-        setMediaList(filteredList);
-        return;
-      }
+    };
 
-      const filteredList = selectedListData.filter(
-        (media: any) => media.mediaType.toLowerCase() === mediaTypeToExtract,
-      );
-      setMediaList(filteredList);
-    }
-  }, [userDetails, selectedList, mediaType]);
+    const selectedListData = getSelectedListData();
+    const mediaTypeToExtract =
+      mediaType.toLowerCase() === "movies" ? "movie" : "show";
 
-  // Filter media list based on selected genres
-  useEffect(() => {
-    let tempFilteredList = [...mediaList];
-    if (selectedGenres.length > 0) {
+    return selectedListData.filter((item) => {
+      const itemMediaType =
+        selectedList === "Watched"
+          ? (item as WatchedMedia).media?.mediaType?.toLowerCase()
+          : (item as Media).mediaType?.toLowerCase();
+
+      return itemMediaType === mediaTypeToExtract;
+    });
+  }, [userDetails, selectedList, mediaType, loading]);
+
+  // Genre filtering
+  const filteredMediaList = useMemo(() => {
+    if (selectedGenres.length === 0) return processedMediaList;
+
+    return processedMediaList.filter((media) => {
+      const genres =
+        selectedList === "Watched"
+          ? (media as WatchedMedia).media?.genres
+          : (media as Media).genres;
+
+      return genres?.some((genre) => selectedGenres.includes(genre));
+    });
+  }, [processedMediaList, selectedGenres, selectedList]);
+
+  // Sorting logic
+  const sortedMediaList = useMemo(() => {
+    if (sortOrder === "none") return filteredMediaList;
+
+    const sortedList = [...filteredMediaList].sort((a, b) => {
+      let valueA: any, valueB: any;
+      let comparisonType = "";
+
+      // Handle different sorting scenarios for Watched and other lists
       if (selectedList === "Watched") {
-        tempFilteredList = mediaList.filter((media: any) =>
-          media?.media?.genres?.some((genre: string) =>
-            selectedGenres.includes(genre),
-          ),
-        );
+        const mediaA = a as WatchedMedia;
+        const mediaB = b as WatchedMedia;
+
+        switch (sortCriterion) {
+          case "name":
+            valueA = mediaA.media?.title;
+            valueB = mediaB.media?.title;
+            comparisonType = "Watched Name";
+            return (
+              valueA?.localeCompare(valueB || "") *
+              (sortOrder === "desc" ? -1 : 1)
+            );
+
+          case "releaseYear":
+            valueA = mediaA.media?.releaseYear;
+            valueB = mediaB.media?.releaseYear;
+            comparisonType = "Watched Release Year";
+            return (
+              ((valueA || 0) - (valueB || 0)) * (sortOrder === "desc" ? -1 : 1)
+            );
+
+          case "rating":
+            valueA = mediaA.rating;
+            valueB = mediaB.rating;
+            comparisonType = "Watched Rating";
+            return (
+              ((valueA || 0) - (valueB || 0)) * (sortOrder === "desc" ? -1 : 1)
+            );
+
+          default:
+            return 0;
+        }
       } else {
-        tempFilteredList = mediaList.filter((media: any) =>
-          media?.genres?.some((genre: string) =>
-            selectedGenres.includes(genre),
-          ),
-        );
+        const mediaA = a as Media;
+        const mediaB = b as Media;
+
+        switch (sortCriterion) {
+          case "name":
+            valueA = mediaA.title;
+            valueB = mediaB.title;
+            comparisonType = "Name";
+            return (
+              valueA?.localeCompare(valueB || "") *
+              (sortOrder === "desc" ? -1 : 1)
+            );
+
+          case "releaseYear":
+            valueA = Number(mediaA.releaseYear) || 0;
+            valueB = Number(mediaB.releaseYear) || 0;
+            comparisonType = "Release Year";
+            return (valueA - valueB) * (sortOrder === "desc" ? -1 : 1);
+
+          default:
+            return 0;
+        }
       }
-    }
-    setFilteredMediaList(tempFilteredList);
-  }, [mediaList, selectedGenres, selectedList]);
+    });
 
-  // Sort filtered media list
-  const sortMediaList = () => {
-    let tempSortedList = [...filteredMediaList];
-    if (sortOrder === "none") {
-      setSortedList(tempSortedList);
-      return;
-    }
-    if (selectedList === "Watched") {
-      if (sortCriterion === "name") {
-        tempSortedList.sort((a: any, b: any) =>
-          a?.media?.title.localeCompare(b?.media?.title),
-        );
-      } else if (sortCriterion === "releaseYear") {
-        tempSortedList.sort(
-          (a: any, b: any) => a?.media?.releaseYear - b?.media?.releaseYear,
-        );
-      } else if (sortCriterion === "rating") {
-        tempSortedList.sort((a: any, b: any) => a.rating - b.rating);
-      }
-    } else {
-      if (sortCriterion === "name") {
-        tempSortedList.sort((a: any, b: any) => a.title.localeCompare(b.title));
-      } else if (sortCriterion === "releaseYear") {
-        tempSortedList.sort((a: any, b: any) => a.releaseYear - b.releaseYear);
-      }
-    }
-    if (sortOrder === "desc") tempSortedList.reverse();
-    setSortedList(tempSortedList);
-  };
+    return sortedList;
+  }, [filteredMediaList, sortCriterion, sortOrder, selectedList]);
 
-  useEffect(() => {
-    sortMediaList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredMediaList, sortCriterion, sortOrder]);
+  // Final list with search filtering
+  const finalMediaList = useMemo(() => {
+    if (!searchQuery) return sortedMediaList;
 
-  // Combine search logic with sorted list
-  useEffect(() => {
-    let tempFinalList = [...sortedList];
-    if (searchQuery.length > 0) {
-      if (selectedList === "Watched") {
-        tempFinalList = sortedList.filter((media: any) =>
-          media?.media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-      } else {
-        tempFinalList = sortedList.filter((media: any) =>
-          media?.title.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-      }
-    }
-    setFinalMediaList(tempFinalList);
-  }, [searchQuery, sortedList, selectedList]);
+    return sortedMediaList.filter((media) => {
+      const title =
+        selectedList === "Watched"
+          ? (media as WatchedMedia).media?.title
+          : (media as Media).title;
 
-  useEffect(() => {
-    if (selectedGenres.length > 0) {
-      setSelectedGenres([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedList]);
+      return title?.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+  }, [sortedMediaList, searchQuery, selectedList]);
 
-  // Extract available genres
-  useEffect(() => {
-    if (mediaList.length > 0) {
-      let allGenres;
-      if (selectedList === "Watched") {
-        allGenres = mediaList.flatMap((media: any) => media?.media?.genres);
-      } else {
-        allGenres = mediaList.flatMap((media: any) => media?.genres);
-      }
-      const uniqueGenresArray = Array.from(new Set(allGenres));
-      setAvailableGenres(uniqueGenresArray);
-    }
-  }, [mediaList, selectedList]);
+  // Available genres extraction
+  const availableGenres = useMemo(() => {
+    const allGenres = processedMediaList.flatMap((media) =>
+      selectedList === "Watched"
+        ? (media as WatchedMedia).media?.genres || []
+        : (media as Media).genres || [],
+    );
+    return Array.from(new Set(allGenres));
+  }, [processedMediaList, selectedList]);
 
+  // Genre change handler
   const handleGenreChange = (genre: string) => {
-    setSelectedGenres((prevSelectedGenres) =>
-      prevSelectedGenres.includes(genre)
-        ? prevSelectedGenres.filter((g) => g !== genre)
-        : [...prevSelectedGenres, genre],
+    setSelectedGenres((prev) =>
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre],
     );
   };
 
+  // Reset genres when list changes
+  useEffect(() => {
+    setSelectedGenres([]);
+  }, [selectedList]);
+
+  // Persist media type and list selection
+  useEffect(() => {
+    localStorage.setItem("mediaType", mediaType);
+    localStorage.setItem("selectedList", selectedList);
+  }, [mediaType, selectedList]);
+
+  // Loading state
   if (!userDetails) {
     return (
       <div className="mx-auto max-w-screen-2xl animate-pulse px-6 py-16 lg:px-8">

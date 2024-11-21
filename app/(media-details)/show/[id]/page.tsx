@@ -1,27 +1,26 @@
 "use client";
+import LoadingScreen from "@/app/_components/LoadingScreen";
+import { Button } from "@/components/ui/button";
+import { formatShowDate, getGenreById } from "@/lib/functions";
+import { TMDBShowDetails } from "@/types/tmdb";
+import { MonitorPlay } from "lucide-react";
+import Image from "next/image";
 import React, { useEffect } from "react";
 import { getMediaDetails, getTrailer } from "../../_actions/actions";
-import Image from "next/image";
-import {
-  formatMovieDate,
-  formatShowDate,
-  getGenreById,
-  getRuntimeFromMinutes,
-} from "@/lib/functions";
-import LoadingScreen from "@/app/_components/LoadingScreen";
 import MediaCrudButtons from "../../_components/MediaCrudButtons";
-import { Button } from "@/components/ui/button";
-import { MonitorPlay } from "lucide-react";
 import TrailerFrame from "../../_components/TrailerFrame";
-import { TMDBShowDetails } from "@/types/tmdb";
 export default function Show({ params }: { params: { id: string } }) {
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
+
+  const { id } = params;
+
   const [loading, setLoading] = React.useState(true);
   const [details, setDetails] = React.useState<TMDBShowDetails | null>(null);
   const [trailer, setTrailer] = React.useState<any>(null);
   const [trailerFrame, setTrailerFrame] = React.useState<any>(null);
-  const { id } = params;
+
   const movieBackdrop = `${imagePrefix}${details?.backdrop_path}`;
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -29,7 +28,6 @@ export default function Show({ params }: { params: { id: string } }) {
         getMediaDetails({ mediaType: "tv", mediaId: id }),
         getTrailer({ mediaId: id, mediaType: "tv" }),
       ]);
-      console.log(response);
       setDetails(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",
@@ -43,6 +41,7 @@ export default function Show({ params }: { params: { id: string } }) {
   }, [id]);
 
   if (loading) return <LoadingScreen />;
+
   if (!loading && !details)
     return (
       <div>

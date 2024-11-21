@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,64 +16,61 @@ const SortSelection = ({
 }: {
   sortCriterion: string;
   setSortCriterion: (criterion: string) => void;
-  sortOrder: string;
-  setSortOrder: (order: string) => void;
+  sortOrder: "asc" | "desc" | "none";
+  setSortOrder: React.Dispatch<React.SetStateAction<"asc" | "desc" | "none">>;
   selectedList: string;
 }) => {
   const [buttonTitle, setButtontitle] = useState("Sort");
+
   const toggleSortOrder = (criterion: string) => {
     if (sortCriterion !== criterion) {
       setSortCriterion(criterion);
       setSortOrder("asc");
     } else {
-      if (sortOrder === "asc") {
-        setSortOrder("desc");
-      } else if (sortOrder === "desc") {
-        setSortOrder("none");
-        setSortCriterion("");
-      } else {
-        setSortOrder("asc");
-      }
+      setSortOrder((prev) =>
+        prev === "asc" ? "desc" : prev === "desc" ? "none" : "asc",
+      );
     }
   };
 
-  const getArrow = (criterion: string) => {
-    if (sortCriterion !== criterion) return "";
-    if (sortOrder === "asc") return "↑";
-    if (sortOrder === "desc") return "↓";
-    return "";
-  };
+  const getArrow = useCallback(
+    (criterion: string) => {
+      if (sortCriterion !== criterion) return "";
+      return sortOrder === "asc" ? "↑" : sortOrder === "desc" ? "↓" : "";
+    },
+    [sortCriterion, sortOrder],
+  );
 
   useEffect(() => {
-    if (selectedList != "Watched" && sortCriterion == "rating") {
+    if (selectedList !== "Watched" && sortCriterion === "rating") {
       setSortOrder("none");
       setSortCriterion("");
       return;
     }
-    if (sortCriterion) {
-      if (sortCriterion === "name") {
-        setButtontitle(`Sort by Name ${getArrow("name")}`);
-      } else if (sortCriterion === "releaseYear") {
-        setButtontitle(`Sort by Release Year ${getArrow("releaseYear")}`);
-      } else if (sortCriterion === "rating") {
-        setButtontitle(`Sort by Rating ${getArrow("rating")}`);
-      }
-    } else {
-      setButtontitle("Sort");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortCriterion, sortOrder, selectedList]);
+
+    const titleMap: Record<string, string> = {
+      name: `Sort by Name ${getArrow("name")}`,
+      releaseYear: `Sort by Release Year ${getArrow("releaseYear")}`,
+      rating: `Sort by Rating ${getArrow("rating")}`,
+    };
+
+    setButtontitle(sortCriterion ? titleMap[sortCriterion] : "Sort");
+  }, [
+    sortCriterion,
+    sortOrder,
+    selectedList,
+    setSortCriterion,
+    setSortOrder,
+    getArrow,
+  ]);
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger
-        className={`${sortOrder !== "none" ? "underline" : ""}`}
-      >
+      <DropdownMenuTrigger className={sortOrder !== "none" ? "underline" : ""}>
         <Button variant="ghost" className="text-sm">
           {buttonTitle}
         </Button>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent className="font-medium">
         <DropdownMenuItem onSelect={() => toggleSortOrder("name")}>
           Name {getArrow("name")}

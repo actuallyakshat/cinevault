@@ -23,7 +23,7 @@ async function searchMedia(query: string, mediaType: string) {
       const movies = response.data.results;
       return movies;
     } else {
-      console.log("No data found for search");
+      console.error("No data found for search");
     }
   } catch (error) {
     console.error("Error fetching data:", error);

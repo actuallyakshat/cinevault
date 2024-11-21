@@ -30,7 +30,6 @@ export default function Movie({ params }: { params: { id: string } }) {
         getMediaDetails({ mediaType: "movie", mediaId: id }),
         getTrailer({ mediaId: id, mediaType: "movie" }),
       ]);
-      console.log(response);
       setDetails(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",

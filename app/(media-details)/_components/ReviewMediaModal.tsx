@@ -17,6 +17,8 @@ import { writeReview } from "../_actions/actions";
 import { AuthContext } from "@/providers/auth-provider";
 import { Loader } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Genre } from "@/types/tmdb";
+import { MediaDetails } from "./MediaCrudButtons";
 export default function ReviewMediaModal({
   title,
   details,
@@ -24,7 +26,7 @@ export default function ReviewMediaModal({
   refreshUserDetails,
 }: {
   title: string;
-  details: any;
+  details: MediaDetails | undefined;
   mediaType: string;
   refreshUserDetails: Function;
 }) {
@@ -48,7 +50,8 @@ export default function ReviewMediaModal({
     e.preventDefault();
     setLoading(true);
     try {
-      const allGenres = details.genres.map((genre: any) =>
+      if (!details) return;
+      const allGenres = details.genres.map((genre: Genre) =>
         getGenreById(genre.id),
       );
 

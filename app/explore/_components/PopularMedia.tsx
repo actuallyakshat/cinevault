@@ -17,7 +17,6 @@ export default function PopularMedia({ mediaType }: { mediaType: string }) {
       const response = await getPopularMedia({ mediaType: media, pageNumber });
       if (response) {
         setPopularMedia(response.results);
-        console.log(response.results);
       }
       setLoading(false);
     }

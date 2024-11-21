@@ -1,9 +1,10 @@
-import { getUserDetails } from "@/app/dashboard/_actions/actions";
 import EditReviewModal from "@/app/dashboard/_components/EditReviewModal";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { getGenreById } from "@/lib/functions";
 import { AuthContext } from "@/providers/auth-provider";
+import { Genre, TMDBMovieDetails, TMDBShowDetails } from "@/types/tmdb";
+import { UserDetailsWithLists } from "@/types/user";
 import { Heart, Loader, Popcorn } from "lucide-react";
 import React, { useContext, useEffect } from "react";
 import {
@@ -13,11 +14,17 @@ import {
   removeFromWatchlist,
 } from "../_actions/actions";
 import ReviewMediaModal from "./ReviewMediaModal";
-import { UserDetailsWithLists } from "@/types/user";
+
+export type MediaDetails = (TMDBMovieDetails | TMDBShowDetails) & {
+  first_air_date?: string;
+  release_date?: string;
+  poster_path: string;
+  genres: { id: number; name: string }[];
+};
 
 interface MediaCrudButtonsProps {
   title: string;
-  details: any;
+  details: MediaDetails | undefined;
   mediaType: string;
 }
 
@@ -46,13 +53,16 @@ export default function MediaCrudButtons({
     }
   }, [userDetails]);
 
+  if (!details) return null;
+
   const handleWatchlist = async (request: string) => {
     setWatchlistLoading(true);
     if (request == "add") {
       try {
         const allGenres = details.genres
-          .map((genre: any) => getGenreById(genre.id))
+          .map((genre: Genre) => getGenreById(genre.id))
           .filter(Boolean);
+
         const payload = {
           id: "",
           tmdbId: details.id.toString() as string,
@@ -118,7 +128,7 @@ export default function MediaCrudButtons({
     setFavoritesLoading(true);
     if (request == "add") {
       try {
-        const allGenres = details.genres.map((genre: any) =>
+        const allGenres = details.genres.map((genre: Genre) =>
           getGenreById(genre.id),
         );
         const payload = {
@@ -246,15 +256,18 @@ export default function MediaCrudButtons({
   );
 }
 
-function isPresentInUser(userDetails: UserDetailsWithLists, details: any) {
+function isPresentInUser(
+  userDetails: UserDetailsWithLists | undefined,
+  details: MediaDetails,
+) {
   const isInWatchlist = userDetails?.watchlist?.some(
-    (item: any) => item.tmdbId == details.id,
+    (item) => String(item.tmdbId) == String(details.id),
   );
   const isInFavorites = userDetails?.favorites?.some(
-    (item: any) => item.tmdbId == details.id,
+    (item) => String(item.tmdbId) == String(details.id),
   );
   const isInWatchedList = userDetails?.watched?.find(
-    (item: any) => item.media.tmdbId == details.id,
+    (item) => String(item.media.tmdbId) == String(details.id),
   );
 
   return { isInWatchlist, isInFavorites, isInWatchedList };

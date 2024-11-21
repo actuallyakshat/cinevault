@@ -7,8 +7,10 @@ import { Media, User, Watched } from "@prisma/client";
 import React, { createContext, useState, useEffect } from "react";
 
 interface AuthContextProps {
-  userDetails: UserDetailsWithLists;
-  setUserDetails: React.Dispatch<React.SetStateAction<UserDetailsWithLists>>;
+  userDetails: UserDetailsWithLists | undefined;
+  setUserDetails: React.Dispatch<
+    React.SetStateAction<UserDetailsWithLists | undefined>
+  >;
   loading: boolean;
   refreshUserDetails: () => Promise<void>;
 }
@@ -19,9 +21,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useUser();
   const { loaded } = useClerk();
   const [loading, setLoading] = useState<boolean>(true);
-  const [userDetails, setUserDetails] = useState<UserDetailsWithLists>(
-    {} as UserDetailsWithLists,
-  );
+  const [userDetails, setUserDetails] = useState<
+    UserDetailsWithLists | undefined
+  >();
 
   const refreshUserDetails = async () => {
     if (!userDetails) return;
