@@ -1,16 +1,18 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import React from "react";
-import { useTheme } from "next-themes";
-import { useAuth, useClerk, useUser } from "@clerk/nextjs";
+import { useGetSocialsLinks } from "@/hooks/constants";
+import { useClerk, useUser } from "@clerk/nextjs";
 import { Github, Heart } from "lucide-react";
-const LinkedIn = "https://www.linkedin.com/in/akshat-dubey29/";
-const GitHub = "https://github.com/actuallyakshat/cinevault";
+import { useTheme } from "next-themes";
+import Link from "next/link";
+
 function Hero() {
   const { user } = useUser();
   const { openSignIn } = useClerk();
   const { theme } = useTheme();
+  const { linkedin, github } = useGetSocialsLinks();
+
   return (
     <div
       className={`herobg ${theme == "dark" ? "dark" : ""} -mt-16 flex h-screen flex-col items-center justify-center gap-4 px-4`}
@@ -40,12 +42,12 @@ function Hero() {
         <div className="flex items-center gap-2">
           Made with <Heart className="size-5" /> by{" "}
           <span className="font-bold">
-            <Link href={LinkedIn} target="_blank">
+            <Link href={linkedin} target="_blank">
               Akshat Dubey
             </Link>
           </span>
         </div>
-        <Link href={GitHub} className="flex items-center gap-2" target="_blank">
+        <Link href={github} className="flex items-center gap-2" target="_blank">
           GitHub
           <Github className="size-5" />
         </Link>

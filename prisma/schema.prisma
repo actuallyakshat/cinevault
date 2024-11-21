@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Define the User model
 model User {
   id        String    @id @default(uuid())
   name      String
@@ -17,7 +16,6 @@ model User {
   watchlist Media[]   @relation(name: "Watchlist")
 }
 
-// Define the Movie model
 model Media {
   id           String    @id @default(uuid())
   tmdbId       String
@@ -31,7 +29,6 @@ model Media {
   watchedBy    Watched[] @relation(name: "Watched")
 }
 
-// Define the Watched model
 model Watched {
   id      String @id @default(uuid())
   rating  Int

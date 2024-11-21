@@ -1,58 +1,52 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  SignedIn,
-  SignedOut,
-  SignOutButton,
-  useAuth,
-  useClerk,
-} from "@clerk/nextjs";
+import { SignedIn, SignedOut, useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
-import ThemeToggler from "./ThemeToggler";
 import MobileSidebar from "./MobileSidebar";
-const navLinks = [
-  { href: "/search", label: "Search" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/explore", label: "Explore" },
-];
+import ThemeToggler from "./ThemeToggler";
+import { useGetNavItems } from "@/hooks/constants";
 
 export default function Navbar() {
   const { signOut, isSignedIn } = useAuth();
   const pathname = usePathname();
   const { openSignIn } = useClerk();
+
+  const navItems = useGetNavItems();
+
   return (
-    <nav
-      className={`${pathname == "/" ? "" : "bg-background"} fixed z-[30] flex h-16 w-full items-center justify-center`}
-    >
-      <div className="flex h-full w-full items-center justify-between px-8 lg:container lg:px-4">
-        <h1 className="hidden text-xl font-extrabold lg:block">
-          <Link href={isSignedIn ? "/dashboard" : "/"}>CineVault</Link>
-        </h1>
-        <MobileSidebar menuItems={navLinks} />
-        <div className="hidden items-center space-x-2 lg:flex">
-          <SignedIn>
-            {navLinks.map(({ href, label }) => (
-              <NavLink key={href} href={href} title={label} />
-            ))}
-          </SignedIn>
+    <header>
+      <nav
+        className={`${pathname == "/" ? "" : "bg-background"} fixed z-[30] flex h-16 w-full items-center justify-center`}
+      >
+        <div className="flex h-full w-full items-center justify-between px-8 lg:container lg:px-4">
+          <h1 className="hidden text-xl font-extrabold lg:block">
+            <Link href={isSignedIn ? "/dashboard" : "/"}>CineVault</Link>
+          </h1>
+          <MobileSidebar menuItems={navItems} />
+          <div className="hidden items-center space-x-2 lg:flex">
+            <SignedIn>
+              {navItems.map(({ href, label }) => (
+                <NavLink key={href} href={href} title={label} />
+              ))}
+            </SignedIn>
+          </div>
+          <div className="flex items-center justify-end gap-3">
+            <SignedIn>
+              <Button variant="ghost" onClick={() => signOut()}>
+                Sign out
+              </Button>
+            </SignedIn>
+            <SignedOut>
+              <Button variant={"ghost"} onClick={() => openSignIn()}>
+                Sign in
+              </Button>
+            </SignedOut>
+            <ThemeToggler />
+          </div>
         </div>
-        <div className="flex items-center justify-end gap-3">
-          <SignedIn>
-            <Button variant="ghost" onClick={() => signOut()}>
-              Sign out
-            </Button>
-          </SignedIn>
-          <SignedOut>
-            <Button variant={"ghost"} onClick={() => openSignIn()}>
-              Sign in
-            </Button>
-          </SignedOut>
-          <ThemeToggler />
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 }
 

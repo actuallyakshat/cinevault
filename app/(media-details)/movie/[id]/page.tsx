@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect } from "react";
 import { getMediaDetails, getTrailer } from "../../_actions/actions";
 import Image from "next/image";
@@ -12,11 +13,12 @@ import MediaCrudButtons from "../../_components/MediaCrudButtons";
 import { Button } from "@/components/ui/button";
 import { MonitorPlay } from "lucide-react";
 import TrailerFrame from "../../_components/TrailerFrame";
+import { TMDBMovieDetails } from "@/types/tmdb";
 
 export default function Movie({ params }: { params: { id: string } }) {
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
   const [loading, setLoading] = React.useState(true);
-  const [details, setDetails] = React.useState<any>(null);
+  const [details, setDetails] = React.useState<TMDBMovieDetails | null>(null);
   const [trailer, setTrailer] = React.useState<any>(null);
   const [trailerFrame, setTrailerFrame] = React.useState<any>(null);
   const { id } = params;
@@ -28,6 +30,7 @@ export default function Movie({ params }: { params: { id: string } }) {
         getMediaDetails({ mediaType: "movie", mediaId: id }),
         getTrailer({ mediaId: id, mediaType: "movie" }),
       ]);
+      console.log(response);
       setDetails(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",
@@ -41,6 +44,7 @@ export default function Movie({ params }: { params: { id: string } }) {
   }, [id]);
 
   if (loading) return <LoadingScreen />;
+
   if (!loading && !details)
     return (
       <div>
@@ -52,10 +56,13 @@ export default function Movie({ params }: { params: { id: string } }) {
         </p>
       </div>
     );
+
+  if (!details) return null;
+
   return (
     <div className="-mt-16 min-h-screen pb-16 text-white">
       <div
-        className="fixed inset-0 z-[-2] scale-110 overflow-y-auto bg-cover bg-center bg-no-repeat blur-lg"
+        className="fixed inset-0 z-[-2] scale-110 overflow-y-auto bg-cover bg-center bg-no-repeat blur-md"
         style={{
           backgroundImage: movieBackdrop ? `url(${movieBackdrop})` : "none",
         }}

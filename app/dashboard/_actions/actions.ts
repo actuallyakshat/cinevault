@@ -1,10 +1,9 @@
 "use server";
 import prisma from "@/db";
-import { ClerkMiddlewareAuthObject } from "@clerk/nextjs/server";
 import axios from "axios";
 
 const TOKEN = process.env.TMDB_API_TOKEN as string;
-async function searchMedia(query: string, mediaType: string): Promise<void> {
+async function searchMedia(query: string, mediaType: string) {
   try {
     // Make a GET request to search for movies
     const response = await axios.get(
@@ -68,4 +67,4 @@ const getUserDetails = async ({
   }
 };
 
-export { searchMedia, getUserDetails };
+export { getUserDetails, searchMedia };

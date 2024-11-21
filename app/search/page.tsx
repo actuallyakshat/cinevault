@@ -5,12 +5,15 @@ import SelectMediaTypeButton from "../dashboard/_components/SelectMediaTypeButto
 import { debounce } from "lodash";
 import { searchMedia } from "../dashboard/_actions/actions";
 import SearchResultCard from "./_components/SearchResultCard";
+import { TMDBMovieSearchQuery, TMDBShowSearchQuery } from "@/types/tmdb";
 
 export default function Search() {
-  const [mediaType, setMediaType] = React.useState(
-    localStorage.getItem("mediaType") || "Movies",
+  const [mediaType, setMediaType] = React.useState<"Movies" | "Shows">(
+    (localStorage.getItem("mediaType") as "Movies" | "Shows") || "Movies",
   );
-  const [searchResults, setSearchResults] = React.useState<any>([]);
+  const [searchResults, setSearchResults] = React.useState<
+    TMDBMovieSearchQuery[]
+  >([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
@@ -22,6 +25,7 @@ export default function Search() {
         searchQuery,
         mediaType === "Movies" ? "movie" : "tv",
       );
+
       setSearchResults(results);
       setLoading(false);
     }, 1000);
@@ -72,13 +76,15 @@ export default function Search() {
       )}
       {!loading && searchQuery && searchResults?.length > 0 && (
         <div className="mt-10 space-y-8 lg:space-y-3">
-          {searchResults.map((result: any) => (
-            <SearchResultCard
-              key={result.id}
-              result={result}
-              mediaType={mediaType}
-            />
-          ))}
+          {searchResults.map(
+            (result: TMDBMovieSearchQuery | TMDBShowSearchQuery) => (
+              <SearchResultCard
+                key={result.id}
+                result={result}
+                mediaType={mediaType}
+              />
+            ),
+          )}
         </div>
       )}
       {!searchQuery && (

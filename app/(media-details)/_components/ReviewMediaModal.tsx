@@ -78,7 +78,7 @@ export default function ReviewMediaModal({
         });
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     setLoading(false);
   }

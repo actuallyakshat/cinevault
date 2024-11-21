@@ -4,8 +4,9 @@ import ExploreMediaCard from "./ExploreMediaCard";
 import { getPopularMedia } from "../_actions/actions";
 import PaginationComponent from "./Pagination";
 import LoadingSpinner from "@/app/_components/LoadingSpinner";
+import { FeaturedByTMDB } from "@/types/tmdb";
 export default function PopularMedia({ mediaType }: { mediaType: string }) {
-  const [popularMedia, setPopularMedia] = React.useState<any[]>([]);
+  const [popularMedia, setPopularMedia] = React.useState<FeaturedByTMDB[]>([]);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [loading, setLoading] = React.useState(true);
   useEffect(() => {
@@ -16,6 +17,7 @@ export default function PopularMedia({ mediaType }: { mediaType: string }) {
       const response = await getPopularMedia({ mediaType: media, pageNumber });
       if (response) {
         setPopularMedia(response.results);
+        console.log(response.results);
       }
       setLoading(false);
     }

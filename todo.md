@@ -1,0 +1,10 @@
+- [ ] Refactor the codebase with added modulatiry and type safety
+- [ ] Add optimistic UI
+- [ ] Add friendships
+- [ ] Add 'Recommend to a friend' feature
+- [ ] Add pagination to dashboard
+- [ ] Add 'Movie Boards'
+  - [ ] They can be made in collaboration
+  - [ ] They can be searched globally if they are public
+  - [ ] An image can be uploaded as the cover of the movie board using cloudinary
+- [ ] Consider adding caching with Redis (Upstash)

@@ -13,10 +13,11 @@ import MediaCrudButtons from "../../_components/MediaCrudButtons";
 import { Button } from "@/components/ui/button";
 import { MonitorPlay } from "lucide-react";
 import TrailerFrame from "../../_components/TrailerFrame";
+import { TMDBShowDetails } from "@/types/tmdb";
 export default function Show({ params }: { params: { id: string } }) {
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
   const [loading, setLoading] = React.useState(true);
-  const [details, setDetails] = React.useState<any>(null);
+  const [details, setDetails] = React.useState<TMDBShowDetails | null>(null);
   const [trailer, setTrailer] = React.useState<any>(null);
   const [trailerFrame, setTrailerFrame] = React.useState<any>(null);
   const { id } = params;
@@ -28,6 +29,7 @@ export default function Show({ params }: { params: { id: string } }) {
         getMediaDetails({ mediaType: "tv", mediaId: id }),
         getTrailer({ mediaId: id, mediaType: "tv" }),
       ]);
+      console.log(response);
       setDetails(response);
       const filteredTrailer = trailerResponse.results.find(
         (result: any) => result.type === "Trailer",
@@ -52,6 +54,8 @@ export default function Show({ params }: { params: { id: string } }) {
         </p>
       </div>
     );
+
+  if (!details) return null;
   return (
     <div className="-mt-16 min-h-screen pb-16 text-white">
       <div
@@ -66,7 +70,7 @@ export default function Show({ params }: { params: { id: string } }) {
           <Image
             loading="lazy"
             src={imagePrefix + details?.poster_path}
-            alt={details?.name}
+            alt={details.name}
             width={500}
             height={500}
             className="mx-auto aspect-auto min-h-[400px] w-[300px] rounded-lg object-cover shadow-2xl shadow-black/70"
@@ -93,7 +97,7 @@ export default function Show({ params }: { params: { id: string } }) {
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
             <div className="max-w-3xl text-5xl font-black">{details?.name}</div>
             <p className="font-medium text-white/80">
-              {formatShowDate(details?.first_air_date)}
+              {formatShowDate(details!.first_air_date)}
             </p>
           </div>
           <div className="my-2 font-semibold text-white/80">
@@ -116,9 +120,6 @@ export default function Show({ params }: { params: { id: string } }) {
 
           <div className="mb-3 mt-1 flex items-center gap-3 font-medium text-white/80">
             <div>Rating: {(details?.vote_average).toFixed(2)}/10</div>
-            {details.runtime && (
-              <div>Runtime: {getRuntimeFromMinutes(details.runtime)}</div>
-            )}
           </div>
           <p className="max-w-2xl text-lg">{details?.overview}</p>
           <div className="mt-8 w-full">

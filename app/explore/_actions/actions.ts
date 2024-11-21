@@ -23,7 +23,7 @@ export async function getTopRatedMedia({
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -51,7 +51,7 @@ export async function getLatestMedia({
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -76,6 +76,6 @@ export async function getPopularMedia({
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }

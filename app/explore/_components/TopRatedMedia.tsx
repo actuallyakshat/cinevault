@@ -4,8 +4,9 @@ import { getTopRatedMedia } from "../_actions/actions";
 import ExploreMediaCard from "./ExploreMediaCard";
 import PaginationComponent from "./Pagination";
 import LoadingSpinner from "@/app/_components/LoadingSpinner";
+import { FeaturedByTMDB } from "@/types/tmdb";
 export default function TopRatedMedia({ mediaType }: { mediaType: string }) {
-  const [topMedia, setTopMedia] = React.useState<any[]>([]);
+  const [topMedia, setTopMedia] = React.useState<FeaturedByTMDB[]>([]);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [loading, setLoading] = React.useState(true);
   useEffect(() => {

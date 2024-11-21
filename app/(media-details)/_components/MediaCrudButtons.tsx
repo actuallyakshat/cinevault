@@ -1,32 +1,38 @@
+import { getUserDetails } from "@/app/dashboard/_actions/actions";
+import EditReviewModal from "@/app/dashboard/_components/EditReviewModal";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { getGenreById } from "@/lib/functions";
+import { AuthContext } from "@/providers/auth-provider";
 import { Heart, Loader, Popcorn } from "lucide-react";
 import React, { useContext, useEffect } from "react";
-import ReviewMediaModal from "./ReviewMediaModal";
 import {
   addToFavorites,
   addToWatchlist,
   removeFromFavorites,
   removeFromWatchlist,
 } from "../_actions/actions";
-import { getGenreById } from "@/lib/functions";
-import { AuthContext } from "@/providers/auth-provider";
-import { useToast } from "@/components/ui/use-toast";
-import { getUserDetails } from "@/app/dashboard/_actions/actions";
-import EditReviewModal from "@/app/dashboard/_components/EditReviewModal";
+import ReviewMediaModal from "./ReviewMediaModal";
+import { UserDetailsWithLists } from "@/types/user";
+
+interface MediaCrudButtonsProps {
+  title: string;
+  details: any;
+  mediaType: string;
+}
+
+const buttonStyle =
+  "w-full bg-white text-black hover:bg-white/80 flex items-center justify-center gap-2";
 
 export default function MediaCrudButtons({
   title,
   details,
   mediaType,
-}: {
-  title: string;
-  details: any;
-  mediaType: string;
-}) {
-  const buttonStyle =
-    "w-full bg-white text-black hover:bg-white/80 flex items-center justify-center gap-2";
-  const { userDetails, setUserDetails } = useContext(AuthContext);
+}: MediaCrudButtonsProps) {
+  const { userDetails, setUserDetails, refreshUserDetails } =
+    useContext(AuthContext);
   const [userId, setUserId] = React.useState<string>("");
+
   const [favoritesLoading, setFavoritesLoading] =
     React.useState<boolean>(false);
   const [watchlistLoading, setWatchlistLoading] =
@@ -39,14 +45,6 @@ export default function MediaCrudButtons({
       setUserId(userDetails.id);
     }
   }, [userDetails]);
-
-  const refreshUserDetails = async () => {
-    const freshUserDetails = await getUserDetails({
-      email: userDetails.email,
-      name: userDetails.name,
-    });
-    setUserDetails(freshUserDetails);
-  };
 
   const handleWatchlist = async (request: string) => {
     setWatchlistLoading(true);
@@ -80,7 +78,7 @@ export default function MediaCrudButtons({
           });
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     } else if (request == "remove") {
       try {
@@ -105,7 +103,7 @@ export default function MediaCrudButtons({
           title: "Error",
           description: `${error}`,
         });
-        console.log(error);
+        console.error(error);
       }
     } else {
       toast({
@@ -148,7 +146,7 @@ export default function MediaCrudButtons({
           });
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     } else if (request == "remove") {
       try {
@@ -173,21 +171,15 @@ export default function MediaCrudButtons({
           title: "Error",
           description: `${error}`,
         });
-        console.log(error);
+        console.error(error);
       }
     }
     setFavoritesLoading(false);
   };
 
-  const isInWatchlist = userDetails?.watchlist?.some(
-    (item: any) => item.tmdbId == details.id,
-  );
-  const isInFavorites = userDetails?.favorites?.some(
-    (item: any) => item.tmdbId == details.id,
-  );
-
-  const isInWatchedList = userDetails?.watched?.find(
-    (item: any) => item.media.tmdbId == details.id,
+  const { isInWatchlist, isInFavorites, isInWatchedList } = isPresentInUser(
+    userDetails,
+    details,
   );
 
   if (!userDetails)
@@ -252,4 +244,18 @@ export default function MediaCrudButtons({
       </div>
     </div>
   );
+}
+
+function isPresentInUser(userDetails: UserDetailsWithLists, details: any) {
+  const isInWatchlist = userDetails?.watchlist?.some(
+    (item: any) => item.tmdbId == details.id,
+  );
+  const isInFavorites = userDetails?.favorites?.some(
+    (item: any) => item.tmdbId == details.id,
+  );
+  const isInWatchedList = userDetails?.watched?.find(
+    (item: any) => item.media.tmdbId == details.id,
+  );
+
+  return { isInWatchlist, isInFavorites, isInWatchedList };
 }

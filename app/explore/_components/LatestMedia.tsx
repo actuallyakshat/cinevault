@@ -4,8 +4,9 @@ import ExploreMediaCard from "./ExploreMediaCard";
 import { getLatestMedia } from "../_actions/actions";
 import PaginationComponent from "./Pagination";
 import LoadingSpinner from "@/app/_components/LoadingSpinner";
+import { FeaturedByTMDB } from "@/types/tmdb";
 export default function LatestMedia({ mediaType }: { mediaType: string }) {
-  const [latestMedia, setLatestMedia] = React.useState<any[]>([]);
+  const [latestMedia, setLatestMedia] = React.useState<FeaturedByTMDB[]>([]);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [loading, setLoading] = React.useState(true);
   useEffect(() => {

@@ -23,7 +23,7 @@ export async function getMediaDetails({
     );
     return res.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 }
@@ -46,7 +46,7 @@ export async function getTrailer({
     );
     return res.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 }
@@ -59,7 +59,7 @@ export const createMedia = async (media: Media) => {
       },
     });
     if (existingMedia) {
-      console.log("Media already exists!");
+      console.error("Media already exists!");
       return existingMedia.id;
     }
     const newMedia = await prisma.media.create({
@@ -99,7 +99,7 @@ export const writeReview = async (
     });
 
     if (existingReview) {
-      console.log("Review already exists!");
+      console.error("Review already exists!");
       return { success: false, message: "Review already exists" };
     }
 
@@ -160,7 +160,7 @@ export const addToWatchlist = async (media: Media, userId: string) => {
     const existingWatchlist = user.watchlist.find((item) => item.id == mediaId);
 
     if (existingWatchlist) {
-      console.log("Movie already exists in watchlist");
+      console.error("Movie already exists in watchlist");
       return {
         success: false,
         message: "This media already exists in watchlist",
@@ -215,7 +215,7 @@ export const addToFavorites = async (media: Media, userId: string) => {
     const existingFavorites = user.favorites.find((item) => item.id == mediaId);
 
     if (existingFavorites) {
-      console.log("Movie already exists in favorites");
+      console.error("Movie already exists in favorites");
       return {
         success: false,
         message: "This media already exists in favorites",
@@ -263,7 +263,7 @@ export async function removeFromWatchlist(mediaId: string, userId: string) {
     );
 
     if (!existingWatchlist) {
-      console.log("Media does not exist in watchlist");
+      console.error("Media does not exist in watchlist");
       return {
         success: false,
         message: "This media does not exist in watchlist",
@@ -294,7 +294,6 @@ export async function removeFromWatchlist(mediaId: string, userId: string) {
     if (!mediaReferences) {
       return { success: false, message: "Media not found" };
     }
-    console.log("all good");
     if (
       mediaReferences.favouritedBy.length === 0 &&
       mediaReferences.watchlistBy.length === 0 &&
@@ -330,7 +329,7 @@ export async function removeFromFavorites(mediaId: string, userId: string) {
     );
 
     if (!existingFavorites) {
-      console.log("Media does not exist in favorites");
+      console.error("Media does not exist in favorites");
       return {
         success: false,
         message: "This media does not exist in favorites",
@@ -394,7 +393,7 @@ export async function removeFromWatched(mediaId: string, userId: string) {
     const existingWatched = user.watched.find((item) => item.id == mediaId);
 
     if (!existingWatched) {
-      console.log("Media does not exist in watched");
+      console.error("Media does not exist in watched");
       return {
         success: false,
         message: "This media does not exist in watched",
