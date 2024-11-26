@@ -1,7 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
-import Image from "next/image";
-import Link from "next/link";
-import React, { Suspense } from "react";
 import {
   Card,
   CardContent,
@@ -10,9 +6,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { imagePrefix } from "@/lib/utils";
 import prisma from "@/db";
-import { Media, Recommendation, User } from "@prisma/client";
+import { imagePrefix } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
+import { Media, Recommendation } from "@prisma/client";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
+import RecommendationOptions from "./_components/RecommendationOptions";
 
 function RecommendationSkeleton() {
   return (
@@ -40,8 +41,10 @@ interface RecommendationWithUserAndMedia extends Recommendation {
 
 function RecommendationCard({
   recommendation,
+  userId,
 }: {
   recommendation: RecommendationWithUserAndMedia;
+  userId: string;
 }) {
   return (
     <Card className="col-span-1 transition-shadow duration-200 hover:shadow-lg">
@@ -49,8 +52,12 @@ function RecommendationCard({
         href={`/${recommendation.media.mediaType}/${recommendation.media.tmdbId}`}
       >
         <CardHeader>
-          <CardTitle className="line-clamp-1 text-xl">
+          <CardTitle className="line-clamp-1 flex items-center justify-between text-xl">
             {recommendation.media.title}
+            <RecommendationOptions
+              userId={userId}
+              recommendationId={recommendation.id}
+            />
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Recommended by {recommendation.sender.name}
@@ -121,11 +128,12 @@ export default async function Recommendations() {
               <RecommendationCard
                 key={recommendation.id}
                 recommendation={recommendation}
+                userId={userId}
               />
             ))}
           </div>
         ) : (
-          <div className="py-12">
+          <div>
             <h2 className="mb-2 text-xl font-semibold">
               No recommendations yet
             </h2>

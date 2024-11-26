@@ -1,15 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import prisma from "@/db";
-import { auth } from "@clerk/nextjs/server";
-import React from "react";
 
 export default async function Profile({ params }: { params: { id: string } }) {
   const { id } = params;
-  const { userId } = await auth();
   const userData = await prisma.user.findFirst({
     where: {
-      id: id || userId!,
+      id: id,
     },
     include: {
       movieBoards: true,

@@ -191,7 +191,7 @@ export default function Dashboard() {
   // Loading state
   if (!userDetails) {
     return (
-      <div className="mx-auto max-w-screen-2xl animate-pulse px-6 py-16 lg:px-8">
+      <div className="mx-auto max-w-screen-2xl animate-pulse px-6 py-12 lg:px-8">
         <div className="h-10 w-[200px] rounded-lg bg-muted sm:max-w-[350px]"></div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-4">

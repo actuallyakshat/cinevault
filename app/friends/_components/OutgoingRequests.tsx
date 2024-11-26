@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export function OutgoingRequests({ friends }: { friends: FriendsProp[] }) {
   if (friends.length === 0) {
     return (
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-left">
         <h2 className="mb-2 text-xl font-bold">No outgoing requests</h2>
         <p className="text-muted-foreground">
           You haven&apos;t sent any outgoing requests yet. Send some friendship

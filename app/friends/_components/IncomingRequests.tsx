@@ -4,7 +4,7 @@ import IncomingRequestCard from "./IncomingRequestCard";
 export function IncomingRequests({ friends }: { friends: FriendsProp[] }) {
   if (friends.length === 0) {
     return (
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-left">
         <h2 className="mb-2 text-xl font-bold">No incoming requests</h2>
         <p className="text-muted-foreground">
           You haven&apos;t received any incoming requests yet.

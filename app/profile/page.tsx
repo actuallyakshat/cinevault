@@ -22,16 +22,16 @@ export default async function Profile({ params }: { params: { id: string } }) {
 
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">
-      <div className="flex gap-4">
-        <Avatar className="size-72">
+      <div className="flex flex-col gap-4 lg:flex-row">
+        <Avatar className="mx-auto size-72">
           <AvatarImage
             src={userData.profileImageUrl || ""}
             alt={userData.name || ""}
           />
           <AvatarFallback>{userData.name?.charAt(0) || "F"}</AvatarFallback>
         </Avatar>
-        <div className="flex flex-1 flex-col gap-2 px-8">
-          <div className="flex items-center justify-between">
+        <div className="flex flex-1 flex-col gap-2 lg:px-8">
+          <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
             <div>
               <h1 className="text-3xl font-bold">{userData.name}</h1>
               <p className="text-muted-foreground">{userData.email}</p>
