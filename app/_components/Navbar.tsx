@@ -2,17 +2,27 @@
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import MobileSidebar from "./MobileSidebar";
 import ThemeToggler from "./ThemeToggler";
-import { useGetNavItems } from "@/hooks/constants";
+import { useGetMoreNavItems, useGetNavItems } from "@/hooks/constants";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
   const { signOut, isSignedIn } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const { openSignIn } = useClerk();
 
   const navItems = useGetNavItems();
+  const moreNavItems = useGetMoreNavItems();
 
   return (
     <header>
@@ -29,6 +39,22 @@ export default function Navbar() {
               {navItems.map(({ href, label }) => (
                 <NavLink key={href} href={href} title={label} />
               ))}
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button variant="ghost">More</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="flex flex-col gap-1">
+                  {moreNavItems.map(({ href, label }) => (
+                    <DropdownMenuItem
+                      key={href}
+                      onClick={() => router.push(href)}
+                      className="cursor-pointer px-3 py-2 font-semibold"
+                    >
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </SignedIn>
           </div>
           <div className="flex items-center justify-end gap-3">

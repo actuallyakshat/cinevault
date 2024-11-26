@@ -11,12 +11,22 @@ export default function TopRatedMedia({ mediaType }: { mediaType: string }) {
   const [loading, setLoading] = React.useState(true);
   useEffect(() => {
     async function handleGetTopRatedMedia() {
-      setLoading(true);
       if (!mediaType) return;
       const media = mediaType == "Movies" ? "movie" : "tv";
-      const response = await getTopRatedMedia({ mediaType: media, pageNumber });
-      setLoading(false);
-      setTopMedia(response.results);
+      setLoading(true);
+      try {
+        const response = await getTopRatedMedia({
+          mediaType: media,
+          pageNumber,
+        });
+        if (response && response.results) {
+          setTopMedia(response.results);
+        }
+      } catch (error) {
+        console.error("Failed to fetch top rated media:", error);
+      } finally {
+        setLoading(false);
+      }
     }
     handleGetTopRatedMedia();
   }, [mediaType, pageNumber]);

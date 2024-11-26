@@ -13,7 +13,6 @@ export default function Explore() {
   const [exploreCategory, setExploreCategory] = React.useState(
     localStorage.getItem("exploreCategory") || "latest",
   );
-  const [loading, setLoading] = React.useState(true);
   return (
     <div>
       <div className="container py-12">

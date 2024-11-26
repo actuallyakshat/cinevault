@@ -32,14 +32,17 @@ async function searchMedia(query: string, mediaType: string) {
 
 const getUserDetails = async ({
   name,
+  clerkId,
   email,
 }: {
   name: string;
+  clerkId: string;
   email: string;
 }) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
+        id: clerkId,
         email,
       },
       include: {
@@ -55,6 +58,7 @@ const getUserDetails = async ({
     if (!user) {
       const newUser = await prisma.user.create({
         data: {
+          id: clerkId,
           email,
           name,
         },

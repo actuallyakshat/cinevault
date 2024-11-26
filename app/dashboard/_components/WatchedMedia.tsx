@@ -1,6 +1,25 @@
 import React, { useEffect } from "react";
 import WatchedMediaCard from "./WatchedMediaCard";
 
+export interface DataType {
+  id: string;
+  rating: number;
+  review: string;
+  mediaId: string;
+  userId: string;
+  media: Media;
+}
+
+export interface Media {
+  id: string;
+  tmdbId: string;
+  title: string;
+  posterUrl: string;
+  releaseYear: string;
+  genres: string[];
+  mediaType: string;
+}
+
 export default function WatchedMedia({
   mediaList,
   mediaType,
@@ -8,7 +27,7 @@ export default function WatchedMedia({
   mediaList: any[];
   mediaType: string;
 }) {
-  const [data, setData] = React.useState<any[]>([]);
+  const [data, setData] = React.useState<DataType[]>([]);
   const comparisionSlug = mediaType == "Movies" ? "movie" : "show";
 
   useEffect(() => {

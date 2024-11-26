@@ -1,7 +1,8 @@
-- [ ] Refactor the codebase with added modulatiry and type safety
+- [x] Refactor the codebase with added modulatiry and type safety
 - [ ] Add optimistic UI
-- [ ] Add friendships
-- [ ] Add 'Recommend to a friend' feature
+- [x] Add friendships
+- [x] Add 'Recommend to a friend' feature
+- [x] Add Profile page
 - [ ] Add pagination to dashboard
 - [ ] Add 'Movie Boards'
   - [ ] They can be made in collaboration

@@ -110,3 +110,11 @@
 .dark {
   scrollbar-color: white #09090b;
 }
+
+.friendshipCard {
+  @apply rounded-lg border p-4 shadow-lg transition-shadow hover:shadow-xl;
+}
+
+.mediaCrudButton {
+  @apply flex w-full items-center justify-center gap-2 bg-white text-black;
+}

@@ -19,12 +19,13 @@ import {
 } from "@/app/(media-details)/_actions/actions";
 import { AuthContext } from "@/providers/auth-provider";
 import { getUserDetails } from "../_actions/actions";
+import { WatchedWithMedia } from "@/types/user";
 
 export default function EditReviewModal({
   details,
   styles,
 }: {
-  details: any;
+  details: WatchedWithMedia;
   styles: string;
 }) {
   const [openModal, setOpenModal] = React.useState(false);
@@ -32,8 +33,8 @@ export default function EditReviewModal({
   const [rating, setRating] = React.useState<number[]>([details.rating]);
   const { toast } = useToast();
   const [review, setReview] = React.useState<string>(details.review || "");
-  const { userDetails, setUserDetails } = useContext(AuthContext);
-
+  const { userDetails, setUserDetails, refreshUserDetails } =
+    useContext(AuthContext);
   async function handleUpdateReview(e: React.FormEvent) {
     try {
       e.preventDefault();
@@ -49,7 +50,7 @@ export default function EditReviewModal({
           title: "Review updated",
           description: res.message,
         });
-        await refreshUser();
+        await refreshUserDetails;
         setLoading(false);
         setOpenModal(false);
       } else {
@@ -67,29 +68,6 @@ export default function EditReviewModal({
     }
   }
 
-  async function refreshUser() {
-    try {
-      const res = await getUserDetails({
-        name: userDetails.name,
-        email: userDetails.email,
-      });
-      if (res) {
-        setUserDetails(res);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to refresh user details",
-        });
-      }
-    } catch (error) {
-      console.error("Error refreshing user details:", error);
-      toast({
-        title: "Error",
-        description: "Failed to refresh user details",
-      });
-    }
-  }
-
   async function handleDeleteReview() {
     try {
       setLoading(true);
@@ -102,7 +80,7 @@ export default function EditReviewModal({
           title: "Review removed",
           description: res.message,
         });
-        await refreshUser();
+        await refreshUserDetails();
         setLoading(false);
         setOpenModal(false);
       } else {
@@ -123,9 +101,7 @@ export default function EditReviewModal({
   return (
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogTrigger asChild>
-        <Button
-          className={`absolute bottom-0 right-0 w-full xl:left-1/2 xl:w-full xl:-translate-x-1/2 ${styles ? styles : ""} `}
-        >
+        <Button className={`mediaCrudButton hover:bg-white/80`}>
           Edit Review
         </Button>
       </DialogTrigger>

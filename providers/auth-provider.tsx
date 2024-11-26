@@ -2,9 +2,8 @@
 import LoadingScreen from "@/app/_components/LoadingScreen";
 import { getUserDetails } from "@/app/dashboard/_actions/actions";
 import { UserDetailsWithLists } from "@/types/user";
-import { useAuth, useClerk, useUser } from "@clerk/nextjs";
-import { Media, User, Watched } from "@prisma/client";
-import React, { createContext, useState, useEffect } from "react";
+import { useClerk, useUser } from "@clerk/nextjs";
+import React, { createContext, useEffect, useState } from "react";
 
 interface AuthContextProps {
   userDetails: UserDetailsWithLists | undefined;
@@ -26,10 +25,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   >();
 
   const refreshUserDetails = async () => {
-    if (!userDetails) return;
+    if (!userDetails || !user) return;
     const freshUserDetails = await getUserDetails({
       email: userDetails.email,
       name: userDetails.name,
+      clerkId: user!.id,
     });
     if (freshUserDetails) {
       setUserDetails(freshUserDetails);
@@ -44,6 +44,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const response = await getUserDetails({
           name: user.fullName!,
+          clerkId: user.id,
           email: user.primaryEmailAddress?.emailAddress!,
         });
 

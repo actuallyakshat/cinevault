@@ -1,6 +1,6 @@
 import { Media, User, Watched } from "@prisma/client";
 
-interface WatchedWithMedia extends Watched {
+export interface WatchedWithMedia extends Watched {
   media: Media;
 }
 

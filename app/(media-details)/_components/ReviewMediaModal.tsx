@@ -35,8 +35,7 @@ export default function ReviewMediaModal({
   const [review, setReview] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
   const [open, setOpen] = React.useState<boolean>(false);
-  const buttonStyle =
-    "w-full bg-white text-black hover:bg-white/80 flex items-center justify-center gap-2";
+
   const { userDetails } = useContext(AuthContext);
   const [userId, setUserId] = React.useState<string>("");
 
@@ -89,7 +88,7 @@ export default function ReviewMediaModal({
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className={`${buttonStyle} overflow-hidden`}>
+          <Button className="mediaCrudButton overflow-hidden hover:bg-white/80">
             Already Watched<span className="-ml-1 truncate">{title}?</span>
           </Button>
         </DialogTrigger>

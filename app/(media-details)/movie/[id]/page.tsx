@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { getMediaDetails, getTrailer } from "../../_actions/actions";
 import Image from "next/image";
 import {
@@ -17,34 +17,40 @@ import { TMDBMovieDetails } from "@/types/tmdb";
 
 export default function Movie({ params }: { params: { id: string } }) {
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
-  const [loading, setLoading] = React.useState(true);
-  const [details, setDetails] = React.useState<TMDBMovieDetails | null>(null);
-  const [trailer, setTrailer] = React.useState<any>(null);
-  const [trailerFrame, setTrailerFrame] = React.useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [details, setDetails] = useState<TMDBMovieDetails | null>(null);
+  const [trailer, setTrailer] = useState<string | null>(null);
+  const [trailerFrame, setTrailerFrame] = useState(false);
   const { id } = params;
-  const movieBackdrop = `${imagePrefix}${details?.backdrop_path}`;
+
   useEffect(() => {
     async function fetchData() {
-      setLoading(true);
-      const [response, trailerResponse] = await Promise.all([
-        getMediaDetails({ mediaType: "movie", mediaId: id }),
-        getTrailer({ mediaId: id, mediaType: "movie" }),
-      ]);
-      setDetails(response);
-      const filteredTrailer = trailerResponse.results.find(
-        (result: any) => result.type === "Trailer",
-      );
-      if (filteredTrailer) {
-        setTrailer(filteredTrailer.key);
+      try {
+        setLoading(true);
+        const [response, trailerResponse] = await Promise.all([
+          getMediaDetails({ mediaType: "movie", mediaId: id }),
+          getTrailer({ mediaId: id, mediaType: "movie" }),
+        ]);
+
+        setDetails(response);
+        const filteredTrailer = trailerResponse?.results?.find(
+          (result: any) => result.type === "Trailer",
+        );
+
+        setTrailer(filteredTrailer ? filteredTrailer.key : null);
+      } catch (error) {
+        console.error("Failed to fetch movie details:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
+
     fetchData();
   }, [id]);
 
   if (loading) return <LoadingScreen />;
 
-  if (!loading && !details)
+  if (!details)
     return (
       <div>
         <h1 className="pt-16 text-center text-3xl font-bold text-foreground/80">
@@ -56,7 +62,7 @@ export default function Movie({ params }: { params: { id: string } }) {
       </div>
     );
 
-  if (!details) return null;
+  const movieBackdrop = `${imagePrefix}${details?.backdrop_path}`;
 
   return (
     <div className="-mt-16 min-h-screen pb-16 text-white">
@@ -80,16 +86,14 @@ export default function Movie({ params }: { params: { id: string } }) {
           {trailer && (
             <Button
               className="mt-4 flex w-full max-w-sm items-center justify-center gap-3 bg-yellow-500 text-black hover:bg-yellow-600"
-              onClick={() => {
-                setTrailerFrame(true);
-              }}
+              onClick={() => setTrailerFrame(true)}
             >
               Watch Trailer <MonitorPlay className="size-5" />
             </Button>
           )}
           {trailerFrame && (
             <TrailerFrame
-              video_key={trailer}
+              video_key={trailer || ""}
               onClose={() => setTrailerFrame(false)}
             />
           )}

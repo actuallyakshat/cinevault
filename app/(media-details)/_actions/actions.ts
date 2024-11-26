@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/db";
-import { Media } from "@prisma/client";
+import { Media, User } from "@prisma/client";
 import axios from "axios";
 const TOKEN = process.env.TMDB_API_TOKEN as string;
 

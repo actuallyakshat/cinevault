@@ -7,6 +7,15 @@ export function useGetNavItems() {
   return navLinks;
 }
 
+export function useGetMoreNavItems() {
+  const navLinks = [
+    { href: "/friends", label: "Friends" },
+    { href: "/recommendations", label: "Recommendations" },
+    { href: "/profile/", label: "Profile" },
+  ];
+  return navLinks;
+}
+
 export function useGetSocialsLinks() {
   const linkedin = "https://www.linkedin.com/in/actuallyakshat";
   const github = "https://github.com/actuallyakshat/cinevault";

@@ -6,7 +6,7 @@ import { AuthContext } from "@/providers/auth-provider";
 import { Genre, TMDBMovieDetails, TMDBShowDetails } from "@/types/tmdb";
 import { UserDetailsWithLists } from "@/types/user";
 import { Heart, Loader, Popcorn } from "lucide-react";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   addToFavorites,
   addToWatchlist,
@@ -14,12 +14,16 @@ import {
   removeFromWatchlist,
 } from "../_actions/actions";
 import ReviewMediaModal from "./ReviewMediaModal";
+import RecommendToAFriendModal from "./RecommendToAFriendModal";
+import { Media } from "@prisma/client";
 
 export type MediaDetails = (TMDBMovieDetails | TMDBShowDetails) & {
   first_air_date?: string;
   release_date?: string;
   poster_path: string;
   genres: { id: number; name: string }[];
+  title?: string;
+  name?: string;
 };
 
 interface MediaCrudButtonsProps {
@@ -36,9 +40,9 @@ export default function MediaCrudButtons({
   details,
   mediaType,
 }: MediaCrudButtonsProps) {
-  const { userDetails, setUserDetails, refreshUserDetails } =
-    useContext(AuthContext);
+  const { userDetails, refreshUserDetails } = useContext(AuthContext);
   const [userId, setUserId] = React.useState<string>("");
+  const [media, setMedia] = useState<Media>();
 
   const [favoritesLoading, setFavoritesLoading] =
     React.useState<boolean>(false);
@@ -52,6 +56,23 @@ export default function MediaCrudButtons({
       setUserId(userDetails.id);
     }
   }, [userDetails]);
+
+  useEffect(() => {
+    if (details) {
+      const mediaObject: Media = {
+        id: String(details.id),
+        tmdbId: String(details.id),
+        title: details.title || details.name || "",
+        posterUrl: details.poster_path,
+        releaseYear:
+          (details?.release_date?.split("-")[0] as string) ||
+          (details?.first_air_date?.split("-")[0] as string),
+        genres: details.genres.map((genre: Genre) => genre.name),
+        mediaType: mediaType,
+      };
+      setMedia(mediaObject);
+    }
+  }, [details, mediaType]);
 
   if (!details) return null;
 
@@ -235,14 +256,9 @@ export default function MediaCrudButtons({
           )}
         </Button>
       </div>
-      <div className="relative w-full">
+      <div className="relative grid grid-cols-1 gap-3 md:grid-cols-2">
         {isInWatchedList ? (
-          <div className="pb-10">
-            <EditReviewModal
-              styles="bg-white text-black hover:bg-white/80"
-              details={isInWatchedList}
-            />
-          </div>
+          <EditReviewModal styles="MediaCrudButton" details={isInWatchedList} />
         ) : (
           <ReviewMediaModal
             title={title}
@@ -251,6 +267,12 @@ export default function MediaCrudButtons({
             refreshUserDetails={refreshUserDetails}
           />
         )}
+
+        <RecommendToAFriendModal
+          mediaTitle={title}
+          mediaId={String(details.id)}
+          media={media}
+        />
       </div>
     </div>
   );

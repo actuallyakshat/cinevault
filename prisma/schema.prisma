@@ -8,33 +8,107 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  watched   Watched[]
-  favorites Media[]   @relation(name: "Favorites")
-  watchlist Media[]   @relation(name: "Watchlist")
+  id                      String           @id @default(uuid())
+  name                    String
+  profileImageUrl         String?
+  email                   String           @unique
+  watched                 Watched[]
+  favorites               Media[]          @relation(name: "Favorites")
+  showFavoritesOnProfile  Boolean          @default(true)
+  watchlist               Media[]          @relation(name: "Watchlist")
+  movieBoards             MovieBoard[]     @relation(name: "OwnedBoards")
+  collaboratingOn         MovieBoard[]     @relation(name: "Collaborators")
+  sentFriendships         Friendship[]     @relation("FriendshipRequester")
+  receivedFriendships     Friendship[]     @relation("FriendshipAddressed")
+  sentRecommendations     Recommendation[] @relation("RecommendationSender")
+  receivedRecommendations Recommendation[] @relation("RecommendationReceiver")
+}
+
+model Friendship {
+  id          String           @id @default(uuid())
+  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id])
+  requesterId String
+  addressed   User             @relation("FriendshipAddressed", fields: [addressedId], references: [id])
+  addressedId String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([requesterId, addressedId])
+  @@index([status])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
 }
 
 model Media {
-  id           String    @id @default(uuid())
-  tmdbId       String
-  title        String
-  posterUrl    String
-  releaseYear  String
-  genres       String[]
-  mediaType    String
-  favouritedBy User[]    @relation(name: "Favorites")
-  watchlistBy  User[]    @relation(name: "Watchlist")
-  watchedBy    Watched[] @relation(name: "Watched")
+  id              String           @id @default(uuid())
+  tmdbId          String           @unique
+  title           String
+  posterUrl       String
+  releaseYear     String
+  genres          String[]
+  mediaType       String
+  favouritedBy    User[]           @relation(name: "Favorites")
+  watchlistBy     User[]           @relation(name: "Watchlist")
+  watchedBy       Watched[]        @relation(name: "Watched")
+  movieBoards     MovieBoard[]     @relation(name: "BoardMedia")
+  recommendations Recommendation[]
 }
 
 model Watched {
-  id      String @id @default(uuid())
-  rating  Int
-  review  String
-  media   Media  @relation(fields: [mediaId], references: [id], name: "Watched")
-  mediaId String
-  user    User   @relation(fields: [userId], references: [id])
-  userId  String
+  id        String   @id @default(uuid())
+  rating    Int
+  review    String
+  media     Media    @relation(fields: [mediaId], references: [id], name: "Watched")
+  mediaId   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([mediaId])
+}
+
+model Recommendation {
+  id         String   @id @default(uuid())
+  media      Media    @relation(fields: [mediaId], references: [id])
+  mediaId    String
+  sender     User     @relation("RecommendationSender", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User     @relation("RecommendationReceiver", fields: [receiverId], references: [id])
+  receiverId String
+  message    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([mediaId])
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+model MovieBoard {
+  id            String     @id @default(uuid())
+  title         String
+  description   String?
+  media         Media[]    @relation(name: "BoardMedia")
+  coverImage    String
+  owner         User       @relation(name: "OwnedBoards", fields: [ownerId], references: [id])
+  ownerId       String
+  collaborators User[]     @relation(name: "Collaborators")
+  visibility    Visibility @default(PRIVATE)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([title])
+  @@index([visibility])
+  @@index([ownerId])
 }

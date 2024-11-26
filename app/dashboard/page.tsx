@@ -10,17 +10,15 @@ import SortSelection from "./_components/SortSelection";
 import WatchedMedia from "./_components/WatchedMedia";
 import WatchlistMedia from "./_components/WatchlistMedia";
 import GenreFilter from "./GenreFilter";
-
-interface WatchedMedia extends Watched {
-  media: Media;
-}
+import { WatchedWithMedia } from "@/types/user";
+import { useClerk } from "@clerk/nextjs";
 
 type ListType = "Watchlist" | "Favorites" | "Watched";
 type MediaType = "Movies" | "Shows";
 
 export default function Dashboard() {
   const { userDetails, loading } = useContext(AuthContext);
-
+  const { user } = useClerk();
   const [mediaType, setMediaType] = useState<MediaType>(
     (localStorage.getItem("mediaType") as MediaType) || "Movies",
   );
@@ -36,7 +34,7 @@ export default function Dashboard() {
   const processedMediaList = useMemo(() => {
     if (!userDetails || loading) return [];
 
-    const getSelectedListData = (): Media[] | WatchedMedia[] => {
+    const getSelectedListData = (): Media[] | WatchedWithMedia[] => {
       switch (selectedList) {
         case "Watchlist":
           return userDetails.watchlist || [];
@@ -56,7 +54,7 @@ export default function Dashboard() {
     return selectedListData.filter((item) => {
       const itemMediaType =
         selectedList === "Watched"
-          ? (item as WatchedMedia).media?.mediaType?.toLowerCase()
+          ? (item as WatchedWithMedia).media?.mediaType?.toLowerCase()
           : (item as Media).mediaType?.toLowerCase();
 
       return itemMediaType === mediaTypeToExtract;
@@ -70,7 +68,7 @@ export default function Dashboard() {
     return processedMediaList.filter((media) => {
       const genres =
         selectedList === "Watched"
-          ? (media as WatchedMedia).media?.genres
+          ? (media as WatchedWithMedia).media?.genres
           : (media as Media).genres;
 
       return genres?.some((genre) => selectedGenres.includes(genre));
@@ -87,8 +85,8 @@ export default function Dashboard() {
 
       // Handle different sorting scenarios for Watched and other lists
       if (selectedList === "Watched") {
-        const mediaA = a as WatchedMedia;
-        const mediaB = b as WatchedMedia;
+        const mediaA = a as WatchedWithMedia;
+        const mediaB = b as WatchedWithMedia;
 
         switch (sortCriterion) {
           case "name":
@@ -155,7 +153,7 @@ export default function Dashboard() {
     return sortedMediaList.filter((media) => {
       const title =
         selectedList === "Watched"
-          ? (media as WatchedMedia).media?.title
+          ? (media as WatchedWithMedia).media?.title
           : (media as Media).title;
 
       return title?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -166,7 +164,7 @@ export default function Dashboard() {
   const availableGenres = useMemo(() => {
     const allGenres = processedMediaList.flatMap((media) =>
       selectedList === "Watched"
-        ? (media as WatchedMedia).media?.genres || []
+        ? (media as WatchedWithMedia).media?.genres || []
         : (media as Media).genres || [],
     );
     return Array.from(new Set(allGenres));

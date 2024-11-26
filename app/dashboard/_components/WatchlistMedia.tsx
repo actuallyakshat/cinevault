@@ -1,6 +1,17 @@
+import { WatchedWithMedia } from "@/types/user";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
+
+interface DateType {
+  id: string;
+  tmdbId: string;
+  title: string;
+  posterUrl: string;
+  releaseYear: string;
+  genres: string[];
+  mediaType: string;
+}
 
 export default function WatchlistMedia({
   mediaList,
@@ -9,7 +20,7 @@ export default function WatchlistMedia({
   mediaList: any[];
   mediaType: string;
 }) {
-  const [data, setData] = React.useState<any[]>([]);
+  const [data, setData] = React.useState<DateType[]>([]);
 
   const imagePrefix = "https://image.tmdb.org/t/p/w500";
   const comparisionSlug = mediaType == "Movies" ? "movie" : "show";
