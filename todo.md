@@ -2,7 +2,7 @@
 - [ ] Add optimistic UI
 - [x] Add friendships
 - [x] Add 'Recommend to a friend' feature
-- [x] Add Profile page
+- [ ] Add Profile page
 - [ ] Add pagination to dashboard
 - [ ] Add 'Movie Boards'
   - [ ] They can be made in collaboration

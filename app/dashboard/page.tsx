@@ -1,7 +1,9 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { AuthContext } from "@/providers/auth-provider";
-import { Media, Watched } from "@prisma/client";
+import { WatchedWithMedia } from "@/types/user";
+import { useClerk } from "@clerk/nextjs";
+import { Media } from "@prisma/client";
 import { useContext, useEffect, useMemo, useState } from "react";
 import FavoriteMedia from "./_components/FavoriteMedia";
 import SelectList from "./_components/SelectList";
@@ -10,8 +12,6 @@ import SortSelection from "./_components/SortSelection";
 import WatchedMedia from "./_components/WatchedMedia";
 import WatchlistMedia from "./_components/WatchlistMedia";
 import GenreFilter from "./GenreFilter";
-import { WatchedWithMedia } from "@/types/user";
-import { useClerk } from "@clerk/nextjs";
 
 type ListType = "Watchlist" | "Favorites" | "Watched";
 type MediaType = "Movies" | "Shows";

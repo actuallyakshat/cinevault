@@ -62,6 +62,10 @@ export const createMedia = async (media: Media) => {
       console.error("Media already exists!");
       return existingMedia.id;
     }
+
+    const finalMediaType =
+      media.mediaType.charAt(0).toLowerCase() == "s" ? "show" : "movie";
+
     const newMedia = await prisma.media.create({
       data: {
         tmdbId: media.tmdbId,
@@ -69,7 +73,7 @@ export const createMedia = async (media: Media) => {
         posterUrl: media.posterUrl,
         releaseYear: media.releaseYear,
         genres: media.genres,
-        mediaType: media.mediaType,
+        mediaType: finalMediaType,
       },
     });
     return newMedia.id;

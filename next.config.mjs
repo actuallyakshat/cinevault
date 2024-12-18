@@ -17,6 +17,11 @@ const nextConfig = {
         hostname: "themoviedb.org",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
     ],
   },
 };

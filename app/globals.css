@@ -118,3 +118,11 @@
 .mediaCrudButton {
   @apply flex w-full items-center justify-center gap-2 bg-white text-black;
 }
+
+.noscrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

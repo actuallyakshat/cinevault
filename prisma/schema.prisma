@@ -100,7 +100,7 @@ model MovieBoard {
   title         String
   description   String?
   media         Media[]    @relation(name: "BoardMedia")
-  coverImage    String
+  coverImage    String?    @default("")
   owner         User       @relation(name: "OwnedBoards", fields: [ownerId], references: [id])
   ownerId       String
   collaborators User[]     @relation(name: "Collaborators")

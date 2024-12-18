@@ -11,6 +11,7 @@ export function useGetMoreNavItems() {
   const navLinks = [
     { href: "/friends", label: "Friends" },
     { href: "/recommendations", label: "Recommendations" },
+    { href: "/movieboard", label: "Movie Boards" },
     { href: "/profile/", label: "Profile" },
   ];
   return navLinks;
