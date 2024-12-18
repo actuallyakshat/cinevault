@@ -1,9 +1,12 @@
-import prisma from "@/db";
-import AddMediaSearch from "./_components/AddMediaSearch";
-import MediaGrid from "./_components/MediaGrid";
-import { revalidatePath } from "next/cache";
-import CloudinaryUpload from "./_components/CloudinaryUpload";
 import UpdateNameDialog from "@/app/_components/UpdateNameDialog";
+import prisma from "@/db";
+import { revalidatePath } from "next/cache";
+import AddMediaSearch from "./_components/AddMediaSearch";
+import CloudinaryUpload from "./_components/CloudinaryUpload";
+import MediaGrid from "./_components/MediaGrid";
+import { Switch } from "@/components/ui/switch";
+import ChangeVisibility from "./_components/ChangeVisibility";
+import { Visibility } from "@prisma/client";
 
 const UPLOAD_PRESET = "cinevault_movieboards";
 
@@ -41,8 +44,17 @@ export default async function MovieBoard({
     revalidatePath(`/movieboard`);
   }
 
+  async function updateVisibility(newVisibility: Visibility) {
+    "use server";
+    await prisma.movieBoard.update({
+      where: { id: params.id },
+      data: { visibility: newVisibility },
+    });
+    revalidatePath(`/movieboard`);
+  }
+
   return (
-    <div className="mx-auto flex max-w-screen-2xl flex-col gap-6 px-6 py-12 md:flex-row lg:px-8">
+    <div className="mx-auto flex max-w-screen-2xl flex-col gap-10 px-6 py-12 lg:flex-row lg:px-8">
       <div className="flex-[1]">
         <CloudinaryUpload
           type="cover"
@@ -52,7 +64,7 @@ export default async function MovieBoard({
         />
         <div className="mt-3 text-center">
           <UpdateNameDialog name={board?.title} onUpdate={updateTitle}>
-            <h1 className="cursor-pointer text-2xl font-bold hover:underline">
+            <h1 className="cursor-pointer text-xl font-bold hover:underline sm:text-2xl">
               {board?.title}
             </h1>
           </UpdateNameDialog>
@@ -60,6 +72,10 @@ export default async function MovieBoard({
             {board?.description}
           </p>
           <AddMediaSearch boardId={board.id} />
+          <ChangeVisibility
+            defaultValue={board.visibility}
+            onToggle={updateVisibility}
+          />
         </div>
       </div>
 

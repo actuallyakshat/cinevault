@@ -30,6 +30,10 @@ export default async function Profile({ params }: { params: { id: string } }) {
     return <div>User not found</div>;
   }
 
+  const publicMovieBoards = userData.movieBoards.filter(
+    (board) => board.visibility === "PUBLIC",
+  );
+
   async function updateCoverImage(newImageUrl: string) {
     "use server";
     await prisma.user.update({
@@ -63,7 +67,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
             <h2 className="text-xl font-bold">Movie Boards</h2>
             {userData.movieBoards.length > 0 && (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-                {userData.movieBoards.map((board) => (
+                {publicMovieBoards.map((board) => (
                   <Link href={"/movieboard/" + board.id} key={board.id}>
                     {board.coverImage && (
                       <Image
