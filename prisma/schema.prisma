@@ -26,9 +26,9 @@ model User {
 
 model Friendship {
   id          String           @id @default(uuid())
-  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id])
+  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
   requesterId String
-  addressed   User             @relation("FriendshipAddressed", fields: [addressedId], references: [id])
+  addressed   User             @relation("FriendshipAddressed", fields: [addressedId], references: [id], onDelete: Cascade)
   addressedId String
   status      FriendshipStatus @default(PENDING)
   createdAt   DateTime         @default(now())
@@ -62,9 +62,9 @@ model Watched {
   id        String   @id @default(uuid())
   rating    Int
   review    String
-  media     Media    @relation(fields: [mediaId], references: [id], name: "Watched")
+  media     Media    @relation(fields: [mediaId], references: [id], name: "Watched", onDelete: Cascade)
   mediaId   String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,11 +75,11 @@ model Watched {
 
 model Recommendation {
   id         String   @id @default(uuid())
-  media      Media    @relation(fields: [mediaId], references: [id])
+  media      Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   mediaId    String
-  sender     User     @relation("RecommendationSender", fields: [senderId], references: [id])
+  sender     User     @relation("RecommendationSender", fields: [senderId], references: [id], onDelete: Cascade)
   senderId   String
-  receiver   User     @relation("RecommendationReceiver", fields: [receiverId], references: [id])
+  receiver   User     @relation("RecommendationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
   receiverId String
   message    String?
   createdAt  DateTime @default(now())
@@ -101,7 +101,7 @@ model MovieBoard {
   description   String?
   media         Media[]    @relation(name: "BoardMedia")
   coverImage    String?    @default("")
-  owner         User       @relation(name: "OwnedBoards", fields: [ownerId], references: [id])
+  owner         User       @relation(name: "OwnedBoards", fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId       String
   collaborators User[]     @relation(name: "Collaborators")
   visibility    Visibility @default(PRIVATE)

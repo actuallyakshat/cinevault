@@ -2,6 +2,7 @@
 
 import prisma from "@/db";
 import { revalidatePath } from "next/cache";
+import cloudinary from "cloudinary";
 
 export async function addMediaToMovieBoard({
   tmdbId,
@@ -74,5 +75,29 @@ export async function addMediaToMovieBoard({
   } catch (error) {
     console.error(error);
     return { success: false, message: "Something went wrong", board: null };
+  }
+}
+
+cloudinary.v2.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export async function deleteFromCloudinary({
+  publicIds,
+}: {
+  publicIds: string[];
+}) {
+  if (publicIds.length === 0) return;
+
+  try {
+    const result = await cloudinary.v2.api.delete_resources(publicIds);
+
+    console.log("Deleted resources:", result.deleted);
+    return result.deleted;
+  } catch (error) {
+    console.error("Error deleting resources from Cloudinary:", error);
+    throw new Error("Failed to delete resources from Cloudinary");
   }
 }

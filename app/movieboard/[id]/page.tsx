@@ -1,12 +1,12 @@
 import UpdateNameDialog from "@/app/_components/UpdateNameDialog";
 import prisma from "@/db";
+import { Visibility } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { deleteFromCloudinary } from "./_actions/action";
 import AddMediaSearch from "./_components/AddMediaSearch";
+import ChangeVisibility from "./_components/ChangeVisibility";
 import CloudinaryUpload from "./_components/CloudinaryUpload";
 import MediaGrid from "./_components/MediaGrid";
-import { Switch } from "@/components/ui/switch";
-import ChangeVisibility from "./_components/ChangeVisibility";
-import { Visibility } from "@prisma/client";
 
 const UPLOAD_PRESET = "cinevault_movieboards";
 
@@ -28,10 +28,36 @@ export default async function MovieBoard({
 
   async function updateCoverImage(newImageUrl: string) {
     "use server";
+
+    if (!board) return;
+
+    const oldImageUrl = board.coverImage;
+
     await prisma.movieBoard.update({
       where: { id: params.id },
       data: { coverImage: newImageUrl },
     });
+
+    if (oldImageUrl) {
+      try {
+        const publicId = oldImageUrl
+          .split("/upload/")[1]
+          .split("/")
+          .filter((segment) => !segment.startsWith("v"))
+          .join("/")
+          .split(".")[0];
+
+        console.log(`Deleting old image: ${publicId}`);
+
+        if (publicId) {
+          await deleteFromCloudinary({ publicIds: [publicId] });
+          console.log(`Successfully deleted old image: ${publicId}`);
+        }
+      } catch (error) {
+        console.error("Error deleting old image from Cloudinary:", error);
+      }
+    }
+
     revalidatePath(`/movieboard/${params.id}`);
   }
 
