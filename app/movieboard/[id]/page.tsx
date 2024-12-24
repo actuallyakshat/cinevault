@@ -2,10 +2,12 @@ import UpdateNameDialog from "@/app/_components/UpdateNameDialog";
 import prisma from "@/db";
 import { Visibility } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { deleteFromCloudinary } from "./_actions/action";
 import AddMediaSearch from "./_components/AddMediaSearch";
 import ChangeVisibility from "./_components/ChangeVisibility";
 import CloudinaryUpload from "./_components/CloudinaryUpload";
+import DeleteMovieBoardDialog from "./_components/DeleteMovieBoardDialog";
 import MediaGrid from "./_components/MediaGrid";
 
 const UPLOAD_PRESET = "cinevault_movieboards";
@@ -79,6 +81,22 @@ export default async function MovieBoard({
     revalidatePath(`/movieboard`);
   }
 
+  async function removeMedia(mediaId: string) {
+    "use server";
+    await prisma.movieBoard.update({
+      where: { id: params.id },
+      data: {
+        media: {
+          disconnect: {
+            id: mediaId,
+          },
+        },
+      },
+    });
+
+    revalidatePath(`/movieboard/${params.id}`);
+  }
+
   return (
     <div className="mx-auto flex max-w-screen-2xl flex-col gap-10 px-6 py-12 lg:flex-row lg:px-8">
       <div className="flex-[1]">
@@ -88,7 +106,7 @@ export default async function MovieBoard({
           currentImage={board.coverImage}
           onUpload={updateCoverImage}
         />
-        <div className="mt-3 text-center">
+        <div className="mt-3 space-y-4 text-center">
           <UpdateNameDialog name={board?.title} onUpdate={updateTitle}>
             <h1 className="cursor-pointer text-xl font-bold hover:underline sm:text-2xl">
               {board?.title}
@@ -102,6 +120,7 @@ export default async function MovieBoard({
             defaultValue={board.visibility}
             onToggle={updateVisibility}
           />
+          <DeleteMovieBoardDialog boardTitle={board.title} boardId={board.id} />
         </div>
       </div>
 
@@ -111,7 +130,7 @@ export default async function MovieBoard({
             This board has no movies yet. Add some to get started
           </p>
         ) : (
-          <MediaGrid media={board.media} />
+          <MediaGrid media={board.media} onRemoveMedia={removeMedia} />
         )}
       </div>
     </div>

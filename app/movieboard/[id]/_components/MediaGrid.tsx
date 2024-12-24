@@ -7,8 +7,14 @@ import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import SortSelection from "@/app/dashboard/_components/SortSelection";
 import GenreFilter from "@/app/dashboard/GenreFilter";
+import { RemoveFromBoardButton } from "./RemoveFromBoardButton";
 
-export default function MediaGrid({ media }: { media: Media[] }) {
+interface MediaGridProps {
+  media: Media[];
+  onRemoveMedia: (mediaId: string) => Promise<void>;
+}
+
+export default function MediaGrid({ media, onRemoveMedia }: MediaGridProps) {
   const [sortCriterion, setSortCriterion] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -79,7 +85,7 @@ export default function MediaGrid({ media }: { media: Media[] }) {
           <Link
             href={`/${item.mediaType.toLowerCase()}/${item.tmdbId}`}
             key={item.id}
-            className="flex flex-col gap-2"
+            className="group relative flex flex-col gap-2"
           >
             <div className="aspect-[2/3] w-full overflow-hidden rounded-lg">
               <Image
@@ -91,6 +97,7 @@ export default function MediaGrid({ media }: { media: Media[] }) {
                 className="h-full w-full cursor-pointer object-cover transition-all duration-300 hover:scale-105"
               />
             </div>
+            <RemoveFromBoardButton onRemove={() => onRemoveMedia(item.id)} />
             <div className="flex w-full flex-col items-center gap-1 text-center">
               <h2 className="line-clamp-1 text-sm font-semibold">
                 {item.title}

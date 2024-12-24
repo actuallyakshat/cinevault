@@ -7,5 +7,6 @@
 - [ ] Add 'Movie Boards'
   - [ ] They can be made in collaboration
   - [ ] They can be searched globally if they are public
-  - [ ] An image can be uploaded as the cover of the movie board using cloudinary
+  - [x] An image can be uploaded as the cover of the movie board using cloudinary
+- [ ] Add 'Not Found' pages
 - [ ] Consider adding caching with Redis (Upstash)

@@ -4,11 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import prisma from "@/db";
 import { imagePrefix } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 
 export default async function Profile({ params }: { params: { id: string } }) {
   const { id } = params;
+  const { userId } = await auth();
   const userData = await prisma.user.findFirst({
     where: {
       id: id,
@@ -22,6 +24,10 @@ export default async function Profile({ params }: { params: { id: string } }) {
   if (!userData) {
     return <div>User not found</div>;
   }
+
+  const publicMovieBoards = userData.movieBoards.filter(
+    (board) => board.visibility === "PUBLIC",
+  );
 
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">
@@ -37,25 +43,35 @@ export default async function Profile({ params }: { params: { id: string } }) {
           <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
             <div>
               <h1 className="text-3xl font-bold">{userData.name}</h1>
-              <p className="text-muted-foreground">{userData.email}</p>
+              {id == userId && (
+                <p className="text-muted-foreground">{userData.email}</p>
+              )}
             </div>
-            <Button variant={"link"}>Edit Profile</Button>
+            {userId == id && <Button variant={"link"}>Edit Profile</Button>}
           </div>
           <hr />
 
           <div className="mt-4 flex flex-col gap-2">
             <h2 className="text-xl font-bold">Movie Boards</h2>
-            {userData.movieBoards.length > 0 && (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {userData.movieBoards.map((board) => (
-                  <div key={board.id} className="flex flex-col gap-2">
-                    <h3 className="text-xl font-bold">{board.title}</h3>
-                    <p className="text-muted-foreground">{board.description}</p>
-                  </div>
+            {publicMovieBoards.length > 0 && (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+                {publicMovieBoards.map((board) => (
+                  <Link href={"/movieboard/" + board.id} key={board.id}>
+                    {board.coverImage && (
+                      <Image
+                        src={board.coverImage}
+                        alt={board.title}
+                        width={500}
+                        height={500}
+                        className="aspect-square cursor-pointer rounded-lg object-cover"
+                      />
+                    )}
+                    <h3 className="mt-1 font-medium">{board.title}</h3>
+                  </Link>
                 ))}
               </div>
             )}
-            {userData.movieBoards.length == 0 && (
+            {publicMovieBoards.length == 0 && (
               <p className="text-muted-foreground">
                 You haven&apos;t added any movie boards yet. Add some movie
                 boards to get started!

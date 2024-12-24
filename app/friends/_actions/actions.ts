@@ -22,14 +22,19 @@ export async function addFriend(userId: string, email: string) {
 
     const alreadyFriends = await prisma.friendship.findFirst({
       where: {
-        addressedId: addressedToUser.id,
-        requesterId: userId,
+        OR: [
+          { addressedId: addressedToUser.id, requesterId: userId },
+          { addressedId: userId, requesterId: addressedToUser.id },
+        ],
       },
     });
 
     if (alreadyFriends) {
       if (alreadyFriends.status == "PENDING") {
-        return { success: false, message: "Friendship already pending" };
+        return {
+          success: false,
+          message: "Friendship status is already pending.",
+        };
       } else {
         return { success: false, message: "Already a friend" };
       }
@@ -153,5 +158,86 @@ export async function cancelFriendRequest(userId: string, friendId: string) {
   } catch (error) {
     console.error("Error cancelling friend request:", error);
     return { success: false, message: "Failed to cancel friend request" };
+  }
+}
+
+export async function deleteFriend(userId: string, friendId: string) {
+  try {
+    const friendship = await prisma.friendship.findUnique({
+      where: {
+        id: friendId,
+      },
+      select: {
+        requesterId: true,
+        addressedId: true,
+      },
+    });
+
+    if (!friendship) {
+      return { success: false, message: "Friendship not found" };
+    }
+
+    const otherUserId =
+      friendship.requesterId === userId
+        ? friendship.addressedId
+        : friendship.requesterId;
+
+    // Remove collaborations
+    await prisma.$transaction(async (tx) => {
+      // Find boards where userId is the owner and otherUserId is a collaborator
+      const userOwnedBoards = await tx.movieBoard.findMany({
+        where: {
+          ownerId: userId,
+          collaborators: { some: { id: otherUserId } },
+        },
+        select: { id: true },
+      });
+
+      // Find boards where otherUserId is the owner and userId is a collaborator
+      const otherUserOwnedBoards = await tx.movieBoard.findMany({
+        where: {
+          ownerId: otherUserId,
+          collaborators: { some: { id: userId } },
+        },
+        select: { id: true },
+      });
+
+      // Remove otherUser from boards owned by userId
+      for (const board of userOwnedBoards) {
+        await tx.movieBoard.update({
+          where: { id: board.id },
+          data: {
+            collaborators: {
+              disconnect: { id: otherUserId },
+            },
+          },
+        });
+      }
+
+      // Remove userId from boards owned by otherUser
+      for (const board of otherUserOwnedBoards) {
+        await tx.movieBoard.update({
+          where: { id: board.id },
+          data: {
+            collaborators: {
+              disconnect: { id: userId },
+            },
+          },
+        });
+      }
+
+      // Delete the friendship
+      await tx.friendship.delete({
+        where: {
+          id: friendId,
+        },
+      });
+    });
+
+    revalidatePath("/friends");
+    return { success: true, message: "Friendship and collaborations removed" };
+  } catch (error) {
+    console.error("Error deleting friend:", error);
+    return { success: false, message: "Failed to delete friend" };
   }
 }

@@ -65,7 +65,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
 
           <div className="mt-4 flex flex-col gap-2">
             <h2 className="text-xl font-bold">Movie Boards</h2>
-            {userData.movieBoards.length > 0 && (
+            {publicMovieBoards.length > 0 && (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
                 {publicMovieBoards.map((board) => (
                   <Link href={"/movieboard/" + board.id} key={board.id}>
@@ -83,7 +83,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
                 ))}
               </div>
             )}
-            {userData.movieBoards.length == 0 && (
+            {publicMovieBoards.length == 0 && (
               <p className="text-muted-foreground">
                 You haven&apos;t added any movie boards yet. Add some movie
                 boards to get started!

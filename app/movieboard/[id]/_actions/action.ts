@@ -101,3 +101,38 @@ export async function deleteFromCloudinary({
     throw new Error("Failed to delete resources from Cloudinary");
   }
 }
+
+export async function deleteBoard({ boardId }: { boardId: string }) {
+  try {
+    const board = await prisma.movieBoard.findUnique({
+      where: { id: boardId },
+    });
+
+    if (!board) return;
+
+    try {
+      if (!board.coverImage) return;
+      const publicId = board.coverImage
+        .split("/upload/")[1]
+        .split("/")
+        .filter((segment) => !segment.startsWith("v"))
+        .join("/")
+        .split(".")[0];
+
+      if (publicId) {
+        await deleteFromCloudinary({ publicIds: [publicId] });
+      }
+    } catch (error) {
+      console.error("Error deleting cover image from Cloudinary:", error);
+    }
+
+    await prisma.movieBoard.delete({
+      where: { id: boardId },
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Error deleting board:", error);
+    throw new Error("Failed to delete board");
+  }
+}

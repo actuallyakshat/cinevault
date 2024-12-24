@@ -4,7 +4,7 @@ import FriendCard from "./FriendCard";
 export function FriendsData({ friends }: { friends: FriendsProp[] }) {
   if (friends.length === 0) {
     return (
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-left">
         <h2 className="mb-2 text-xl font-bold">No friends found</h2>
         <p className="text-muted-foreground">
           You haven&apos;t added any friends yet. Add some friends to get
