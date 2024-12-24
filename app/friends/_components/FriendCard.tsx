@@ -3,11 +3,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { AuthContext } from "@/providers/auth-provider";
+import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { deleteFriend } from "../_actions/actions";
-import { CrossIcon, PlusIcon } from "lucide-react";
 
 type FriendsProp = {
   id: string;
@@ -15,13 +15,13 @@ type FriendsProp = {
     id: string;
     name: string;
     email: string;
-    profileImageUrl?: string;
+    profileImageUrl: string | null;
   };
   addressed: {
     id: string;
     name: string;
     email: string;
-    profileImageUrl?: string;
+    profileImageUrl: string | null;
   };
 };
 
@@ -33,7 +33,7 @@ export default function FriendCard({ friend }: { friend: FriendsProp }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsDeleting(true);
     try {
@@ -69,15 +69,62 @@ export default function FriendCard({ friend }: { friend: FriendsProp }) {
             </p>
           </div>
         </Link>
-        <Button variant="link" onClick={handleDelete} disabled={isDeleting}>
-          {isDeleting ? (
-            "Deleting..."
-          ) : (
-            <PlusIcon className="size-5 rotate-45" />
-          )}
-        </Button>
+        <DeleteFriendDialog
+          handleDelete={handleDelete}
+          isDeleting={isDeleting}
+        />
       </div>
       <hr />
     </div>
+  );
+}
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+function DeleteFriendDialog({
+  handleDelete,
+  isDeleting,
+}: {
+  handleDelete: (e: React.FormEvent<HTMLFormElement>) => void;
+  isDeleting: boolean;
+}) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="link">
+          <PlusIcon className="size-5 rotate-45" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            You are about to remove this user from your friends list. This also
+            means that you will no longer be able to collaborate on movie
+            boards.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={(e) => handleDelete(e)} className="space-y-2">
+          <Button variant={"secondary"} type="button" className="w-full">
+            Cancel
+          </Button>
+          <Button
+            className="w-full"
+            type="submit"
+            variant={"destructive"}
+            disabled={isDeleting}
+          >
+            {isDeleting ? "Removing..." : "Remove Friend"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

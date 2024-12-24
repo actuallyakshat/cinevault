@@ -1,13 +1,13 @@
-import { Suspense } from "react";
-import { auth } from "@clerk/nextjs/server";
-import prisma from "@/db";
-import { Friendship, User } from "@prisma/client";
-import AddFriendsModal from "./_components/AddFriendModal";
-import { SelectFriendCategory } from "./_components/SelectFriendsCategory";
 import { Skeleton } from "@/components/ui/skeleton";
+import prisma from "@/db";
+import { auth } from "@clerk/nextjs/server";
+import { Friendship, User } from "@prisma/client";
+import { Suspense } from "react";
+import AddFriendsModal from "./_components/AddFriendModal";
 import { FriendsData } from "./_components/FriendsData";
 import { IncomingRequests } from "./_components/IncomingRequests";
 import { OutgoingRequests } from "./_components/OutgoingRequests";
+import { SelectFriendCategory } from "./_components/SelectFriendsCategory";
 
 export interface FriendsProp extends Friendship {
   requester: User;

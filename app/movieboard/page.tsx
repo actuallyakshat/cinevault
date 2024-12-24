@@ -9,6 +9,9 @@ export default async function MovieBoards() {
     where: {
       ownerId: userId!,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return (
