@@ -9,11 +9,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
-  const [query, setQuery] = useState("");
-
-  useEffect(() => {
-    onSearch(query);
-  }, [query, onSearch]);
+  console.log("infinite loop");
 
   return (
     <div className="relative w-full max-w-sm">
@@ -21,8 +17,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       <Input
         type="search"
         placeholder="Search boards..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => onSearch(e.target.value)}
         className="pl-8"
       />
     </div>
