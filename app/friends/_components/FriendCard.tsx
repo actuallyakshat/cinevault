@@ -5,7 +5,6 @@ import { CardTitle } from "@/components/ui/card";
 import { AuthContext } from "@/providers/auth-provider";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { deleteFriend } from "../_actions/actions";
 
@@ -31,14 +30,14 @@ export default function FriendCard({ friend }: { friend: FriendsProp }) {
   const friendData =
     friend.requester.id === userId ? friend.addressed : friend.requester;
   const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsDeleting(true);
     try {
       await deleteFriend(userId!, friend.id);
-      router.refresh();
+      setIsOpen(false);
     } catch (error) {
       console.error("Failed to delete friend:", error);
     } finally {
@@ -72,6 +71,8 @@ export default function FriendCard({ friend }: { friend: FriendsProp }) {
         <DeleteFriendDialog
           handleDelete={handleDelete}
           isDeleting={isDeleting}
+          open={isOpen}
+          onOpenChange={setIsOpen}
         />
       </div>
       <hr />
@@ -91,12 +92,16 @@ import {
 function DeleteFriendDialog({
   handleDelete,
   isDeleting,
+  open,
+  onOpenChange,
 }: {
   handleDelete: (e: React.FormEvent<HTMLFormElement>) => void;
   isDeleting: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="link">
           <PlusIcon className="size-5 rotate-45" />

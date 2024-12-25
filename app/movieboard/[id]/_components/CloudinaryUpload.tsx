@@ -8,6 +8,7 @@ interface CloudinaryUploadProps {
   currentImage: string | null;
   uploadPreset: string;
   type: "cover" | "profile";
+  isAuthorised: boolean;
 }
 
 export default function CloudinaryUpload({
@@ -15,7 +16,31 @@ export default function CloudinaryUpload({
   currentImage,
   uploadPreset,
   type,
+  isAuthorised,
 }: CloudinaryUploadProps) {
+  if (!isAuthorised)
+    return (
+      <>
+        {currentImage ? (
+          <Image
+            src={currentImage}
+            alt="Cover Image"
+            width={500}
+            height={500}
+            className={`aspect-square w-full object-cover ${type === "cover" ? "rounded-lg" : "size-72 rounded-full"}`}
+          />
+        ) : (
+          <div
+            className={`flex aspect-square w-full items-center justify-center ${type === "cover" ? "rounded-lg" : "size-72 rounded-full"} bg-muted`}
+          >
+            <p className="text-wrap text-xs text-muted-foreground">
+              Click to add {type === "cover" ? "cover image" : "profile image"}
+            </p>
+          </div>
+        )}
+      </>
+    );
+
   return (
     <CldUploadWidget
       options={{

@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,32 +10,29 @@ import {
 } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { deleteBoard } from "../_actions/action";
 
-interface DeleteMovieBoardDialogProps {
-  boardTitle: string;
-  boardId: string;
-}
+import React, { useState } from "react";
 
-export default function DeleteMovieBoardDialog({
+export default function LeaveMovieBoardDialog({
   boardTitle,
   boardId,
-}: DeleteMovieBoardDialogProps) {
+  onLeave,
+}: {
+  boardTitle: string;
+  boardId: string;
+  onLeave: ({ boardId }: { boardId: string }) => Promise<void>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const router = useRouter();
+  const [isLeaving, setIsLeaving] = useState(false);
 
   const handleDelete = async () => {
     try {
-      setIsDeleting(true);
-      await deleteBoard({ boardId });
-      router.replace("/movieboard");
+      setIsLeaving(true);
+      await onLeave({ boardId });
     } catch (error) {
       console.error("Error deleting board:", error);
     } finally {
-      setIsDeleting(false);
+      setIsLeaving(false);
       setIsOpen(false);
     }
   };
@@ -50,22 +46,22 @@ export default function DeleteMovieBoardDialog({
           className="mt-4 text-red-700 hover:text-red-800"
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete Board
+          Leave Board
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Movie Board</DialogTitle>
+          <DialogTitle>Exit Collaboration?</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete &quot;{boardTitle}&quot;? This
-            action cannot be undone.
+            Are you sure you want to leave &quot;{boardTitle}&quot;? You will no
+            longer be able to add or remove media from this board.
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end gap-3">
           <Button
             variant="outline"
             onClick={() => setIsOpen(false)}
-            disabled={isDeleting}
+            disabled={isLeaving}
             className="w-full"
           >
             Cancel
@@ -73,10 +69,10 @@ export default function DeleteMovieBoardDialog({
           <Button
             variant="destructive"
             onClick={handleDelete}
-            disabled={isDeleting}
+            disabled={isLeaving}
             className="w-full"
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isLeaving ? "Leaving..." : "Leave"}
           </Button>
         </div>
       </DialogContent>

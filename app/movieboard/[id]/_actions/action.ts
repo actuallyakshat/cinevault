@@ -136,3 +136,123 @@ export async function deleteBoard({ boardId }: { boardId: string }) {
     throw new Error("Failed to delete board");
   }
 }
+
+export async function addCollaboratorToBoard({
+  boardId,
+  userId,
+}: {
+  boardId: string;
+  userId: string;
+}) {
+  try {
+    const board = await prisma.movieBoard.findUnique({
+      where: { id: boardId },
+      include: {
+        collaborators: true,
+      },
+    });
+
+    if (!board) return;
+
+    if (board.collaborators.some((item) => item.id === userId)) {
+      return;
+    }
+
+    await prisma.$transaction([
+      prisma.movieBoard.update({
+        where: { id: boardId },
+        data: {
+          collaborators: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      }),
+      prisma.boardVisibility.create({
+        data: {
+          userId,
+          boardId,
+          visibility: "PRIVATE",
+        },
+      }),
+    ]);
+
+    revalidatePath("/movieboard/" + boardId);
+  } catch (error) {
+    console.error("Error adding collaborator to board:", error);
+    throw new Error("Failed to add collaborator to board");
+  }
+}
+
+export async function removeCollaboratorFromBoard({
+  boardId,
+  userId,
+}: {
+  boardId: string;
+  userId: string;
+}) {
+  try {
+    const board = await prisma.movieBoard.findUnique({
+      where: { id: boardId },
+      include: {
+        collaborators: true,
+      },
+    });
+
+    if (!board) return false;
+
+    if (!board.collaborators.some((item) => item.id == userId)) {
+      return false;
+    }
+
+    await prisma.movieBoard.update({
+      where: { id: boardId },
+      data: {
+        collaborators: {
+          disconnect: {
+            id: userId,
+          },
+        },
+        visibilities: {
+          deleteMany: {
+            userId,
+          },
+        },
+      },
+    });
+
+    revalidatePath("/movieboard/" + boardId);
+    return true;
+  } catch (error) {
+    console.error("Error removing collaborator from board:", error);
+    throw new Error("Failed to remove collaborator from board");
+  }
+}
+
+export async function getFriendsToAdd({ boardId }: { boardId: string }) {
+  try {
+    console.log("Getting friends to add", boardId);
+    const board = await prisma.movieBoard.findUnique({
+      where: { id: boardId },
+      include: {
+        collaborators: true,
+      },
+    });
+
+    if (!board) return;
+
+    const friends = await prisma.user.findMany({
+      where: {
+        id: {
+          notIn: board.collaborators.map((item) => item.id),
+        },
+      },
+    });
+
+    return friends;
+  } catch (error) {
+    console.error("Error getting friends to add:", error);
+    throw new Error("Failed to get friends to add");
+  }
+}

@@ -15,10 +15,12 @@ import { useToast } from "@/components/ui/use-toast";
 
 export default function UpdateNameDialog({
   onUpdate,
+  isAuthorised,
   name,
   children,
 }: {
   onUpdate: (name: string) => void;
+  isAuthorised: boolean;
   name: string;
   children: React.ReactNode;
 }) {
@@ -26,6 +28,8 @@ export default function UpdateNameDialog({
   const [newName, setNewName] = React.useState(name);
   const [loading, setLoading] = React.useState(false);
   const { toast } = useToast();
+
+  if (!isAuthorised) return children;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

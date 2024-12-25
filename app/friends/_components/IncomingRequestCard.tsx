@@ -7,13 +7,15 @@ import { Loader } from "lucide-react";
 import { acceptFriendRequest, rejectFriendRequest } from "../_actions/actions";
 import { AuthContext } from "@/providers/auth-provider";
 import { useToast } from "@/components/ui/use-toast";
+import Image from "next/image";
 
 export default function IncomingRequestCard({
   friend,
 }: {
   friend: FriendsProp;
 }) {
-  const [loading, setLoading] = React.useState(false);
+  const [acceptLoading, setAcceptLoading] = React.useState(false);
+  const [rejectLoading, setRejectLoading] = React.useState(false);
   const { userDetails } = useContext(AuthContext);
   const { toast } = useToast();
 
@@ -21,7 +23,7 @@ export default function IncomingRequestCard({
     try {
       if (!userDetails) return;
 
-      setLoading(true);
+      setAcceptLoading(true);
       const repsonse = await acceptFriendRequest(userDetails.id, friendId);
       if (repsonse.success) {
         toast({ title: "Success", description: "Friend request accepted." });
@@ -32,7 +34,7 @@ export default function IncomingRequestCard({
       console.error(error);
       toast({ title: "Error", description: error as string });
     } finally {
-      setLoading(false);
+      setAcceptLoading(false);
     }
   }
 
@@ -40,7 +42,7 @@ export default function IncomingRequestCard({
     try {
       if (!userDetails) return;
 
-      setLoading(true);
+      setRejectLoading(true);
       const repsonse = await rejectFriendRequest(userDetails.id, friendId);
       if (repsonse.success) {
         toast({ title: "Success", description: "Friend request accepted." });
@@ -51,30 +53,49 @@ export default function IncomingRequestCard({
       console.error(error);
       toast({ title: "Error", description: error as string });
     } finally {
-      setLoading(false);
+      setRejectLoading(false);
     }
   }
 
   return (
     <div className="friendshipCard">
-      <div key={friend.id}>
-        <h2 className="text-xl font-bold">{friend.requester.name}</h2>
-        <p className="text-muted-foreground">{friend.requester.email}</p>
-        <div className="mt-3 flex w-full items-center justify-center gap-3">
-          <Button
-            variant={"secondary"}
-            className="w-full"
-            onClick={() => handleRejectFriendRequest(friend.id)}
-          >
-            {loading ? <Loader className="size-5 animate-spin" /> : "Reject"}
-          </Button>
-          <Button
-            className="w-full"
-            onClick={() => handleAcceptFriendRequest(friend.id)}
-          >
-            {loading ? <Loader className="size-5 animate-spin" /> : "Accept"}
-          </Button>
+      <div key={friend.id} className="flex items-center gap-3">
+        <Image
+          src={friend.requester.profileImageUrl}
+          alt="Profile"
+          width={400}
+          height={400}
+          className="size-14 rounded-full"
+        />
+        <div>
+          <h2 className="text-xl font-bold">{friend.requester.name}</h2>
+          <p className="text-muted-foreground">{friend.requester.email}</p>
         </div>
+      </div>
+      <div className="mt-3 flex w-full items-center justify-center gap-3">
+        <Button
+          variant={"secondary"}
+          className="w-full"
+          disabled={acceptLoading || rejectLoading}
+          onClick={() => handleRejectFriendRequest(friend.id)}
+        >
+          {rejectLoading ? (
+            <Loader className="size-5 animate-spin" />
+          ) : (
+            "Reject"
+          )}
+        </Button>
+        <Button
+          className="w-full"
+          disabled={acceptLoading || rejectLoading}
+          onClick={() => handleAcceptFriendRequest(friend.id)}
+        >
+          {acceptLoading ? (
+            <Loader className="size-5 animate-spin" />
+          ) : (
+            "Accept"
+          )}
+        </Button>
       </div>
     </div>
   );

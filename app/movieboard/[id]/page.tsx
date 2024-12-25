@@ -1,14 +1,18 @@
 import UpdateNameDialog from "@/app/_components/UpdateNameDialog";
 import prisma from "@/db";
-import { Visibility } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { deleteFromCloudinary } from "./_actions/action";
 import AddMediaSearch from "./_components/AddMediaSearch";
 import ChangeVisibility from "./_components/ChangeVisibility";
 import CloudinaryUpload from "./_components/CloudinaryUpload";
 import DeleteMovieBoardDialog from "./_components/DeleteMovieBoardDialog";
+import EditCollaborators from "./_components/EditCollaborators";
 import MediaGrid from "./_components/MediaGrid";
+import { VisibilityOption } from "@prisma/client";
+import { redirect } from "next/navigation";
+import LeaveMovieBoardDialog from "./_components/LeaveMovieBoardDialog";
+import { isAbsolute } from "node:path/posix";
 
 const UPLOAD_PRESET = "cinevault_movieboards";
 
@@ -17,16 +21,47 @@ export default async function MovieBoard({
 }: {
   params: { id: string };
 }) {
+  const { userId } = await auth();
   const board = await prisma.movieBoard.findUnique({
     where: {
       id: params.id,
     },
     include: {
       media: true,
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          profileImageUrl: true,
+        },
+      },
+      collaborators: {
+        select: {
+          id: true,
+          name: true,
+          profileImageUrl: true,
+        },
+      },
+      visibilities: {
+        select: {
+          visibility: true,
+          userId: true,
+        },
+      },
     },
   });
 
   if (!board) return <div>Board not found</div>;
+
+  const isAuthorised =
+    board.owner.id === userId ||
+    board.collaborators.some((item) => item.id === userId);
+
+  const isAdmin = board.owner.id === userId;
+
+  const isPublic = board.visibilities.some(
+    (item) => item.userId === userId && item.visibility === "PUBLIC",
+  );
 
   async function updateCoverImage(newImageUrl: string) {
     "use server";
@@ -72,12 +107,22 @@ export default async function MovieBoard({
     revalidatePath(`/movieboard`);
   }
 
-  async function updateVisibility(newVisibility: Visibility) {
+  async function updateVisibility(newVisibility: VisibilityOption) {
     "use server";
-    await prisma.movieBoard.update({
-      where: { id: params.id },
+    const visibility = await prisma.boardVisibility.findFirst({
+      where: {
+        boardId: params.id,
+        userId: userId!,
+      },
+    });
+
+    if (!visibility) return;
+
+    await prisma.boardVisibility.update({
+      where: { id: visibility.id },
       data: { visibility: newVisibility },
     });
+
     revalidatePath(`/movieboard`);
   }
 
@@ -97,30 +142,85 @@ export default async function MovieBoard({
     revalidatePath(`/movieboard/${params.id}`);
   }
 
+  async function leaveBoard() {
+    "use server";
+    await prisma.$transaction([
+      prisma.movieBoard.update({
+        where: { id: params.id },
+        data: {
+          collaborators: {
+            disconnect: {
+              id: userId!,
+            },
+          },
+        },
+      }),
+
+      prisma.boardVisibility.deleteMany({
+        where: {
+          userId: userId!,
+          boardId: params.id,
+        },
+      }),
+    ]);
+    revalidatePath(`/movieboard`);
+    revalidatePath(`/movieboard` + params.id);
+  }
+
   return (
     <div className="mx-auto flex max-w-screen-2xl flex-col gap-10 px-6 py-12 lg:flex-row lg:px-8">
       <div className="flex-[1]">
         <CloudinaryUpload
+          isAuthorised={isAuthorised && isAdmin}
           type="cover"
           uploadPreset={UPLOAD_PRESET}
           currentImage={board.coverImage}
           onUpload={updateCoverImage}
         />
-        <div className="mt-3 space-y-4 text-center">
-          <UpdateNameDialog name={board?.title} onUpdate={updateTitle}>
-            <h1 className="cursor-pointer text-xl font-bold hover:underline sm:text-2xl">
+        <div className="mt-3 text-center">
+          <UpdateNameDialog
+            isAuthorised={isAuthorised && isAdmin}
+            name={board?.title}
+            onUpdate={updateTitle}
+          >
+            <h1
+              className={`text-xl font-bold ${isAuthorised && isAdmin ? "cursor-pointer hover:underline" : ""} sm:text-2xl`}
+            >
               {board?.title}
             </h1>
           </UpdateNameDialog>
+          <p className="mt-1 text-center text-sm font-medium text-muted-foreground">
+            {board.owner.name}
+          </p>
           <p className="text-wrap text-sm text-muted-foreground">
             {board?.description}
           </p>
-          <AddMediaSearch boardId={board.id} />
-          <ChangeVisibility
-            defaultValue={board.visibility}
-            onToggle={updateVisibility}
+          {isAuthorised && <AddMediaSearch boardId={board.id} />}
+          {isAuthorised && (
+            <ChangeVisibility
+              defaultValue={isPublic ? "PUBLIC" : "PRIVATE"}
+              onToggle={updateVisibility}
+            />
+          )}
+          <EditCollaborators
+            isAdmin={isAdmin}
+            boardId={board.id}
+            collaborators={board.collaborators}
           />
-          <DeleteMovieBoardDialog boardTitle={board.title} boardId={board.id} />
+          {isAdmin && (
+            <DeleteMovieBoardDialog
+              boardTitle={board.title}
+              boardId={board.id}
+            />
+          )}
+
+          {isAuthorised && !isAdmin && (
+            <LeaveMovieBoardDialog
+              boardTitle={board.title}
+              boardId={board.id}
+              onLeave={leaveBoard}
+            />
+          )}
         </div>
       </div>
 

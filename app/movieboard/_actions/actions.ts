@@ -21,6 +21,11 @@ export async function createMovieBoard({
         title: name,
         ownerId: creatorId,
         description,
+        visibilities: {
+          create: {
+            userId: creatorId,
+          },
+        },
       },
     });
 

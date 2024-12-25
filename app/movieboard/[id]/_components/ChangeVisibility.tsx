@@ -1,19 +1,19 @@
 "use client";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Visibility } from "@prisma/client";
 import React, { useEffect } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
+import { VisibilityOption } from "@prisma/client";
 
 export default function ChangeVisibility({
   onToggle,
   defaultValue,
 }: {
-  onToggle: (newVisibility: Visibility) => Promise<void>;
-  defaultValue: Visibility;
+  onToggle: (newVisibility: VisibilityOption) => Promise<void>;
+  defaultValue: VisibilityOption;
 }) {
-  const [value, setValue] = React.useState<Visibility>(defaultValue);
-  const debouncedValue = useDebounce<Visibility>(value, 500); // 500ms delay
+  const [value, setValue] = React.useState<VisibilityOption>(defaultValue);
+  const debouncedValue = useDebounce<VisibilityOption>(value, 500); // 500ms delay
 
   useEffect(() => {
     if (debouncedValue !== defaultValue) {

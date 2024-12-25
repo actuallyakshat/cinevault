@@ -150,7 +150,7 @@ export default function AddMediaSearch({ boardId }: { boardId: string }) {
               </div>
             )}
 
-            {searchQuery && !loading && searchResults.length === 0 && (
+            {searchQuery && !loading && searchResults?.length === 0 && (
               <div className="flex h-full items-center justify-center">
                 <p className="text-center text-muted-foreground">
                   No results found for &quot;{searchQuery}&quot;
@@ -159,7 +159,7 @@ export default function AddMediaSearch({ boardId }: { boardId: string }) {
             )}
 
             <div className="space-y-6">
-              {searchResults.map(
+              {searchResults?.map(
                 (result: TMDBMovieSearchQuery | TMDBShowSearchQuery) => (
                   <SearchResultCard
                     loading={addMediaLoading}

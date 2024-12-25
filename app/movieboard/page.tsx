@@ -7,7 +7,7 @@ export default async function MovieBoards() {
 
   const boards = await prisma.movieBoard.findMany({
     where: {
-      ownerId: userId!,
+      OR: [{ ownerId: userId! }, { collaborators: { some: { id: userId! } } }],
     },
     orderBy: {
       createdAt: "desc",

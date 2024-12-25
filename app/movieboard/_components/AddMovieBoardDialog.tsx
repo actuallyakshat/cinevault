@@ -44,8 +44,8 @@ export default function AddMovieBoardDialog() {
       if (response.success && response.board) {
         toast({
           title: "Board Created!",
+          description: "Please wait while we redirect you to the board",
         });
-
         router.push("/movieboard/" + response.board.id);
       } else {
         toast({

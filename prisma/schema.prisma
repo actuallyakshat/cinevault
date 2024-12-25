@@ -8,20 +8,21 @@ datasource db {
 }
 
 model User {
-  id                      String           @id @default(uuid())
+  id                      String            @id @default(uuid())
   name                    String
-  profileImageUrl         String?
-  email                   String           @unique
+  profileImageUrl         String            @default("https://res.cloudinary.com/djpbvhxfh/image/upload/v1735148944/cinevault/profile/jo9vh0lfjf4bwca2bc6o.jpg")
+  email                   String            @unique
   watched                 Watched[]
-  favorites               Media[]          @relation(name: "Favorites")
-  showFavoritesOnProfile  Boolean          @default(true)
-  watchlist               Media[]          @relation(name: "Watchlist")
-  movieBoards             MovieBoard[]     @relation(name: "OwnedBoards")
-  collaboratingOn         MovieBoard[]     @relation(name: "Collaborators")
-  sentFriendships         Friendship[]     @relation("FriendshipRequester")
-  receivedFriendships     Friendship[]     @relation("FriendshipAddressed")
-  sentRecommendations     Recommendation[] @relation("RecommendationSender")
-  receivedRecommendations Recommendation[] @relation("RecommendationReceiver")
+  favorites               Media[]           @relation(name: "Favorites")
+  showFavoritesOnProfile  Boolean           @default(true)
+  watchlist               Media[]           @relation(name: "Watchlist")
+  movieBoards             MovieBoard[]      @relation(name: "OwnedBoards")
+  collaboratingOn         MovieBoard[]      @relation(name: "Collaborators")
+  sentFriendships         Friendship[]      @relation("FriendshipRequester")
+  receivedFriendships     Friendship[]      @relation("FriendshipAddressed")
+  sentRecommendations     Recommendation[]  @relation("RecommendationSender")
+  receivedRecommendations Recommendation[]  @relation("RecommendationReceiver")
+  boardVisibilities       BoardVisibility[]
 }
 
 model Friendship {
@@ -90,25 +91,39 @@ model Recommendation {
   @@index([mediaId])
 }
 
-enum Visibility {
+enum VisibilityOption {
   PUBLIC
   PRIVATE
 }
 
 model MovieBoard {
-  id            String     @id @default(uuid())
+  id            String            @id @default(uuid())
   title         String
   description   String?
-  media         Media[]    @relation(name: "BoardMedia")
-  coverImage    String?    @default("")
-  owner         User       @relation(name: "OwnedBoards", fields: [ownerId], references: [id], onDelete: Cascade)
+  media         Media[]           @relation(name: "BoardMedia")
+  coverImage    String?           @default("")
+  owner         User              @relation(name: "OwnedBoards", fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId       String
-  collaborators User[]     @relation(name: "Collaborators")
-  visibility    Visibility @default(PRIVATE)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  collaborators User[]            @relation(name: "Collaborators")
+  visibilities  BoardVisibility[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   @@index([title])
-  @@index([visibility])
   @@index([ownerId])
+}
+
+model BoardVisibility {
+  id         String           @id @default(uuid())
+  userId     String
+  boardId    String
+  visibility VisibilityOption @default(PRIVATE)
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  board      MovieBoard       @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([userId, boardId])
+  @@index([userId])
+  @@index([boardId])
 }

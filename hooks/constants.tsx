@@ -22,3 +22,6 @@ export function useGetSocialsLinks() {
   const github = "https://github.com/actuallyakshat/cinevault";
   return { linkedin, github };
 }
+
+export const defaultProfileImage =
+  "https://res.cloudinary.com/djpbvhxfh/image/upload/v1735148944/cinevault/profile/jo9vh0lfjf4bwca2bc6o.jpg";

@@ -10,6 +10,7 @@ import Link from "next/link";
 import React from "react";
 import CloudinaryUpload from "../movieboard/[id]/_components/CloudinaryUpload";
 import { revalidatePath } from "next/cache";
+import { deleteFromCloudinary } from "../movieboard/[id]/_actions/action";
 
 const UPLOAD_PRESET = "cinevault_user_profile_image";
 
@@ -21,7 +22,6 @@ export default async function Profile({ params }: { params: { id: string } }) {
       id: id || userId!,
     },
     include: {
-      movieBoards: true,
       favorites: true,
     },
   });
@@ -30,12 +30,43 @@ export default async function Profile({ params }: { params: { id: string } }) {
     return <div>User not found</div>;
   }
 
-  const publicMovieBoards = userData.movieBoards.filter(
-    (board) => board.visibility === "PUBLIC",
-  );
+  const movieboards = await prisma.movieBoard.findMany({
+    where: {
+      OR: [{ ownerId: userId! }, { collaborators: { some: { id: userId! } } }],
+      visibilities: {
+        some: {
+          userId: userId!,
+          visibility: "PUBLIC",
+        },
+      },
+    },
+  });
 
   async function updateCoverImage(newImageUrl: string) {
     "use server";
+
+    const oldImageUrl = userData!.profileImageUrl;
+
+    if (oldImageUrl) {
+      try {
+        const publicId = oldImageUrl
+          .split("/upload/")[1]
+          .split("/")
+          .filter((segment) => !segment.startsWith("v"))
+          .join("/")
+          .split(".")[0];
+
+        console.log(`Deleting old image: ${publicId}`);
+
+        if (publicId) {
+          await deleteFromCloudinary({ publicIds: [publicId] });
+          console.log(`Successfully deleted old image: ${publicId}`);
+        }
+      } catch (error) {
+        console.error("Error deleting old image from Cloudinary:", error);
+      }
+    }
+
     await prisma.user.update({
       where: { id: id || userId! },
       data: { profileImageUrl: newImageUrl },
@@ -47,6 +78,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">
       <div className="flex flex-col gap-4 lg:flex-row">
         <CloudinaryUpload
+          isAuthorised={true}
           type="profile"
           uploadPreset={UPLOAD_PRESET}
           currentImage={userData.profileImageUrl}
@@ -65,11 +97,11 @@ export default async function Profile({ params }: { params: { id: string } }) {
 
           <div className="mt-4 flex flex-col gap-2">
             <h2 className="text-xl font-bold">Movie Boards</h2>
-            {publicMovieBoards.length > 0 && (
+            {movieboards.length > 0 && (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-                {publicMovieBoards.map((board) => (
+                {movieboards.map((board) => (
                   <Link href={"/movieboard/" + board.id} key={board.id}>
-                    {board.coverImage && (
+                    {board.coverImage ? (
                       <Image
                         src={board.coverImage}
                         alt={board.title}
@@ -77,13 +109,21 @@ export default async function Profile({ params }: { params: { id: string } }) {
                         height={500}
                         className="aspect-square cursor-pointer rounded-lg object-cover"
                       />
+                    ) : (
+                      <div className="flex aspect-square w-full items-center justify-center rounded-lg bg-muted">
+                        <div className="text-center text-muted-foreground">
+                          {board.title.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
                     )}
-                    <h3 className="mt-1 font-medium">{board.title}</h3>
+                    <h3 className="mt-1.5 text-sm font-medium">
+                      {board.title}
+                    </h3>
                   </Link>
                 ))}
               </div>
             )}
-            {publicMovieBoards.length == 0 && (
+            {movieboards.length == 0 && (
               <p className="text-muted-foreground">
                 You haven&apos;t added any movie boards yet. Add some movie
                 boards to get started!

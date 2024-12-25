@@ -76,7 +76,7 @@ export default function Search() {
       )}
       {!loading && searchQuery && searchResults?.length > 0 && (
         <div className="mt-10 space-y-8 lg:space-y-3">
-          {searchResults.map(
+          {searchResults?.map(
             (result: TMDBMovieSearchQuery | TMDBShowSearchQuery) => (
               <SearchResultCard
                 key={result.id}

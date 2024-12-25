@@ -16,7 +16,6 @@ export default async function Profile({ params }: { params: { id: string } }) {
       id: id,
     },
     include: {
-      movieBoards: true,
       favorites: true,
     },
   });
@@ -25,9 +24,40 @@ export default async function Profile({ params }: { params: { id: string } }) {
     return <div>User not found</div>;
   }
 
-  const publicMovieBoards = userData.movieBoards.filter(
-    (board) => board.visibility === "PUBLIC",
-  );
+  const movieboards = await prisma.movieBoard.findMany({
+    where: {
+      OR: [
+        {
+          ownerId: id,
+          visibilities: {
+            some: {
+              userId: id,
+              visibility: "PUBLIC",
+            },
+          },
+        },
+        {
+          collaborators: {
+            some: { id: id },
+          },
+          visibilities: {
+            some: {
+              userId: id,
+              visibility: "PUBLIC",
+            },
+          },
+        },
+      ],
+    },
+    include: {
+      visibilities: true,
+      owner: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
 
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">
@@ -43,38 +73,53 @@ export default async function Profile({ params }: { params: { id: string } }) {
           <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
             <div>
               <h1 className="text-3xl font-bold">{userData.name}</h1>
-              {id == userId && (
+              {id === userId && (
                 <p className="text-muted-foreground">{userData.email}</p>
               )}
             </div>
-            {userId == id && <Button variant={"link"}>Edit Profile</Button>}
+            {userId === id && <Button variant={"link"}>Edit Profile</Button>}
           </div>
           <hr />
 
           <div className="mt-4 flex flex-col gap-2">
-            <h2 className="text-xl font-bold">Movie Boards</h2>
-            {publicMovieBoards.length > 0 && (
+            <h2 className="text-xl font-bold">Public Movie Boards</h2>
+            {movieboards.length > 0 ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-                {publicMovieBoards.map((board) => (
+                {movieboards.map((board) => (
                   <Link href={"/movieboard/" + board.id} key={board.id}>
-                    {board.coverImage && (
-                      <Image
-                        src={board.coverImage}
-                        alt={board.title}
-                        width={500}
-                        height={500}
-                        className="aspect-square cursor-pointer rounded-lg object-cover"
-                      />
-                    )}
-                    <h3 className="mt-1 font-medium">{board.title}</h3>
+                    <div className="flex flex-col">
+                      {board.coverImage ? (
+                        <Image
+                          src={board.coverImage}
+                          alt={board.title}
+                          width={500}
+                          height={500}
+                          className="aspect-square cursor-pointer rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="flex aspect-square w-full items-center justify-center rounded-lg bg-muted">
+                          <div className="text-center text-muted-foreground">
+                            {board.title.charAt(0).toUpperCase()}
+                          </div>
+                        </div>
+                      )}
+                      <h3 className="mt-1.5 text-sm font-medium">
+                        {board.title}
+                      </h3>
+                      {board.ownerId !== id && (
+                        <p className="text-xs text-muted-foreground">
+                          by {board.owner.name}
+                        </p>
+                      )}
+                    </div>
                   </Link>
                 ))}
               </div>
-            )}
-            {publicMovieBoards.length == 0 && (
+            ) : (
               <p className="text-muted-foreground">
-                You haven&apos;t added any movie boards yet. Add some movie
-                boards to get started!
+                {id === userId
+                  ? "You haven't added any public movie boards yet. Add some movie boards and set them to public to get started!"
+                  : "This user hasn't added any public movie boards yet."}
               </p>
             )}
           </div>
@@ -105,12 +150,13 @@ export default async function Profile({ params }: { params: { id: string } }) {
             </div>
           )}
 
-          {userData.favorites.length == 0 && (
+          {userData.favorites.length === 0 && (
             <div className="mt-4 flex flex-col gap-2">
               <h2 className="text-xl font-bold">Favorites</h2>
               <p className="text-muted-foreground">
-                You haven&apos;t added any media to favorites yet. Add some
-                movie boards to get started!
+                {id === userId
+                  ? "You haven't added any media to favorites yet. Add some favorites to get started!"
+                  : "This user hasn't added any media to favorites yet."}
               </p>
             </div>
           )}
