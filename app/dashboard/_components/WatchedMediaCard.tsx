@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Edit, Star } from "lucide-react";
+"use client";
+
+import { Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -29,7 +30,7 @@ export default function WatchedMediaCard({
         />
       </div>
 
-      <div className="relative h-full w-full pb-16">
+      <div className="flex h-full w-full flex-col">
         <Link
           href={"/" + comparisionSlug + "/" + media.media.tmdbId}
           className="flex w-full items-center justify-between gap-4"
@@ -39,6 +40,7 @@ export default function WatchedMediaCard({
             <Star className="size-5 fill-primary" /> {media?.rating}/10
           </h4>
         </Link>
+
         <div className="my-1">
           {media.media.genres.map((genre: string) => (
             <span
@@ -49,13 +51,16 @@ export default function WatchedMediaCard({
             </span>
           ))}
         </div>
-        <div className="">
-          <p className="mt-3 block h-fit text-sm font-medium text-foreground">
+
+        <div className="flex flex-1 flex-col justify-between">
+          <p className="mt-3 text-sm font-medium text-foreground">
             {media.review.length > 360
               ? `${media.review.substring(0, 360)}...`
               : media.review}
           </p>
-          <EditReviewModal styles="" details={media} />
+          <div className="mt-4">
+            <EditReviewModal styles="" details={media} />
+          </div>
         </div>
       </div>
     </div>

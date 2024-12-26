@@ -115,7 +115,16 @@ export default async function Profile({ params }: { params: { id: string } }) {
                 <p className="text-muted-foreground">{userData.email}</p>
               )}
             </div>
-            {userId === id && <EditProfileDialog />}
+            {userId === id && (
+              <EditProfileDialog
+                initialProfile={{
+                  name: userData.name,
+                  userId: userData.id,
+                  email: userData.email,
+                  showFavorites: userData.showFavoritesOnProfile,
+                }}
+              />
+            )}
           </div>
           <hr />
 

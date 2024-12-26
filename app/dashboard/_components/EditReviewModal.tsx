@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useContext } from "react";
 import {
   Dialog,
@@ -11,14 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { Loader } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   removeFromWatchedList,
   updateReview,
 } from "@/app/(media-details)/_actions/actions";
 import { AuthContext } from "@/providers/auth-provider";
-import { getUserDetails } from "../_actions/actions";
 import { WatchedWithMedia } from "@/types/user";
 
 export default function EditReviewModal({
@@ -29,16 +29,17 @@ export default function EditReviewModal({
   styles: string;
 }) {
   const [openModal, setOpenModal] = React.useState(false);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isUpdating, setIsUpdating] = React.useState(false);
   const [rating, setRating] = React.useState<number[]>([details.rating]);
   const { toast } = useToast();
   const [review, setReview] = React.useState<string>(details.review || "");
-  const { userDetails, setUserDetails, refreshUserDetails } =
-    useContext(AuthContext);
+  const { refreshUserDetails } = useContext(AuthContext);
+
   async function handleUpdateReview(e: React.FormEvent) {
     try {
       e.preventDefault();
-      setLoading(true);
+      setIsUpdating(true);
       const res = await updateReview(
         details.media.tmdbId,
         details.userId,
@@ -50,8 +51,8 @@ export default function EditReviewModal({
           title: "Review updated",
           description: res.message,
         });
-        await refreshUserDetails;
-        setLoading(false);
+        await refreshUserDetails();
+        setIsUpdating(false);
         setOpenModal(false);
       } else {
         toast({
@@ -65,12 +66,14 @@ export default function EditReviewModal({
         title: "Error",
         description: "Failed to update review",
       });
+    } finally {
+      setIsUpdating(false);
     }
   }
 
   async function handleDeleteReview() {
     try {
-      setLoading(true);
+      setIsDeleting(true);
       const res = await removeFromWatchedList(
         details.media.tmdbId,
         details.userId,
@@ -81,7 +84,7 @@ export default function EditReviewModal({
           description: res.message,
         });
         await refreshUserDetails();
-        setLoading(false);
+        setIsDeleting(false);
         setOpenModal(false);
       } else {
         toast({
@@ -95,15 +98,15 @@ export default function EditReviewModal({
         title: "Error",
         description: "Failed to remove from watched",
       });
+    } finally {
+      setIsDeleting(false);
     }
   }
 
   return (
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogTrigger asChild>
-        <Button className={`mediaCrudButton hover:bg-white/80`}>
-          Edit Review
-        </Button>
+        <Button className="w-full">Edit Review</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -136,21 +139,17 @@ export default function EditReviewModal({
                     className="w-full"
                     variant={"destructive"}
                     type="button"
-                    disabled={loading}
+                    disabled={isDeleting || isUpdating}
                     onClick={handleDeleteReview}
                   >
-                    {loading ? (
-                      <Loader className="animate-spin" />
-                    ) : (
-                      "Delete Review"
-                    )}
+                    {isDeleting ? "Deleting..." : "Delete Review"}
                   </Button>
-                  <Button className="w-full" type="submit" disabled={loading}>
-                    {loading ? (
-                      <Loader className="animate-spin" />
-                    ) : (
-                      "Update Review"
-                    )}
+                  <Button
+                    className="w-full"
+                    type="submit"
+                    disabled={isDeleting || isUpdating}
+                  >
+                    {isUpdating ? "Updating..." : "Update Review"}
                   </Button>
                 </div>
               </form>

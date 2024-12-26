@@ -2,13 +2,15 @@
 CREATE TYPE "FriendshipStatus" AS ENUM ('PENDING', 'ACCEPTED');
 
 -- CreateEnum
-CREATE TYPE "Visibility" AS ENUM ('PUBLIC', 'PRIVATE');
+CREATE TYPE "VisibilityOption" AS ENUM ('PUBLIC', 'PRIVATE');
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "profileImageUrl" TEXT NOT NULL DEFAULT 'https://res.cloudinary.com/djpbvhxfh/image/upload/v1735148944/cinevault/profile/jo9vh0lfjf4bwca2bc6o.jpg',
     "email" TEXT NOT NULL,
+    "showFavoritesOnProfile" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -69,13 +71,24 @@ CREATE TABLE "MovieBoard" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "coverImage" TEXT NOT NULL,
+    "coverImage" TEXT DEFAULT '',
     "ownerId" TEXT NOT NULL,
-    "visibility" "Visibility" NOT NULL DEFAULT 'PRIVATE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "MovieBoard_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BoardVisibility" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "boardId" TEXT NOT NULL,
+    "visibility" "VisibilityOption" NOT NULL DEFAULT 'PRIVATE',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "BoardVisibility_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -133,10 +146,16 @@ CREATE INDEX "Recommendation_mediaId_idx" ON "Recommendation"("mediaId");
 CREATE INDEX "MovieBoard_title_idx" ON "MovieBoard"("title");
 
 -- CreateIndex
-CREATE INDEX "MovieBoard_visibility_idx" ON "MovieBoard"("visibility");
+CREATE INDEX "MovieBoard_ownerId_idx" ON "MovieBoard"("ownerId");
 
 -- CreateIndex
-CREATE INDEX "MovieBoard_ownerId_idx" ON "MovieBoard"("ownerId");
+CREATE INDEX "BoardVisibility_userId_idx" ON "BoardVisibility"("userId");
+
+-- CreateIndex
+CREATE INDEX "BoardVisibility_boardId_idx" ON "BoardVisibility"("boardId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BoardVisibility_userId_boardId_key" ON "BoardVisibility"("userId", "boardId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_Favorites_AB_unique" ON "_Favorites"("A", "B");
@@ -163,28 +182,34 @@ CREATE UNIQUE INDEX "_Collaborators_AB_unique" ON "_Collaborators"("A", "B");
 CREATE INDEX "_Collaborators_B_index" ON "_Collaborators"("B");
 
 -- AddForeignKey
-ALTER TABLE "Friendship" ADD CONSTRAINT "Friendship_requesterId_fkey" FOREIGN KEY ("requesterId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Friendship" ADD CONSTRAINT "Friendship_requesterId_fkey" FOREIGN KEY ("requesterId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Friendship" ADD CONSTRAINT "Friendship_addressedId_fkey" FOREIGN KEY ("addressedId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Friendship" ADD CONSTRAINT "Friendship_addressedId_fkey" FOREIGN KEY ("addressedId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Watched" ADD CONSTRAINT "Watched_mediaId_fkey" FOREIGN KEY ("mediaId") REFERENCES "Media"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Watched" ADD CONSTRAINT "Watched_mediaId_fkey" FOREIGN KEY ("mediaId") REFERENCES "Media"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Watched" ADD CONSTRAINT "Watched_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Watched" ADD CONSTRAINT "Watched_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Recommendation" ADD CONSTRAINT "Recommendation_mediaId_fkey" FOREIGN KEY ("mediaId") REFERENCES "Media"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Recommendation" ADD CONSTRAINT "Recommendation_mediaId_fkey" FOREIGN KEY ("mediaId") REFERENCES "Media"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Recommendation" ADD CONSTRAINT "Recommendation_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Recommendation" ADD CONSTRAINT "Recommendation_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Recommendation" ADD CONSTRAINT "Recommendation_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Recommendation" ADD CONSTRAINT "Recommendation_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MovieBoard" ADD CONSTRAINT "MovieBoard_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MovieBoard" ADD CONSTRAINT "MovieBoard_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BoardVisibility" ADD CONSTRAINT "BoardVisibility_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BoardVisibility" ADD CONSTRAINT "BoardVisibility_boardId_fkey" FOREIGN KEY ("boardId") REFERENCES "MovieBoard"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_Favorites" ADD CONSTRAINT "_Favorites_A_fkey" FOREIGN KEY ("A") REFERENCES "Media"("id") ON DELETE CASCADE ON UPDATE CASCADE;

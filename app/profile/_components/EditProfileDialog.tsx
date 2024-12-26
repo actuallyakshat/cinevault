@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,12 +8,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { AuthContext } from "@/providers/auth-provider";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo } from "react";
 import { updateUserProfile } from "../_actions/actions";
 
 interface UserProfile {
@@ -22,28 +22,33 @@ interface UserProfile {
   email: string;
   showFavorites: boolean;
 }
-export default function EditProfileDialog() {
-  const { userDetails } = useContext(AuthContext);
+export default function EditProfileDialog({
+  initialProfile,
+}: {
+  initialProfile: UserProfile;
+}) {
   const [open, setOpen] = React.useState(false);
   const [profile, setProfile] = React.useState<UserProfile>({
-    userId: userDetails?.id || "",
-    name: "",
-    email: "",
-    showFavorites: false,
+    userId: initialProfile.userId,
+    name: initialProfile.name,
+    email: initialProfile.email,
+    showFavorites: initialProfile.showFavorites,
   });
   const [loading, setLoading] = React.useState(false);
   const { toast } = useToast();
 
+  const router = useRouter();
+
   useEffect(() => {
-    if (userDetails) {
+    if (initialProfile) {
       setProfile({
-        userId: userDetails.id,
-        name: userDetails.name,
-        email: userDetails.email,
-        showFavorites: userDetails.showFavoritesOnProfile,
+        userId: initialProfile.userId,
+        name: initialProfile.name,
+        email: initialProfile.email,
+        showFavorites: initialProfile.showFavorites,
       });
     }
-  }, [userDetails]);
+  }, [initialProfile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,13 +60,13 @@ export default function EditProfileDialog() {
   };
 
   const isProfileChanged = useMemo(() => {
-    if (!userDetails) return false;
+    if (!initialProfile) return false;
     return (
-      profile.name !== userDetails.name ||
-      profile.email !== userDetails.email ||
-      profile.showFavorites !== userDetails.showFavoritesOnProfile
+      profile.name !== initialProfile.name ||
+      profile.email !== initialProfile.email ||
+      profile.showFavorites !== initialProfile.showFavorites
     );
-  }, [profile, userDetails]);
+  }, [profile, initialProfile]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,6 +83,7 @@ export default function EditProfileDialog() {
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
       });
+      router.refresh();
       setOpen(false);
     } catch (error) {
       toast({
@@ -124,6 +130,7 @@ export default function EditProfileDialog() {
             <Input
               type="email"
               id="email"
+              disabled={true}
               name="email"
               value={profile.email}
               onChange={handleInputChange}

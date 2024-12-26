@@ -1,19 +1,17 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useGetMoreNavItems, useGetNavItems } from "@/hooks/constants";
 import { SignedIn, SignedOut, useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import MobileSidebar from "./MobileSidebar";
 import ThemeToggler from "./ThemeToggler";
-import { useGetMoreNavItems, useGetNavItems } from "@/hooks/constants";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
   const { signOut, isSignedIn } = useAuth();
@@ -33,7 +31,7 @@ export default function Navbar() {
           <h1 className="hidden text-xl font-extrabold lg:block">
             <Link href={isSignedIn ? "/dashboard" : "/"}>CineVault</Link>
           </h1>
-          <MobileSidebar menuItems={navItems} />
+          <MobileSidebar menuItems={[...navItems, ...moreNavItems]} />
           <div className="hidden items-center space-x-2 lg:flex">
             <SignedIn>
               {navItems.map(({ href, label }) => (

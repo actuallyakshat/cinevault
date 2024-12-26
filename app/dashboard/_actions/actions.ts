@@ -42,7 +42,7 @@ const getUserDetails = async ({
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: clerkId,
+        // id: clerkId,
         email,
       },
       include: {
@@ -55,6 +55,7 @@ const getUserDetails = async ({
         },
       },
     });
+
     if (!user) {
       const newUser = await prisma.user.create({
         data: {
@@ -65,6 +66,18 @@ const getUserDetails = async ({
       });
       return { ...newUser, watchlist: [], favorites: [], watched: [] };
     }
+
+    if (user.id != clerkId) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          id: clerkId,
+        },
+      });
+    }
+
     return user;
   } catch (error) {
     console.error("Error fetching data:", error);

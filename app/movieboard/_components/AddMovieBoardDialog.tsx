@@ -45,6 +45,7 @@ export default function AddMovieBoardDialog() {
           description:
             "Hooray! You have successfully created a new movie board",
         });
+        setOpen(false);
       } else {
         toast({
           title: "Error",
