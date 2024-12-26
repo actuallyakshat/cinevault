@@ -22,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { AuthContext } from "@/providers/auth-provider";
-import { Media, User } from "@prisma/client";
+import { Media } from "@prisma/client";
 import React, { useContext, useEffect, useState } from "react";
 import {
   getFriendsForRecommendation,
@@ -35,10 +35,16 @@ interface Props {
   media: Media | undefined;
 }
 
+interface Friend {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function RecommendToAFriendModal(props: Props) {
   const { userDetails } = useContext(AuthContext);
   const [fetchingFriends, setFetchingFriends] = React.useState(false);
-  const [friends, setFriends] = React.useState<User[]>([]);
+  const [friends, setFriends] = React.useState<Friend[]>([]);
   const [selectedFriend, setSelectedFriend] = React.useState<string>("");
   const [loading, setLoading] = useState(false);
   const [mediaId, setMediaId] = useState("");
