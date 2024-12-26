@@ -190,7 +190,7 @@ export default async function MovieBoard({
             </h1>
           </UpdateNameDialog>
           <p className="mt-1 text-center text-sm font-medium text-muted-foreground">
-            {board.owner.name}
+            by {board.owner.name}
           </p>
           <p className="text-wrap text-sm text-muted-foreground">
             {board?.description}

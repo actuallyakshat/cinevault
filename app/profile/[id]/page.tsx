@@ -7,6 +7,7 @@ import { imagePrefix } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
+import EditProfileDialog from "../_components/EditProfileDialog";
 
 export default async function Profile({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -77,7 +78,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
                 <p className="text-muted-foreground">{userData.email}</p>
               )}
             </div>
-            {userId === id && <Button variant={"link"}>Edit Profile</Button>}
+            {userId === id && <EditProfileDialog />}
           </div>
           <hr />
 

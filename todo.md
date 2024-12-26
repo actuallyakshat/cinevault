@@ -2,10 +2,10 @@
 - [ ] Add optimistic UI
 - [x] Add friendships
 - [x] Add 'Recommend to a friend' feature
-- [ ] Add Profile page
+- [x] Add Profile page
 - [ ] Add pagination to dashboard
-- [ ] Add 'Movie Boards'
-  - [ ] They can be made in collaboration
+- [x] Add 'Movie Boards'
+  - [x] They can be made in collaboration
   - [ ] They can be searched globally if they are public
   - [x] An image can be uploaded as the cover of the movie board using cloudinary
 - [ ] Add 'Not Found' pages

@@ -16,7 +16,6 @@ import { AuthContext } from "@/providers/auth-provider";
 import { useToast } from "@/components/ui/use-toast";
 import { useContext, useState } from "react";
 import { createMovieBoard } from "../_actions/actions";
-import { useRouter } from "next/navigation";
 
 export default function AddMovieBoardDialog() {
   const { userDetails } = useContext(AuthContext);
@@ -24,7 +23,6 @@ export default function AddMovieBoardDialog() {
   const [boardName, setBoardName] = useState("");
   const { toast } = useToast();
   const [description, setDescription] = useState("");
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   async function createBoardHandler() {
@@ -44,9 +42,9 @@ export default function AddMovieBoardDialog() {
       if (response.success && response.board) {
         toast({
           title: "Board Created!",
-          description: "Please wait while we redirect you to the board",
+          description:
+            "Hooray! You have successfully created a new movie board",
         });
-        router.push("/movieboard/" + response.board.id);
       } else {
         toast({
           title: "Error",

@@ -11,6 +11,7 @@ import React from "react";
 import CloudinaryUpload from "../movieboard/[id]/_components/CloudinaryUpload";
 import { revalidatePath } from "next/cache";
 import { deleteFromCloudinary } from "../movieboard/[id]/_actions/action";
+import EditProfileDialog from "./_components/EditProfileDialog";
 
 const UPLOAD_PRESET = "cinevault_user_profile_image";
 
@@ -91,7 +92,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
               <h1 className="text-3xl font-bold">{userData.name}</h1>
               <p className="text-muted-foreground">{userData.email}</p>
             </div>
-            <Button variant={"link"}>Edit Profile</Button>
+            <EditProfileDialog />
           </div>
           <hr />
 
