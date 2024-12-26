@@ -1,13 +1,18 @@
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import prisma from "@/db";
 import { imagePrefix } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import EditProfileDialog from "../_components/EditProfileDialog";
+import CloudinaryUpload from "@/app/movieboard/[id]/_components/CloudinaryUpload";
+import { deleteFromCloudinary } from "@/app/movieboard/[id]/_actions/action";
+import { revalidatePath } from "next/cache";
+
+const UPLOAD_PRESET = "cinevault_user_profile_image";
 
 export default async function Profile({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -60,16 +65,48 @@ export default async function Profile({ params }: { params: { id: string } }) {
     },
   });
 
+  async function updateCoverImage(newImageUrl: string) {
+    "use server";
+
+    const oldImageUrl = userData!.profileImageUrl;
+
+    if (oldImageUrl) {
+      try {
+        const publicId = oldImageUrl
+          .split("/upload/")[1]
+          .split("/")
+          .filter((segment) => !segment.startsWith("v"))
+          .join("/")
+          .split(".")[0];
+
+        console.log(`Deleting old image: ${publicId}`);
+
+        if (publicId) {
+          await deleteFromCloudinary({ publicIds: [publicId] });
+          console.log(`Successfully deleted old image: ${publicId}`);
+        }
+      } catch (error) {
+        console.error("Error deleting old image from Cloudinary:", error);
+      }
+    }
+
+    await prisma.user.update({
+      where: { id: id || userId! },
+      data: { profileImageUrl: newImageUrl },
+    });
+    revalidatePath("/profile/" + userId);
+  }
+
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-12 lg:px-8">
       <div className="flex flex-col gap-4 lg:flex-row">
-        <Avatar className="mx-auto size-72">
-          <AvatarImage
-            src={userData.profileImageUrl || ""}
-            alt={userData.name || ""}
-          />
-          <AvatarFallback>{userData.name?.charAt(0) || "F"}</AvatarFallback>
-        </Avatar>
+        <CloudinaryUpload
+          isAuthorised={userId == id}
+          type="profile"
+          uploadPreset={UPLOAD_PRESET}
+          currentImage={userData.profileImageUrl}
+          onUpload={updateCoverImage}
+        />
         <div className="flex flex-1 flex-col gap-2 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
             <div>
@@ -83,7 +120,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
           <hr />
 
           <div className="mt-4 flex flex-col gap-2">
-            <h2 className="text-xl font-bold">Public Movie Boards</h2>
+            <h2 className="text-xl font-bold">Movie Boards</h2>
             {movieboards.length > 0 ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
                 {movieboards.map((board) => (
@@ -125,7 +162,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          {userData.favorites.length > 0 && (
+          {userData.showFavoritesOnProfile && userData.favorites.length > 0 && (
             <div className="mt-4 flex flex-col gap-2">
               <h2 className="text-xl font-bold">Favorites</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">

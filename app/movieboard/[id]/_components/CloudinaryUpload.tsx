@@ -20,7 +20,7 @@ export default function CloudinaryUpload({
 }: CloudinaryUploadProps) {
   if (!isAuthorised)
     return (
-      <>
+      <div>
         {currentImage ? (
           <Image
             src={currentImage}
@@ -38,7 +38,7 @@ export default function CloudinaryUpload({
             </p>
           </div>
         )}
-      </>
+      </div>
     );
 
   return (

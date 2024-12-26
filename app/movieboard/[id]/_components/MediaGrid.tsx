@@ -11,10 +11,15 @@ import { RemoveFromBoardButton } from "./RemoveFromBoardButton";
 
 interface MediaGridProps {
   media: Media[];
+  isAuthorised: boolean;
   onRemoveMedia: (mediaId: string) => Promise<void>;
 }
 
-export default function MediaGrid({ media, onRemoveMedia }: MediaGridProps) {
+export default function MediaGrid({
+  media,
+  onRemoveMedia,
+  isAuthorised,
+}: MediaGridProps) {
   const [sortCriterion, setSortCriterion] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -97,7 +102,9 @@ export default function MediaGrid({ media, onRemoveMedia }: MediaGridProps) {
                 className="h-full w-full cursor-pointer object-cover transition-all duration-300 hover:scale-105"
               />
             </div>
-            <RemoveFromBoardButton onRemove={() => onRemoveMedia(item.id)} />
+            {isAuthorised && (
+              <RemoveFromBoardButton onRemove={() => onRemoveMedia(item.id)} />
+            )}
             <div className="flex w-full flex-col items-center gap-1 text-center">
               <h2 className="line-clamp-1 text-sm font-semibold">
                 {item.title}

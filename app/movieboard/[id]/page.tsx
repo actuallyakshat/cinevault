@@ -13,6 +13,7 @@ import { VisibilityOption } from "@prisma/client";
 import { redirect } from "next/navigation";
 import LeaveMovieBoardDialog from "./_components/LeaveMovieBoardDialog";
 import { isAbsolute } from "node:path/posix";
+import Link from "next/link";
 
 const UPLOAD_PRESET = "cinevault_movieboards";
 
@@ -190,7 +191,13 @@ export default async function MovieBoard({
             </h1>
           </UpdateNameDialog>
           <p className="mt-1 text-center text-sm font-medium text-muted-foreground">
-            by {board.owner.name}
+            by{" "}
+            <Link
+              href={"/profile/" + board.owner.id}
+              className="hover:underline"
+            >
+              {board.owner.name}
+            </Link>
           </p>
           <p className="text-wrap text-sm text-muted-foreground">
             {board?.description}
@@ -230,7 +237,11 @@ export default async function MovieBoard({
             This board has no movies yet. Add some to get started
           </p>
         ) : (
-          <MediaGrid media={board.media} onRemoveMedia={removeMedia} />
+          <MediaGrid
+            isAuthorised={isAuthorised}
+            media={board.media}
+            onRemoveMedia={removeMedia}
+          />
         )}
       </div>
     </div>
