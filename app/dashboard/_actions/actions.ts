@@ -40,7 +40,8 @@ const getUserDetails = async ({
   email: string;
 }) => {
   try {
-    const user = await prisma.user.findUnique({
+    console.log("FETCHING USER");
+    let user = await prisma.user.findUnique({
       where: {
         // id: clerkId,
         email,
@@ -68,12 +69,21 @@ const getUserDetails = async ({
     }
 
     if (user.id != clerkId) {
-      await prisma.user.update({
+      user = await prisma.user.update({
         where: {
           id: user.id,
         },
         data: {
           id: clerkId,
+        },
+        include: {
+          watchlist: true,
+          favorites: true,
+          watched: {
+            include: {
+              media: true,
+            },
+          },
         },
       });
     }

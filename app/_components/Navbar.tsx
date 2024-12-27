@@ -62,8 +62,8 @@ export default function Navbar() {
               </Button>
             </SignedIn>
             <SignedOut>
-              <Button variant={"ghost"} onClick={() => openSignIn()}>
-                Sign in
+              <Button variant={"ghost"} asChild>
+                <Link href="/sign-in">Sign in</Link>
               </Button>
             </SignedOut>
             <ThemeToggler />
