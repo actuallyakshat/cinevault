@@ -10,7 +10,7 @@ datasource db {
 model User {
   id                      String            @id @default(uuid())
   name                    String
-  profileImageUrl         String            @default("https://res.cloudinary.com/djpbvhxfh/image/upload/v1735148944/cinevault/profile/jo9vh0lfjf4bwca2bc6o.jpg")
+  profileImageUrl         String            @default("")
   email                   String            @unique
   watched                 Watched[]
   favorites               Media[]           @relation(name: "Favorites")

@@ -3,6 +3,9 @@ import prisma from "@/db";
 import axios from "axios";
 
 const TOKEN = process.env.TMDB_API_TOKEN as string;
+const DEFAULT_PFP =
+  "https://res.cloudinary.com/djpbvhxfh/image/upload/v1735321020/cinevault/profile/hkljs8qrndn7wpyqsbnt.jpg";
+
 async function searchMedia(query: string, mediaType: string) {
   try {
     // Make a GET request to search for movies
@@ -63,6 +66,7 @@ const getUserDetails = async ({
           id: clerkId,
           email,
           name,
+          profileImageUrl: DEFAULT_PFP,
         },
       });
       return { ...newUser, watchlist: [], favorites: [], watched: [] };

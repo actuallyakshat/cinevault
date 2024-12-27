@@ -104,11 +104,12 @@ export default async function MovieBoard({
     await revalidatePath(`/movieboard/${params.id}`);
   }
 
-  async function updateTitle(newTitle: string) {
+  async function updateTitle(newTitle: string, description: string) {
     "use server";
+
     await prisma.movieBoard.update({
       where: { id: params.id },
-      data: { title: newTitle },
+      data: { title: newTitle, description },
     });
     await revalidatePath(`/movieboard`);
   }
@@ -187,6 +188,7 @@ export default async function MovieBoard({
           <UpdateNameDialog
             isAuthorised={isAuthorised && isAdmin}
             name={board?.title}
+            oldDescription={board?.description}
             onUpdate={updateTitle}
           >
             <h1

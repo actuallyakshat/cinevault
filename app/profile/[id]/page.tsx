@@ -1,23 +1,25 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { deleteFromCloudinary } from "@/app/movieboard/[id]/_actions/action";
+import CloudinaryUpload from "@/app/movieboard/[id]/_components/CloudinaryUpload";
+import NotFound from "@/components/ui/not-found";
 import prisma from "@/db";
 import { imagePrefix } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import EditProfileDialog from "../_components/EditProfileDialog";
-import CloudinaryUpload from "@/app/movieboard/[id]/_components/CloudinaryUpload";
-import { deleteFromCloudinary } from "@/app/movieboard/[id]/_actions/action";
-import { revalidatePath } from "next/cache";
-import NotFound from "@/components/ui/not-found";
 
 const UPLOAD_PRESET = "cinevault_user_profile_image";
+const DEFAULT_PFP =
+  "https://res.cloudinary.com/djpbvhxfh/image/upload/v1735321020/cinevault/profile/hkljs8qrndn7wpyqsbnt.jpg";
 
 export default async function Profile({ params }: { params: { id: string } }) {
   const { id } = params;
   const { userId } = await auth();
+
   const userData = await prisma.user.findFirst({
     where: {
       id: id,
@@ -79,30 +81,48 @@ export default async function Profile({ params }: { params: { id: string } }) {
   async function updateCoverImage(newImageUrl: string) {
     "use server";
 
-    const oldImageUrl = userData!.profileImageUrl;
+    console.log("NEW IMAGE", newImageUrl);
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId!,
+      },
+    });
+
+    if (!user) {
+      console.log("User not found");
+      return;
+    }
+
+    const oldImageUrl = user.profileImageUrl;
+
+    const isOldImageTheDefault = oldImageUrl == DEFAULT_PFP;
+    console.log("OLD", oldImageUrl);
 
     if (oldImageUrl) {
-      try {
-        const publicId = oldImageUrl
-          .split("/upload/")[1]
-          .split("/")
-          .filter((segment) => !segment.startsWith("v"))
-          .join("/")
-          .split(".")[0];
+      if (!isOldImageTheDefault) {
+        try {
+          const publicId = oldImageUrl
+            .split("/upload/")[1]
+            .split("/")
+            .filter((segment) => !segment.startsWith("v"))
+            .join("/")
+            .split(".")[0];
 
-        console.log(`Deleting old image: ${publicId}`);
+          console.log(`Deleting old image: ${publicId}`);
 
-        if (publicId) {
-          await deleteFromCloudinary({ publicIds: [publicId] });
-          console.log(`Successfully deleted old image: ${publicId}`);
+          if (publicId) {
+            await deleteFromCloudinary({ publicIds: [publicId] });
+            console.log(`Successfully deleted old image: ${publicId}`);
+          }
+        } catch (error) {
+          console.error("Error deleting old image from Cloudinary:", error);
         }
-      } catch (error) {
-        console.error("Error deleting old image from Cloudinary:", error);
       }
     }
 
     await prisma.user.update({
-      where: { id: id || userId! },
+      where: { id: userId! },
       data: { profileImageUrl: newImageUrl },
     });
     await revalidatePath("/profile/" + userId);

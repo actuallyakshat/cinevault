@@ -56,11 +56,14 @@ export default function CloudinaryUpload({
       options={{
         sources: ["local", "url"],
         clientAllowedFormats: ["jpg", "jpeg", "png", "gif", "webp"],
+        maxFiles: 1,
+        multiple: false,
       }}
       uploadPreset={uploadPreset}
       onSuccess={async (result, widget) => {
         if (result.event !== "success") return;
         const info = result.info as { secure_url: string };
+        console.log("NEW UPLOAD DONE", info.secure_url);
         await onUpload(info.secure_url);
         widget.close();
       }}
