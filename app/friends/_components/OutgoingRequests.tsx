@@ -49,15 +49,15 @@ export function OutgoingRequests({ friends }: { friends: FriendsProp[] }) {
         <div className="friendshipCard" key={friend.id}>
           <div className="flex items-center gap-3">
             <Image
-              src={friend.requester.profileImageUrl}
+              src={friend.addressed.profileImageUrl}
               alt="Profile"
               width={400}
               height={400}
               className="size-14 rounded-full"
             />
             <div>
-              <h2 className="text-xl font-bold">{friend.requester.name}</h2>
-              <p className="text-muted-foreground">{friend.requester.email}</p>
+              <h2 className="text-xl font-bold">{friend.addressed.name}</h2>
+              <p className="text-muted-foreground">{friend.addressed.email}</p>
             </div>
           </div>
           <div className="mt-5 flex w-full items-center justify-center gap-3">

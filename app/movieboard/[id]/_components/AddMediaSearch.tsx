@@ -74,9 +74,6 @@ export default function AddMediaSearch({ boardId }: { boardId: string }) {
       });
 
       if (response.success) {
-        console.log(
-          `Added ${isMovie(result) ? result.title : result.name} to movieboard`,
-        );
         setOpen(false);
       } else {
         toast({
@@ -85,7 +82,7 @@ export default function AddMediaSearch({ boardId }: { boardId: string }) {
         });
       }
     } catch (error) {
-      console.log("Something went wrong");
+      console.error("Something went wrong");
       toast({
         title: "Error",
         description: "Something went wrong",

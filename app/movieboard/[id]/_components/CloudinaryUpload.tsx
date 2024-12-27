@@ -18,20 +18,30 @@ export default function CloudinaryUpload({
   type,
   isAuthorised,
 }: CloudinaryUploadProps) {
+  const imageClasses =
+    type === "cover"
+      ? "aspect-square w-full rounded-lg object-cover"
+      : "w-72 h-72 rounded-full object-cover";
+
+  const placeholderClasses =
+    type === "cover"
+      ? "aspect-square w-full rounded-lg bg-muted"
+      : "w-72 h-72 rounded-full bg-muted";
+
   if (!isAuthorised)
     return (
-      <div>
+      <div className="flex justify-center">
         {currentImage ? (
           <Image
             src={currentImage}
             alt="Cover Image"
             width={500}
             height={500}
-            className={`aspect-square w-full object-cover ${type === "cover" ? "rounded-lg" : "size-72 rounded-full"}`}
+            className={imageClasses}
           />
         ) : (
           <div
-            className={`flex aspect-square w-full items-center justify-center ${type === "cover" ? "rounded-lg" : "size-72 rounded-full"} bg-muted`}
+            className={`flex items-center justify-center ${placeholderClasses}`}
           >
             <p className="text-wrap text-xs text-muted-foreground">
               Click to add {type === "cover" ? "cover image" : "profile image"}
@@ -56,18 +66,21 @@ export default function CloudinaryUpload({
       }}
     >
       {({ open }) => (
-        <div onClick={() => open()} className="cursor-pointer">
+        <div
+          onClick={() => open()}
+          className="flex cursor-pointer justify-center"
+        >
           {currentImage ? (
             <Image
               src={currentImage}
               alt="Cover Image"
               width={500}
               height={500}
-              className={`aspect-square w-full object-cover ${type === "cover" ? "rounded-lg" : "size-72 rounded-full"}`}
+              className={imageClasses}
             />
           ) : (
             <div
-              className={`flex aspect-square w-full items-center justify-center ${type === "cover" ? "rounded-lg" : "size-72 rounded-full"} bg-muted`}
+              className={`flex items-center justify-center ${placeholderClasses}`}
             >
               <p className="text-wrap text-xs text-muted-foreground">
                 Click to add{" "}

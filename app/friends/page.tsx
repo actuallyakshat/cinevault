@@ -48,19 +48,17 @@ export default async function Friends({
   const category = searchParams.category || "all";
   const { userId } = await auth();
 
-  if (!userId) {
-    return <div>Please sign in to view your friends.</div>;
-  }
-
-  const friends = await getFriends(userId, category);
+  const friends = await getFriends(userId!, category);
 
   return (
-    <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 flex w-full flex-col items-center justify-between sm:flex-row">
-        <h1 className="mb-4 text-3xl font-extrabold sm:mb-0">Friends</h1>
+    <div className="mx-auto max-w-screen-2xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
+      <div className="flex w-full flex-row items-center justify-between gap-4 sm:mb-8">
+        <h1 className="text-2xl font-extrabold sm:text-3xl">Friends</h1>
         <AddFriendsModal />
       </div>
-      <SelectFriendCategory selectedCategory={category} />
+      <div className="mt-4 sm:mt-6">
+        <SelectFriendCategory selectedCategory={category} />
+      </div>
       <Suspense fallback={<FriendsSkeleton />}>
         {category === "all" && <FriendsData friends={friends} />}
         {category === "incoming" && (
@@ -80,9 +78,9 @@ export default async function Friends({
 
 function FriendsSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {[...Array(6)].map((_, i) => (
-        <Skeleton key={i} className="h-[200px] w-full" />
+        <Skeleton key={i} className="h-[140px] w-full sm:h-[200px]" />
       ))}
     </div>
   );

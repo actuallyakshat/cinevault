@@ -13,7 +13,7 @@ export function BoardList({ boards }: { boards: MovieBoard[] }) {
         </div>
       ) : (
         <p className="pt-2 text-muted-foreground">
-          No boards found. Create one to get started or try a different search.
+          No boards found. Create one to get started.
         </p>
       )}
     </>

@@ -1,28 +1,15 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { CardTitle } from "@/components/ui/card";
+
 import { AuthContext } from "@/providers/auth-provider";
-import { PlusIcon } from "lucide-react";
-import Link from "next/link";
 import { useContext, useState } from "react";
 import { deleteFriend } from "../_actions/actions";
 
-type FriendsProp = {
+export interface FriendUser {
   id: string;
-  requester: {
-    id: string;
-    name: string;
-    email: string;
-    profileImageUrl: string | null;
-  };
-  addressed: {
-    id: string;
-    name: string;
-    email: string;
-    profileImageUrl: string | null;
-  };
-};
+  name: string;
+  email: string;
+  profileImageUrl: string | null;
+}
 
 export default function FriendCard({ friend }: { friend: FriendsProp }) {
   const { userDetails } = useContext(AuthContext);
@@ -47,27 +34,8 @@ export default function FriendCard({ friend }: { friend: FriendsProp }) {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <Link
-          href={"/profile/" + friendData.id}
-          className="flex items-center gap-3 md:gap-5"
-        >
-          <Avatar>
-            <AvatarImage
-              src={friendData.profileImageUrl || ""}
-              alt={friendData.name || ""}
-            />
-            <AvatarFallback>{friendData.name?.charAt(0) || "F"}</AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle className="text-xl md:text-2xl">
-              {friendData.name}
-            </CardTitle>
-            <p className="block text-sm text-muted-foreground">
-              {friendData.email}
-            </p>
-          </div>
-        </Link>
+      <div className="flex w-full flex-row items-center justify-between gap-4">
+        <FriendInfo user={friendData} />
         <DeleteFriendDialog
           handleDelete={handleDelete}
           isDeleting={isDeleting}
@@ -80,6 +48,7 @@ export default function FriendCard({ friend }: { friend: FriendsProp }) {
   );
 }
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -88,18 +57,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { PlusIcon } from "lucide-react";
+import { FriendsProp } from "../page";
 
-function DeleteFriendDialog({
-  handleDelete,
-  isDeleting,
-  open,
-  onOpenChange,
-}: {
+interface DeleteFriendDialogProps {
   handleDelete: (e: React.FormEvent<HTMLFormElement>) => void;
   isDeleting: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}) {
+}
+
+export function DeleteFriendDialog({
+  handleDelete,
+  isDeleting,
+  open,
+  onOpenChange,
+}: DeleteFriendDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -116,14 +89,19 @@ function DeleteFriendDialog({
             boards.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={(e) => handleDelete(e)} className="space-y-2">
-          <Button variant={"secondary"} type="button" className="w-full">
+        <form onSubmit={handleDelete} className="space-y-2">
+          <Button
+            variant="secondary"
+            type="button"
+            className="w-full"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <Button
             className="w-full"
             type="submit"
-            variant={"destructive"}
+            variant="destructive"
             disabled={isDeleting}
           >
             {isDeleting ? "Removing..." : "Remove Friend"}
@@ -131,5 +109,42 @@ function DeleteFriendDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+import { CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+
+interface FriendInfoProps {
+  user: FriendUser;
+}
+
+export function FriendInfo({ user }: FriendInfoProps) {
+  return (
+    <Link
+      href={"/profile/" + user.id}
+      className="flex items-center gap-3 md:gap-5"
+    >
+      <FriendAvatar user={user} />
+      <div>
+        <CardTitle className="text-xl md:text-2xl">{user.name}</CardTitle>
+        <p className="block text-sm text-muted-foreground">{user.email}</p>
+      </div>
+    </Link>
+  );
+}
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface FriendAvatarProps {
+  user: FriendUser;
+}
+
+export function FriendAvatar({ user }: FriendAvatarProps) {
+  return (
+    <Avatar>
+      <AvatarImage src={user.profileImageUrl || ""} alt={user.name || ""} />
+      <AvatarFallback>{user.name?.charAt(0) || "F"}</AvatarFallback>
+    </Avatar>
   );
 }

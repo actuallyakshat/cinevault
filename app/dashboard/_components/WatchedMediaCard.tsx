@@ -35,17 +35,19 @@ export default function WatchedMediaCard({
           href={"/" + comparisionSlug + "/" + media.media.tmdbId}
           className="flex w-full items-center justify-between gap-4"
         >
-          <h1 className="text-3xl font-bold">{media?.media?.title}</h1>
+          <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
+            {media?.media?.title}
+          </h1>
           <h4 className="flex items-center gap-2 text-2xl font-bold text-foreground/80">
             <Star className="size-5 fill-primary" /> {media?.rating}/10
           </h4>
         </Link>
 
-        <div className="my-1">
+        <div className="mt-2 flex flex-wrap gap-1 ">
           {media.media.genres.map((genre: string) => (
             <span
               key={genre}
-              className="mr-1 rounded-full border bg-background px-3 py-1 text-xs font-medium text-foreground"
+              className="rounded-full border bg-background px-3 py-1 text-xs font-medium text-foreground"
             >
               {genre}
             </span>

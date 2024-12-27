@@ -23,7 +23,7 @@ export function SelectFriendCategory({
 
   return (
     <Select defaultValue={selectedCategory} onValueChange={handleValueChange}>
-      <SelectTrigger className="mt-4 w-[240px]">
+      <SelectTrigger className="my-4 w-[240px] md:mx-0">
         <SelectValue placeholder="Select category" />
       </SelectTrigger>
       <SelectContent>

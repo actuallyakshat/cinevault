@@ -53,7 +53,7 @@ export default function AddMovieBoardDialog() {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast({
         title: "Error",
         description: "Something went wrong",

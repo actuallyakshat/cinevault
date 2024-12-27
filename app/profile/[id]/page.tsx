@@ -11,6 +11,7 @@ import EditProfileDialog from "../_components/EditProfileDialog";
 import CloudinaryUpload from "@/app/movieboard/[id]/_components/CloudinaryUpload";
 import { deleteFromCloudinary } from "@/app/movieboard/[id]/_actions/action";
 import { revalidatePath } from "next/cache";
+import NotFound from "@/components/ui/not-found";
 
 const UPLOAD_PRESET = "cinevault_user_profile_image";
 
@@ -27,7 +28,17 @@ export default async function Profile({ params }: { params: { id: string } }) {
   });
 
   if (!userData) {
-    return <div>User not found</div>;
+    return (
+      <NotFound>
+        <h1 className="text-3xl font-bold">Profile not found</h1>
+        <p className="text-sm">
+          The profile you are looking for does not exist.
+        </p>
+        <Link href={"/profile"} className="mt-4 text-sm hover:underline">
+          Back to Your Profile
+        </Link>
+      </NotFound>
+    );
   }
 
   const movieboards = await prisma.movieBoard.findMany({
@@ -131,7 +142,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
           <div className="mt-4 flex flex-col gap-2">
             <h2 className="text-xl font-bold">Movie Boards</h2>
             {movieboards.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
                 {movieboards.map((board) => (
                   <Link href={"/movieboard/" + board.id} key={board.id}>
                     <div className="flex flex-col">
@@ -197,16 +208,17 @@ export default async function Profile({ params }: { params: { id: string } }) {
             </div>
           )}
 
-          {userData.favorites.length === 0 && (
-            <div className="mt-4 flex flex-col gap-2">
-              <h2 className="text-xl font-bold">Favorites</h2>
-              <p className="text-muted-foreground">
-                {id === userId
-                  ? "You haven't added any media to favorites yet. Add some favorites to get started!"
-                  : "This user hasn't added any media to favorites yet."}
-              </p>
-            </div>
-          )}
+          {userData.showFavoritesOnProfile &&
+            userData.favorites.length === 0 && (
+              <div className="mt-4 flex flex-col gap-2">
+                <h2 className="text-xl font-bold">Favorites</h2>
+                <p className="text-muted-foreground">
+                  {id === userId
+                    ? "You haven't added any media to favorites yet. Add some favorites to get started!"
+                    : "This user hasn't added any media to favorites yet."}
+                </p>
+              </div>
+            )}
         </div>
       </div>
     </div>

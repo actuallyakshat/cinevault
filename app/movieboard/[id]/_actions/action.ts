@@ -232,7 +232,6 @@ export async function removeCollaboratorFromBoard({
 
 export async function getFriendsToAdd({ boardId }: { boardId: string }) {
   try {
-    console.log("Getting friends to add", boardId);
     const board = await prisma.movieBoard.findUnique({
       where: { id: boardId },
       include: {

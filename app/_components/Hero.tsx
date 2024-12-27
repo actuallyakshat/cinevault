@@ -26,7 +26,7 @@ function Hero() {
       </p>
       <div>
         {user ? (
-          <Button>
+          <Button asChild>
             <Link href={"/dashboard"}>Dashboard</Link>
           </Button>
         ) : (

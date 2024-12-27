@@ -44,7 +44,7 @@ export default function WatchedMedia({
   return (
     <div>
       {data.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:p-4 md:grid-cols-2">
           {data.map((media) => (
             <WatchedMediaCard
               key={media.id}

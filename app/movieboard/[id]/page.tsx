@@ -1,19 +1,18 @@
 import UpdateNameDialog from "@/app/_components/UpdateNameDialog";
+import NotFound from "@/components/ui/not-found";
 import prisma from "@/db";
 import { auth } from "@clerk/nextjs/server";
+import { VisibilityOption } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import Link from "next/link";
 import { deleteFromCloudinary } from "./_actions/action";
 import AddMediaSearch from "./_components/AddMediaSearch";
 import ChangeVisibility from "./_components/ChangeVisibility";
 import CloudinaryUpload from "./_components/CloudinaryUpload";
 import DeleteMovieBoardDialog from "./_components/DeleteMovieBoardDialog";
 import EditCollaborators from "./_components/EditCollaborators";
-import MediaGrid from "./_components/MediaGrid";
-import { VisibilityOption } from "@prisma/client";
-import { redirect } from "next/navigation";
 import LeaveMovieBoardDialog from "./_components/LeaveMovieBoardDialog";
-import { isAbsolute } from "node:path/posix";
-import Link from "next/link";
+import MediaGrid from "./_components/MediaGrid";
 
 const UPLOAD_PRESET = "cinevault_movieboards";
 
@@ -52,7 +51,16 @@ export default async function MovieBoard({
     },
   });
 
-  if (!board) return <div>Board not found</div>;
+  if (!board)
+    return (
+      <NotFound>
+        <h1 className="text-3xl font-bold">Board not found</h1>
+        <p className="text-sm">The board you are looking for does not exist.</p>
+        <Link href={"/movieboard"} className="mt-4 text-sm hover:underline">
+          Back to Boards
+        </Link>
+      </NotFound>
+    );
 
   const isAuthorised =
     board.owner.id === userId ||
@@ -85,11 +93,8 @@ export default async function MovieBoard({
           .join("/")
           .split(".")[0];
 
-        console.log(`Deleting old image: ${publicId}`);
-
         if (publicId) {
           await deleteFromCloudinary({ publicIds: [publicId] });
-          console.log(`Successfully deleted old image: ${publicId}`);
         }
       } catch (error) {
         console.error("Error deleting old image from Cloudinary:", error);

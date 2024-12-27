@@ -27,7 +27,7 @@ export default function Navbar() {
       <nav
         className={`${pathname == "/" ? "" : "bg-background"} fixed z-[30] flex h-16 w-full items-center justify-center`}
       >
-        <div className="flex h-full w-full items-center justify-between px-8 lg:container lg:px-4">
+        <div className="flex h-full w-full items-center justify-between px-6 lg:container lg:px-4">
           <h1 className="hidden text-xl font-extrabold lg:block">
             <Link href={isSignedIn ? "/dashboard" : "/"}>CineVault</Link>
           </h1>
