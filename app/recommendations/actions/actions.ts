@@ -19,7 +19,7 @@ export async function addRecommendationToWatchlist(
     }
 
     await addToWatchlist(recommendation.media, userId);
-    revalidatePath("/recommendations");
+    await revalidatePath("/recommendations");
     return { success: true, message: "Recommendation added to watchlist" };
   } catch (error) {
     console.error(error);
@@ -41,7 +41,7 @@ export async function deleteRecommendation(recommendationId: string) {
     }
 
     await prisma.recommendation.delete({ where: { id: recommendationId } });
-    revalidatePath("/recommendations");
+    await revalidatePath("/recommendations");
     return { success: true, message: "Recommendation removed successfully" };
   } catch (error) {
     console.error(error);

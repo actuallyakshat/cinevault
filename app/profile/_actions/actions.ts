@@ -34,8 +34,8 @@ export async function updateUserProfile({
       },
     });
 
-    revalidatePath("/profile");
-    revalidatePath("/profile/" + userId);
+    await revalidatePath("/profile");
+    await revalidatePath("/profile/" + userId);
     return true;
   } catch (error) {
     console.error("Error updating profile:", error);

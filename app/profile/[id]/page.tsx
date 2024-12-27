@@ -105,7 +105,7 @@ export default async function Profile({ params }: { params: { id: string } }) {
       where: { id: id || userId! },
       data: { profileImageUrl: newImageUrl },
     });
-    revalidatePath("/profile/" + userId);
+    await revalidatePath("/profile/" + userId);
   }
 
   return (

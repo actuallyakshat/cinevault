@@ -48,7 +48,7 @@ export async function addFriend(userId: string, email: string) {
       },
     });
 
-    revalidatePath("/friends");
+    await revalidatePath("/friends");
     return { success: true, message: "Friend added" };
   } catch (error) {
     console.error("Error adding friend:", error);
@@ -85,7 +85,7 @@ export async function acceptFriendRequest(userId: string, friendId: string) {
       },
     });
 
-    revalidatePath("/friends");
+    await revalidatePath("/friends");
     return { success: true, message: "Friendship accepted" };
   } catch (error) {
     console.error("Error accepting friend request:", error);
@@ -119,7 +119,7 @@ export async function rejectFriendRequest(userId: string, friendId: string) {
       },
     });
 
-    revalidatePath("/friends");
+    await revalidatePath("/friends");
     return { success: true, message: "Friendship rejected" };
   } catch (error) {
     console.error("Error rejecting friend request:", error);
@@ -153,7 +153,7 @@ export async function cancelFriendRequest(userId: string, friendId: string) {
       },
     });
 
-    revalidatePath("/friends");
+    await revalidatePath("/friends");
     return { success: true, message: "Friendship cancelled" };
   } catch (error) {
     console.error("Error cancelling friend request:", error);
@@ -234,7 +234,7 @@ export async function deleteFriend(userId: string, friendId: string) {
       });
     });
 
-    revalidatePath("/friends");
+    await revalidatePath("/friends");
     return { success: true, message: "Friendship and collaborations removed" };
   } catch (error) {
     console.error("Error deleting friend:", error);

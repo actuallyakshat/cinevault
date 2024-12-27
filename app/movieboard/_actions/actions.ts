@@ -29,7 +29,7 @@ export async function createMovieBoard({
       },
     });
 
-    revalidatePath("/movieboard");
+    await revalidatePath("/movieboard");
     return { success: true, message: "New Board Added", board: newBoard };
   } catch (error) {
     console.error(error);

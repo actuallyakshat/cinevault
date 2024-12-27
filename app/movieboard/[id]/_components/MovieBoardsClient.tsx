@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MovieBoard } from "@prisma/client";
 import SearchBar from "./SearchBar";
 import AddMovieBoardDialog from "../../_components/AddMovieBoardDialog";
@@ -12,6 +12,10 @@ export default function MovieBoardsClient({
   initialBoards: MovieBoard[];
 }) {
   const [boards, setBoards] = useState(initialBoards);
+
+  useEffect(() => {
+    setBoards(initialBoards);
+  }, [initialBoards]);
 
   const handleSearch = (query: string) => {
     const filteredBoards = initialBoards.filter((board) =>

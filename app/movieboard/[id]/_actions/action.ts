@@ -65,7 +65,7 @@ export async function addMediaToMovieBoard({
       },
     });
 
-    revalidatePath("/movieboard/" + updatedBoard.id);
+    await revalidatePath("/movieboard/" + updatedBoard.id);
 
     return {
       success: true,
@@ -108,19 +108,25 @@ export async function deleteBoard({ boardId }: { boardId: string }) {
       where: { id: boardId },
     });
 
-    if (!board) return;
+    console.log("Board", board);
+
+    if (!board) {
+      console.log("Board not found");
+      return;
+    }
 
     try {
-      if (!board.coverImage) return;
-      const publicId = board.coverImage
-        .split("/upload/")[1]
-        .split("/")
-        .filter((segment) => !segment.startsWith("v"))
-        .join("/")
-        .split(".")[0];
+      if (board.coverImage) {
+        const publicId = board.coverImage
+          .split("/upload/")[1]
+          .split("/")
+          .filter((segment) => !segment.startsWith("v"))
+          .join("/")
+          .split(".")[0];
 
-      if (publicId) {
-        await deleteFromCloudinary({ publicIds: [publicId] });
+        if (publicId) {
+          await deleteFromCloudinary({ publicIds: [publicId] });
+        }
       }
     } catch (error) {
       console.error("Error deleting cover image from Cloudinary:", error);
@@ -129,6 +135,8 @@ export async function deleteBoard({ boardId }: { boardId: string }) {
     await prisma.movieBoard.delete({
       where: { id: boardId },
     });
+
+    await revalidatePath("/movieboard");
 
     return true;
   } catch (error) {
@@ -178,7 +186,7 @@ export async function addCollaboratorToBoard({
       }),
     ]);
 
-    revalidatePath("/movieboard/" + boardId);
+    await revalidatePath("/movieboard/" + boardId);
   } catch (error) {
     console.error("Error adding collaborator to board:", error);
     throw new Error("Failed to add collaborator to board");
@@ -222,7 +230,7 @@ export async function removeCollaboratorFromBoard({
       },
     });
 
-    revalidatePath("/movieboard/" + boardId);
+    await revalidatePath("/movieboard/" + boardId);
     return true;
   } catch (error) {
     console.error("Error removing collaborator from board:", error);

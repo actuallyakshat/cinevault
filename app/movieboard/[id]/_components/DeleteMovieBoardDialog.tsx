@@ -31,7 +31,8 @@ export default function DeleteMovieBoardDialog({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await deleteBoard({ boardId });
+      const res = await deleteBoard({ boardId });
+      console.log("Movie board deleted", res);
       router.replace("/movieboard");
     } catch (error) {
       console.error("Error deleting board:", error);

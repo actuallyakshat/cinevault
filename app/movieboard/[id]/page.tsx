@@ -101,7 +101,7 @@ export default async function MovieBoard({
       }
     }
 
-    revalidatePath(`/movieboard/${params.id}`);
+    await revalidatePath(`/movieboard/${params.id}`);
   }
 
   async function updateTitle(newTitle: string) {
@@ -110,7 +110,7 @@ export default async function MovieBoard({
       where: { id: params.id },
       data: { title: newTitle },
     });
-    revalidatePath(`/movieboard`);
+    await revalidatePath(`/movieboard`);
   }
 
   async function updateVisibility(newVisibility: VisibilityOption) {
@@ -129,7 +129,7 @@ export default async function MovieBoard({
       data: { visibility: newVisibility },
     });
 
-    revalidatePath(`/movieboard`);
+    await revalidatePath(`/movieboard`);
   }
 
   async function removeMedia(mediaId: string) {
@@ -145,7 +145,7 @@ export default async function MovieBoard({
       },
     });
 
-    revalidatePath(`/movieboard/${params.id}`);
+    await revalidatePath(`/movieboard/${params.id}`);
   }
 
   async function leaveBoard() {
@@ -169,8 +169,8 @@ export default async function MovieBoard({
         },
       }),
     ]);
-    revalidatePath(`/movieboard`);
-    revalidatePath(`/movieboard` + params.id);
+    await revalidatePath(`/movieboard`);
+    await revalidatePath(`/movieboard` + params.id);
   }
 
   return (
