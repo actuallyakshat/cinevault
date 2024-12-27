@@ -204,9 +204,11 @@ export default async function MovieBoard({
               {board.owner.name}
             </Link>
           </p>
-          <p className="text-wrap text-sm text-muted-foreground">
+          <p className="mt-2 text-wrap text-sm text-muted-foreground">
             {board?.description}
           </p>
+
+          <hr className="mt-3" />
           {isAuthorised && <AddMediaSearch boardId={board.id} />}
           {isAuthorised && (
             <ChangeVisibility
