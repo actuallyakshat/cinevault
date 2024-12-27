@@ -1,8 +1,17 @@
-import Hero from "./_components/Hero";
-export default async function Home() {
+"use client";
+
+import { Features } from "./_components/Features";
+import { Footer } from "./_components/Footer";
+import { Hero } from "./_components/Hero";
+import { Testimonials } from "./_components/Testimonials";
+
+export default function Home() {
   return (
-    <section>
+    <main className="min-h-screen">
       <Hero />
-    </section>
+      <Features />
+      <Testimonials />
+      <Footer />
+    </main>
   );
 }

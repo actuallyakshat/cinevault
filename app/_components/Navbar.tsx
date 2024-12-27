@@ -25,7 +25,7 @@ export default function Navbar() {
   return (
     <header>
       <nav
-        className={`${pathname == "/" ? "" : "bg-background"} fixed z-[30] flex h-16 w-full items-center justify-center`}
+        className={`fixed z-[30] flex h-16 w-full items-center justify-center bg-background`}
       >
         <div className="flex h-full w-full items-center justify-between px-6 lg:container lg:px-4">
           <h1 className="hidden text-xl font-extrabold lg:block">
