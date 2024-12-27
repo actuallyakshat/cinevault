@@ -31,16 +31,20 @@ export default function AddCollaboratorDialog({
   const [friends, setFriends] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [fetchingFriends, setFetchingFriends] = React.useState(false);
   const [selectedFriend, setSelectedFriend] = React.useState<any>();
   const { toast } = useToast();
 
   useEffect(() => {
     async function fetchFriends() {
       if (!userDetails?.id) return;
+      setFetchingFriends(true);
+      setTimeout(() => setFetchingFriends(false), 10000);
       const response = await getFriendsToAdd({
         boardId,
         userId: userDetails.id,
       });
+      // setFetchingFriends(false);
       if (response) {
         const filteredFriends = response.filter(
           (user) => user.id != userDetails?.id,
@@ -91,30 +95,38 @@ export default function AddCollaboratorDialog({
               <SelectValue placeholder="Select Friend" />
             </SelectTrigger>
             <SelectContent>
-              {friends.length > 0 ? (
-                friends.map((friend) => (
-                  <SelectItem
-                    key={friend.id}
-                    value={friend}
-                    className="min-h-[50px]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Image
-                        width={1080}
-                        height={1080}
-                        src={friend.profileImageUrl}
-                        alt={friend.name}
-                        className="h-8 w-8 rounded-full"
-                      />
-                      <p>{friend.name}</p>
-                    </div>
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value={"no-user"} disabled>
-                  <p>No friends found</p>
+              {fetchingFriends && (
+                <SelectItem value={"loading"} disabled>
+                  <p>Loading...</p>
                 </SelectItem>
               )}
+
+              {!fetchingFriends &&
+                (friends.length > 0 ? (
+                  friends.map((friend) => (
+                    <SelectItem
+                      key={friend.id}
+                      value={friend}
+                      className="min-h-[50px]"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Image
+                          width={1080}
+                          priority
+                          height={1080}
+                          src={friend.profileImageUrl}
+                          alt={friend.name}
+                          className="h-8 w-8 rounded-full"
+                        />
+                        <p>{friend.name}</p>
+                      </div>
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value={"no-user"} disabled>
+                    <p>No friends found</p>
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
           <form
