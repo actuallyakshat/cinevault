@@ -230,8 +230,15 @@ export async function removeCollaboratorFromBoard({
   }
 }
 
-export async function getFriendsToAdd({ boardId }: { boardId: string }) {
+export async function getFriendsToAdd({
+  boardId,
+  userId,
+}: {
+  boardId: string;
+  userId: string;
+}) {
   try {
+    // First get the board and its collaborators
     const board = await prisma.movieBoard.findUnique({
       where: { id: boardId },
       include: {
@@ -243,9 +250,35 @@ export async function getFriendsToAdd({ boardId }: { boardId: string }) {
 
     const friends = await prisma.user.findMany({
       where: {
-        id: {
-          notIn: board.collaborators.map((item) => item.id),
-        },
+        AND: [
+          {
+            id: {
+              notIn: board.collaborators.map((item) => item.id),
+            },
+          },
+          {
+            OR: [
+              {
+                // User is the requester
+                receivedFriendships: {
+                  some: {
+                    requesterId: userId,
+                    status: "ACCEPTED",
+                  },
+                },
+              },
+              {
+                // User is the addressed
+                sentFriendships: {
+                  some: {
+                    addressedId: userId,
+                    status: "ACCEPTED",
+                  },
+                },
+              },
+            ],
+          },
+        ],
       },
     });
 
