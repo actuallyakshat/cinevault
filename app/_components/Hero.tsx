@@ -17,7 +17,7 @@ function Hero() {
     <div
       className={`herobg ${theme == "dark" ? "dark" : ""} -mt-16 flex h-screen flex-col items-center justify-center gap-4 px-4`}
     >
-      <h1 className="text-center text-5xl font-black">
+      <h1 className="text-center text-4xl font-black md:text-5xl">
         Your Digital Cinematic Memory
       </h1>
       <p className="w-full max-w-xl text-center text-xl font-medium text-muted-foreground">

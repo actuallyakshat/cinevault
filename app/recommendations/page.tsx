@@ -15,6 +15,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import RecommendationOptions from "./_components/RecommendationOptions";
 
+interface RecommendationWithUserAndMedia extends Recommendation {
+  sender: {
+    name: string;
+  };
+  media: Media;
+}
+
 function RecommendationSkeleton() {
   return (
     <Card className="col-span-1">
@@ -23,20 +30,13 @@ function RecommendationSkeleton() {
         <Skeleton className="h-4 w-3/4" />
       </CardHeader>
       <CardContent>
-        <Skeleton className="h-[200px] w-full" />
+        <Skeleton className="aspect-[2/3] w-full" />
       </CardContent>
       <CardFooter>
         <Skeleton className="h-4 w-full" />
       </CardFooter>
     </Card>
   );
-}
-
-interface RecommendationWithUserAndMedia extends Recommendation {
-  sender: {
-    name: string;
-  };
-  media: Media;
 }
 
 function RecommendationCard({
@@ -64,12 +64,13 @@ function RecommendationCard({
           </p>
         </CardHeader>
         <CardContent>
-          <div className="relative h-[400px] w-full">
+          <div className="relative aspect-[2/3] w-full">
             <Image
               src={imagePrefix + recommendation.media.posterUrl}
               alt={`Poster of ${recommendation.media.title}`}
               fill
               className="rounded-md object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
         </CardContent>
