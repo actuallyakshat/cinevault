@@ -36,7 +36,11 @@ export default function AddCollaboratorDialog({
 
   useEffect(() => {
     async function fetchFriends() {
-      const response = await getFriendsToAdd({ boardId });
+      if (!userDetails?.id) return;
+      const response = await getFriendsToAdd({
+        boardId,
+        userId: userDetails.id,
+      });
       if (response) {
         const filteredFriends = response.filter(
           (user) => user.id != userDetails?.id,
