@@ -1,3 +1,5 @@
+"use client";
+
 import { Clapperboard } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
