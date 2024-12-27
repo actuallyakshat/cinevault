@@ -8,5 +8,5 @@
   - [x] They can be made in collaboration
   - [ ] They can be searched globally if they are public
   - [x] An image can be uploaded as the cover of the movie board using cloudinary
-- [ ] Add 'Not Found' pages
+- [x] Add 'Not Found' pages
 - [ ] Consider adding caching with Redis (Upstash)
