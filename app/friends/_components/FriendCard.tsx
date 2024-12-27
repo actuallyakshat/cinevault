@@ -33,7 +33,7 @@ export default function FriendCard({ friend }: { friend: FriendsProp }) {
   };
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="mt-3 flex w-full flex-col gap-2">
       <div className="flex w-full flex-row items-center justify-between gap-4">
         <FriendInfo user={friendData} />
         <DeleteFriendDialog
@@ -127,7 +127,7 @@ export function FriendInfo({ user }: FriendInfoProps) {
     >
       <FriendAvatar user={user} />
       <div>
-        <CardTitle className="text-xl md:text-2xl">{user.name}</CardTitle>
+        <CardTitle className="text-xl">{user.name}</CardTitle>
         <p className="block text-sm text-muted-foreground">{user.email}</p>
       </div>
     </Link>

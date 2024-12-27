@@ -12,7 +12,28 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CineVault",
-  description: "Your Digital Cinematic Memory",
+  description: "Your Perfect Movie Companion",
+  openGraph: {
+    images: [
+      {
+        url: "/landing.png",
+        width: 1200,
+        height: 630,
+        alt: "CineVault",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [
+      {
+        url: "/landing.png",
+        width: 1200,
+        height: 630,
+        alt: "CineVault",
+      },
+    ],
+  },
   icons: {
     icon: ["/favicon.ico"],
     apple: ["/apple-touch-icon.png"],
