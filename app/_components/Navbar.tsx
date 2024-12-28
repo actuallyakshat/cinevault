@@ -51,6 +51,14 @@ export default function Navbar() {
                       {label}
                     </DropdownMenuItem>
                   ))}
+                  {moreNavItems.length == 0 && (
+                    <DropdownMenuItem
+                      disabled
+                      className="cursor-pointer px-3 py-2 font-semibold"
+                    >
+                      Loading...
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </SignedIn>
