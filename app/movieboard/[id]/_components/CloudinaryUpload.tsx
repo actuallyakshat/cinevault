@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 
@@ -33,7 +34,7 @@ export default function CloudinaryUpload({
       <div className="flex justify-center">
         {currentImage ? (
           <Image
-            src={currentImage}
+            src={currentImage || "/placeholder.svg"}
             alt="Cover Image"
             width={500}
             height={500}
@@ -74,13 +75,24 @@ export default function CloudinaryUpload({
           className="flex cursor-pointer justify-center"
         >
           {currentImage ? (
-            <Image
-              src={currentImage}
-              alt="Cover Image"
-              width={500}
-              height={500}
-              className={imageClasses}
-            />
+            type === "cover" ? (
+              <Image
+                src={currentImage || "/placeholder.svg"}
+                alt="Cover Image"
+                width={500}
+                height={500}
+                className={imageClasses}
+              />
+            ) : (
+              <Avatar className={imageClasses}>
+                <AvatarImage
+                  className="aspect-square object-cover"
+                  src={currentImage}
+                  alt={"Profile Image"}
+                />
+                <AvatarFallback> </AvatarFallback>
+              </Avatar>
+            )
           ) : (
             <div
               className={`flex items-center justify-center ${placeholderClasses}`}
