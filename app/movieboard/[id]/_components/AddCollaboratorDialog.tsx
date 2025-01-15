@@ -21,6 +21,7 @@ import Image from "next/image";
 import { AuthContext } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { FriendAvatar } from "@/app/friends/_components/FriendCard";
 
 export default function AddCollaboratorDialog({
   boardId,
@@ -110,14 +111,7 @@ export default function AddCollaboratorDialog({
                       className="min-h-[50px]"
                     >
                       <div className="flex items-center gap-2">
-                        <Image
-                          width={1080}
-                          priority
-                          height={1080}
-                          src={friend.profileImageUrl}
-                          alt={friend.name}
-                          className="h-8 w-8 rounded-full"
-                        />
+                        <FriendAvatar user={friend} />
                         <p>{friend.name}</p>
                       </div>
                     </SelectItem>
@@ -136,7 +130,11 @@ export default function AddCollaboratorDialog({
             }}
             className="mt-2 flex w-full flex-col gap-2"
           >
-            <Button type="button" variant={"secondary"}>
+            <Button
+              type="button"
+              variant={"secondary"}
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
