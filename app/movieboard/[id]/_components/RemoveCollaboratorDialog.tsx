@@ -37,6 +37,10 @@ export default function RemoveCollaboratorDialog({
       }
     } catch (error) {
       console.error("Error removing collaborator:", error);
+      toast({
+        title: "Error",
+        description: "Something went wrong",
+      });
     } finally {
       setIsDeleting(false);
     }

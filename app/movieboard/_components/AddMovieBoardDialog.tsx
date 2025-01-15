@@ -99,7 +99,9 @@ export default function AddMovieBoardDialog() {
               onChange={(e) => setDescription(e.currentTarget.value)}
             />
           </div>
-          <Button disabled={loading}>Create</Button>
+          <Button disabled={loading}>
+            {loading ? "Creating..." : "Create"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

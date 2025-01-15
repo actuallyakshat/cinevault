@@ -201,37 +201,46 @@ export async function removeCollaboratorFromBoard({
   userId: string;
 }) {
   try {
-    const board = await prisma.movieBoard.findUnique({
-      where: { id: boardId },
-      include: {
-        collaborators: true,
-      },
+    const result = await prisma.$transaction(async (prisma) => {
+      const board = await prisma.movieBoard.findUnique({
+        where: { id: boardId },
+        include: {
+          collaborators: true,
+        },
+      });
+
+      if (!board) return false;
+
+      if (!board.collaborators.some((item) => item.id === userId)) {
+        return false;
+      }
+
+      await prisma.movieBoard.update({
+        where: { id: boardId },
+        data: {
+          collaborators: {
+            disconnect: {
+              id: userId,
+            },
+          },
+        },
+      });
+
+      await prisma.boardVisibility.deleteMany({
+        where: {
+          boardId,
+          userId,
+        },
+      });
+
+      return true;
     });
 
-    if (!board) return false;
-
-    if (!board.collaborators.some((item) => item.id == userId)) {
-      return false;
+    if (result) {
+      await revalidatePath("/movieboard/" + boardId);
     }
 
-    await prisma.movieBoard.update({
-      where: { id: boardId },
-      data: {
-        collaborators: {
-          disconnect: {
-            id: userId,
-          },
-        },
-        visibilities: {
-          deleteMany: {
-            userId,
-          },
-        },
-      },
-    });
-
-    await revalidatePath("/movieboard/" + boardId);
-    return true;
+    return result;
   } catch (error) {
     console.error("Error removing collaborator from board:", error);
     throw new Error("Failed to remove collaborator from board");
