@@ -59,7 +59,7 @@ export const createMedia = async (media: Media) => {
       },
     });
     if (existingMedia) {
-      console.error("Media already exists!");
+      console.log(`${existingMedia.title}: Media already exists!`);
       return existingMedia.id;
     }
 

@@ -43,10 +43,8 @@ const getUserDetails = async ({
   email: string;
 }) => {
   try {
-    console.log("FETCHING USER");
     let user = await prisma.user.findUnique({
       where: {
-        // id: clerkId,
         email,
       },
       include: {
